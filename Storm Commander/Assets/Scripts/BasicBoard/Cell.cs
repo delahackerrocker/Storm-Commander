@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
+    public const int SCALE = 100;
+
     public Image mOutlineImage;
 
     [HideInInspector]

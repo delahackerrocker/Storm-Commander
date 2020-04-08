@@ -5,24 +5,27 @@ using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
+    // TODO: use a variable amount of cell numbers
+    public const int SCALE = 8;
+
     public GameObject mCellPrefab;
 
     [HideInInspector]
-    public Cell[,] mAllCells = new Cell[8, 8];
+    public Cell[,] mAllCells = new Cell[SCALE, SCALE];
 
     public void Create()
     {
         // Create
-        for (int y = 0; y < 8; y++)
+        for (int y = 0; y < SCALE; y++)
         {
-            for (int x = 0; x < 8; x++)
+            for (int x = 0; x < SCALE; x++)
             {
                 // Create the cell
                 GameObject newCell = Instantiate(mCellPrefab, transform);
 
                 // position
                 RectTransform rectTransform = newCell.GetComponent<RectTransform>();
-                rectTransform.anchoredPosition = new Vector2((x * 100) + 50, (y * 100) + 50);
+                rectTransform.anchoredPosition = new Vector2((x * Cell.SCALE) + (Cell.SCALE/2), (y * Cell.SCALE) + (Cell.SCALE / 2));
 
                 // setup
                 mAllCells[x, y] = newCell.GetComponent<Cell>();
