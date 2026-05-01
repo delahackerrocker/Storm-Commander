@@ -1,0 +1,355 @@
+:root {
+  --bg: #f6f7f2;
+  --panel: #ffffff;
+  --panel-strong: #22252a;
+  --text: #22252a;
+  --muted: #697077;
+  --line: #d8ddd1;
+  --light-square: #d9dfcf;
+  --dark-square: #536f54;
+  --selected: #f6c85f;
+  --legal: #2d8a8a;
+  --capture: #c54d4d;
+  --last-move: #8aa6d9;
+  --piece-white: #fffaf0;
+  --piece-black: #151515;
+  --shadow: 0 18px 55px rgba(34, 37, 42, 0.14);
+  --radius: 8px;
+
+  color: var(--text);
+  background: var(--bg);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 720px) minmax(280px, 360px);
+  gap: 28px;
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
+  align-items: start;
+}
+
+.play-area {
+  min-width: 0;
+}
+
+.board-wrap {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.board-with-ranks {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 20px;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.board-files {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  padding: 0 28px;
+  text-align: center;
+}
+
+.board-files-top {
+  display: none;
+}
+
+.board-ranks {
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  align-items: center;
+  text-align: center;
+}
+
+.chess-board {
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  overflow: hidden;
+  border: 4px solid var(--panel-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--panel-strong);
+}
+
+.chess-square {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.chess-square:disabled {
+  cursor: default;
+}
+
+.chess-square-light {
+  background: var(--light-square);
+}
+
+.chess-square-dark {
+  background: var(--dark-square);
+}
+
+.chess-square.is-selected {
+  box-shadow: inset 0 0 0 5px var(--selected);
+}
+
+.chess-square.is-last-move::before,
+.chess-square.is-legal-move::after {
+  content: '';
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.chess-square.is-last-move::before {
+  border: 4px solid rgba(138, 166, 217, 0.82);
+}
+
+.chess-square.is-legal-move::after {
+  width: 28%;
+  height: 28%;
+  inset: auto;
+  background: rgba(45, 138, 138, 0.85);
+}
+
+.chess-square.is-capture::after {
+  width: auto;
+  height: auto;
+  inset: 13%;
+  border: 5px solid rgba(197, 77, 77, 0.9);
+  background: transparent;
+}
+
+.chess-square:focus-visible {
+  z-index: 2;
+  outline: 4px solid #111;
+  outline-offset: -4px;
+}
+
+.chess-piece {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-size: 4.35rem;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  user-select: none;
+}
+
+.chess-piece-w {
+  color: var(--piece-white);
+  -webkit-text-stroke: 1px rgba(34, 37, 42, 0.42);
+}
+
+.chess-piece-b {
+  color: var(--piece-black);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.18);
+}
+
+.side-panel {
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 34px rgba(34, 37, 42, 0.08);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.game-status h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 2.35rem;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.status-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.status-list div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f9faf6;
+}
+
+.status-list dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.status-list dd {
+  margin: 4px 0 0;
+  min-height: 1.5rem;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.new-game-button {
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  color: #fff;
+  background: #2f6458;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.new-game-button:hover {
+  background: #275449;
+}
+
+.new-game-button:focus-visible {
+  outline: 3px solid var(--selected);
+  outline-offset: 3px;
+}
+
+.panel-divider {
+  height: 1px;
+  background: var(--line);
+}
+
+.move-history h2 {
+  margin: 0 0 12px;
+  font-size: 1.08rem;
+  letter-spacing: 0;
+}
+
+.empty-history {
+  margin: 0;
+  color: var(--muted);
+}
+
+.move-list {
+  display: grid;
+  gap: 6px;
+  max-height: 360px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.move-list li {
+  display: grid;
+  grid-template-columns: 38px 1fr 1fr;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f4f6ef;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.move-number {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    width: min(720px, calc(100vw - 24px));
+    gap: 22px;
+    padding: 18px 0 28px;
+  }
+
+  .side-panel {
+    padding: 18px;
+  }
+
+  .game-status h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .board-with-ranks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .board-ranks,
+  .board-ranks-right,
+  .board-files {
+    display: none;
+  }
+
+  .board-files-top {
+    display: grid;
+  }
+
+  .chess-board {
+    border-width: 3px;
+  }
+
+  .chess-piece {
+    font-size: 2.1rem;
+  }
+
+  .status-list {
+    grid-template-columns: 1fr;
+  }
+}

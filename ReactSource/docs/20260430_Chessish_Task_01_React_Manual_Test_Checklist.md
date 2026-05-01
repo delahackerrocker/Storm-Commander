@@ -1,0 +1,24 @@
+# 20260430 Chess-ish Task 01 React Manual Test Checklist
+
+- [ ] App starts with no console errors.
+- [ ] Board renders as 8x8.
+- [ ] White is at the bottom.
+- [ ] White moves first.
+- [ ] Clicking a White piece highlights legal moves.
+- [ ] Clicking a highlighted square moves the piece.
+- [ ] Clicking an invalid square clears selection.
+- [ ] Black pieces cannot be moved by the human.
+- [ ] Pawns move correctly.
+- [ ] Knights jump correctly.
+- [ ] Bishops move diagonally and cannot pass through pieces.
+- [ ] Rooks move orthogonally and cannot pass through pieces.
+- [ ] Queens combine rook and bishop movement.
+- [ ] Kings move legally.
+- [ ] Captures remove pieces.
+- [ ] Check state appears.
+- [ ] Checkmate state appears if reached.
+- [ ] Stalemate/draw state appears if reached.
+- [ ] Computer moves after the human move.
+- [ ] Computer prioritizes higher-value captures.
+- [ ] Pawn promotion becomes Queen.
+- [ ] New Game resets the board.
