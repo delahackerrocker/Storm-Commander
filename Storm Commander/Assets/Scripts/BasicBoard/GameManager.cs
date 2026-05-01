@@ -5,9 +5,15 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Board mBoard;
+
+    public PieceManager mPieceManager;
     void Start()
     {
-        mBoard.Create();   
+        // Create the board
+        mBoard.Create();
+
+        // Create Pieces
+        mPieceManager.Setup(mBoard);
     }
 
     // Update is called once per frame

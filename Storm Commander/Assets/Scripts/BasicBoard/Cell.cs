@@ -16,6 +16,8 @@ public class Cell : MonoBehaviour
     [HideInInspector]
     public RectTransform mRectTransform = null;
 
+    public BasePiece mCurrentPiece = null;
+
     public void Setup(Vector2Int newBoardPosition, Board newBoard)
     {
         mBoardPosition = newBoardPosition;
