@@ -12,6 +12,9 @@ npm.cmd run test
 
 ## Play
 
+- The app starts on a small menu.
+- Choose `basic chess` to open the playable chess prototype.
+- Use `Back` to return to the menu.
 - Human plays White.
 - Computer plays Black.
 - Click a White piece, then click a highlighted destination.

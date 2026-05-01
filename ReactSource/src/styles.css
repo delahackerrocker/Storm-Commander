@@ -46,13 +46,71 @@ button {
   min-height: 100vh;
 }
 
+.start-page,
+.blank-page {
+  min-height: 100vh;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: 56px 16px;
+}
+
+.menu-stack {
+  display: grid;
+  gap: 14px;
+  width: min(360px, 100%);
+}
+
+.menu-button,
+.back-button {
+  border: 0;
+  border-radius: var(--radius);
+  color: #fff;
+  background: #2f6458;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.menu-button {
+  min-height: 56px;
+  padding: 14px 18px;
+  font-size: 1.15rem;
+  text-transform: lowercase;
+}
+
+.back-button {
+  min-width: 112px;
+  padding: 10px 16px;
+  font-size: 1rem;
+}
+
+.menu-button:hover,
+.back-button:hover {
+  background: #275449;
+}
+
+.menu-button:focus-visible,
+.back-button:focus-visible {
+  outline: 3px solid var(--selected);
+  outline-offset: 3px;
+}
+
+.game-page {
+  min-height: 100vh;
+  padding-top: 18px;
+}
+
+.game-page > .back-button {
+  margin-left: max(16px, calc((100vw - 1180px) / 2));
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: minmax(320px, 720px) minmax(280px, 360px);
   gap: 28px;
   width: min(1180px, calc(100vw - 32px));
   margin: 0 auto;
-  padding: 32px 0;
+  padding: 18px 0 32px;
   align-items: start;
 }
 
