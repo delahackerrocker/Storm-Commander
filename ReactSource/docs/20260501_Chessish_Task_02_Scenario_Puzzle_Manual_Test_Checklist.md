@@ -1,0 +1,21 @@
+# 20260501 Chess-ish Task 02 Scenario Puzzle Manual Test Checklist
+
+- [ ] App starts with no console errors.
+- [ ] Standard new game still works.
+- [ ] New Random Scenario loads a non-starting FEN.
+- [ ] Loaded board shows missing pieces when the FEN contains missing pieces.
+- [ ] Metadata panel appears after scenario load.
+- [ ] Metadata panel shows ID, source, rating, popularity, themes, FEN, piece count, material summary, and side to move.
+- [ ] Copy FEN works.
+- [ ] Theme filter works.
+- [ ] Promotion filter finds promotion scenarios.
+- [ ] Promotion scenario loads.
+- [ ] Human can move from a loaded scenario.
+- [ ] Computer responds from a loaded scenario.
+- [ ] Captures still work from a loaded scenario.
+- [ ] Reset Current Scenario returns to the loaded FEN.
+- [ ] New Game returns to the standard chess starting position.
+- [ ] Reveal Solution does not show solution moves by default.
+- [ ] Reveal Solution shows solution moves when opened.
+- [ ] Scenario JSON format doc exists.
+- [ ] Scenario JSON format doc explains future Unity consumption.
