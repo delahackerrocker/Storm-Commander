@@ -75,7 +75,6 @@ button {
   min-height: 56px;
   padding: 14px 18px;
   font-size: 1.15rem;
-  text-transform: lowercase;
 }
 
 .back-button {
@@ -246,6 +245,14 @@ button {
 .chess-piece-b {
   color: var(--piece-black);
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.18);
+}
+
+.chess-piece-image {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .side-panel {

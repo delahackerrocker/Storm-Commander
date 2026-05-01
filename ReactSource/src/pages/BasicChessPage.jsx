@@ -56,7 +56,11 @@ function getStatusText(game, isBlackThinking) {
   return `${sideToMove} to move`
 }
 
-export function BasicChessPage({ onBack }) {
+export function BasicChessPage({
+  onBack,
+  pieceSet = 'unicode',
+  title = 'Chess-ish',
+}) {
   const [game, setGame] = useState(() => new Chess())
   const [selectedSquare, setSelectedSquare] = useState(null)
   const [legalMoves, setLegalMoves] = useState([])
@@ -232,6 +236,7 @@ export function BasicChessPage({ onBack }) {
             lastMove={lastMove}
             inputDisabled={isBlackThinking || game.isGameOver()}
             onSquareClick={handleSquareClick}
+            pieceSet={pieceSet}
           />
         </section>
 
@@ -241,6 +246,7 @@ export function BasicChessPage({ onBack }) {
             lastMove={lastMove}
             isBlackThinking={isBlackThinking}
             onNewGame={startNewGame}
+            title={title}
           />
           <div className="panel-divider" />
           <ScenarioPanel

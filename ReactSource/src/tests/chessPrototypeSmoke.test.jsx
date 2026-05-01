@@ -13,7 +13,7 @@ describe('Chess-ish prototype', () => {
       screen.getByRole('button', { name: /^basic chess$/i }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /^second page$/i }),
+      screen.getByRole('button', { name: /^Storm Commander$/ }),
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /^basic chess$/i }))
@@ -24,15 +24,15 @@ describe('Chess-ish prototype', () => {
     expect(screen.getByRole('button', { name: /^back$/i })).toBeInTheDocument()
   })
 
-  it('navigates to the second page and back to the start menu', async () => {
+  it('navigates to Storm Commander and back to the start menu', async () => {
     const user = userEvent.setup()
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^second page$/i }))
+    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
 
-    expect(screen.getByLabelText('Second page')).toBeInTheDocument()
-    expect(screen.queryByTestId('chess-square')).not.toBeInTheDocument()
+    expect(screen.getByText('Storm Commander')).toBeInTheDocument()
+    expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
 
     await user.click(screen.getByRole('button', { name: /^back$/i }))
 

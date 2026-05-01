@@ -14,6 +14,7 @@ npm.cmd run test
 
 - The app starts on a small menu.
 - Choose `basic chess` to open the playable chess prototype.
+- Choose `Storm Commander` to open the same chess prototype with local PNG pieces.
 - Use `Back` to return to the menu.
 - Use the Scenario Library panel to load random scenarios or puzzles.
 - Use the Theme Filter to choose tactical themes, including `promotion`.
@@ -32,3 +33,7 @@ node scripts/buildPuzzleScenarios.mjs --help
 ```
 
 The importer reads a local Lichess-style puzzle CSV and writes a small curated JSON scenario library. Do not commit the full raw CSV.
+
+## Storm Commander Art
+
+Storm Commander PNG placeholders live at `public/assets/chess/storm-commander/pieces/`. The code maps pieces to those files in `src/chess/stormCommanderPieceAssets.js`, so art can be replaced later without changing component code.

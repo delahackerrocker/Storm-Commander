@@ -1,7 +1,13 @@
-export function GameStatus({ isBlackThinking, lastMove, onNewGame, statusText }) {
+export function GameStatus({
+  isBlackThinking,
+  lastMove,
+  onNewGame,
+  statusText,
+  title = 'Chess-ish',
+}) {
   return (
     <section className="game-status" aria-live="polite">
-      <p className="eyebrow">Chess-ish</p>
+      <p className="eyebrow">{title}</p>
       <h1>{statusText}</h1>
       <dl className="status-list">
         <div>

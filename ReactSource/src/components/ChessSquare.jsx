@@ -11,6 +11,7 @@ export function ChessSquare({
   isSelected,
   inputDisabled,
   onClick,
+  pieceSet,
 }) {
   const tone = getSquareTone(square)
   const className = [
@@ -40,7 +41,7 @@ export function ChessSquare({
       aria-label={`${square} ${getPieceName(piece)} ${actionLabel}`}
       onClick={() => onClick(square)}
     >
-      <ChessPiece piece={piece} />
+      <ChessPiece piece={piece} pieceSet={pieceSet} />
     </button>
   )
 }

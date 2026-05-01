@@ -7,6 +7,7 @@ export function ChessBoard({
   lastMove,
   legalMoves,
   onSquareClick,
+  pieceSet = 'unicode',
   selectedSquare,
 }) {
   const legalMoveByDestination = new Map()
@@ -56,6 +57,7 @@ export function ChessBoard({
                 isLastMove={lastMove?.from === square || lastMove?.to === square}
                 inputDisabled={inputDisabled}
                 onClick={onSquareClick}
+                pieceSet={pieceSet}
               />
             )
           })}
