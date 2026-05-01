@@ -37,3 +37,11 @@ The importer reads a local Lichess-style puzzle CSV and writes a small curated J
 ## Storm Commander Art
 
 Storm Commander PNG placeholders live at `public/assets/chess/storm-commander/pieces/`. The code maps pieces to those files in `src/chess/stormCommanderPieceAssets.js`, so art can be replaced later without changing component code.
+
+## Variant Styles
+
+Standard Chess styling lives in `src/styles/standardChess.css` under `.standard-chess-root`.
+
+Storm Commander styling lives in `src/styles/stormCommander.css` under `.storm-commander-root`.
+
+`src/styles.css` is reserved for global shell styles such as the reset, root font, and main menu.

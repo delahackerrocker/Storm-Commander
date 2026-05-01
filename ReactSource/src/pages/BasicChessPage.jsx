@@ -59,6 +59,7 @@ function getStatusText(game, isBlackThinking) {
 export function BasicChessPage({
   onBack,
   pieceSet = 'unicode',
+  rootClassName = '',
   title = 'Chess-ish',
 }) {
   const [game, setGame] = useState(() => new Chess())
@@ -222,7 +223,7 @@ export function BasicChessPage({
   }
 
   return (
-    <div className="game-page">
+    <div className={['game-page', rootClassName].filter(Boolean).join(' ')}>
       <button type="button" className="back-button" onClick={onBack}>
         Back
       </button>
