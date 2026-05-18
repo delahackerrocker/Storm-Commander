@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="720" viewBox="0 0 1180 720" role="img" aria-labelledby="title desc">
+  <title id="title">Storm Commander cartoon spaceship chess piece directions</title>
+  <desc id="desc">Three visual directions for cartoon spaceship chess pieces: readable fleet icons, character squadrons, and emblem fleet.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f8f3; }
+      .ink { fill: #22252a; }
+      .muted { fill: #68737a; }
+      .card { fill: #fbfcf7; stroke: #d8ded4; stroke-width: 3; }
+      .selected { stroke: #2f6458; stroke-width: 5; }
+      .preview-a { fill: #eef3e8; }
+      .preview-b { fill: #edf2f7; }
+      .preview-c { fill: #eaf0e7; }
+      .cell { fill: rgba(255,255,255,.72); stroke: rgba(34,37,42,.10); stroke-width: 1.5; }
+      .hull { fill: #f7f3df; stroke: #22252a; stroke-width: 5; stroke-linejoin: round; }
+      .blue { fill: #8aa6d9; stroke: #22252a; stroke-width: 4; }
+      .gold { fill: #f6c85f; }
+      .red { fill: #c54d4d; }
+      .green { fill: #2f6458; }
+      .title { font: 700 48px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0; }
+      .subtitle { font: 400 20px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0; }
+      .card-title { font: 750 24px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0; }
+      .body { font: 400 17px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0; }
+      .badge { font: 800 18px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1180" height="720"/>
+  <text class="title ink" x="40" y="74">Storm Commander Ship Piece Concepts</text>
+  <text class="subtitle muted" x="40" y="112">Pick a fleet direction. A is selected as the clearest board-readable default.</text>
+
+  <g transform="translate(40 150)">
+    <rect class="card selected" width="350" height="500" rx="10"/>
+    <rect class="preview-a" x="0" y="0" width="350" height="265" rx="10"/>
+    <text class="badge green" x="24" y="38">RECOMMENDED</text>
+    <g transform="translate(30 62)">
+      <g transform="translate(0 0)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 12 L58 34 L78 26 L70 53 L80 73 L43 82 L6 73 L16 53 L8 26 L28 34 Z"/>
+        <rect class="gold" x="33" y="38" width="20" height="10" rx="5"/>
+        <rect class="blue" x="32" y="58" width="22" height="10" rx="5"/>
+      </g>
+      <g transform="translate(102 0)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M22 12 L33 25 L43 12 L54 25 L64 12 L70 77 L16 77 Z"/>
+        <rect class="red" x="24" y="42" width="38" height="12" rx="6"/>
+      </g>
+      <g transform="translate(204 0)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M34 14 Q43 4 52 14 L58 76 L28 76 Z"/>
+        <ellipse class="blue" cx="43" cy="61" rx="24" ry="10"/>
+      </g>
+      <g transform="translate(0 102)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 8 L78 45 L62 78 L43 63 L24 78 L8 45 Z"/>
+        <ellipse class="blue" cx="43" cy="43" rx="10" ry="18"/>
+      </g>
+      <g transform="translate(102 102)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M12 47 L49 10 L78 18 L60 43 L78 70 L48 78 Z"/>
+        <ellipse class="blue" cx="56" cy="38" rx="13" ry="9"/>
+      </g>
+      <g transform="translate(204 102)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q74 18 74 48 Q70 76 43 78 Q16 76 12 48 Q12 18 43 11 Z"/>
+        <circle class="gold" cx="43" cy="42" r="13"/>
+        <ellipse class="green" cx="43" cy="66" rx="13" ry="7"/>
+      </g>
+    </g>
+    <text class="card-title ink" x="24" y="315">A. Readable Fleet Icons</text>
+    <text class="body muted" x="24" y="350">Bold silhouettes, thick outlines,</text>
+    <text class="body muted" x="24" y="374">simple cockpit colors, and</text>
+    <text class="body muted" x="24" y="398">rank-specific profiles.</text>
+    <text class="body muted" x="24" y="436">Best for board readability.</text>
+  </g>
+
+  <g transform="translate(415 150)">
+    <rect class="card" width="350" height="500" rx="10"/>
+    <rect class="preview-b" x="0" y="0" width="350" height="265" rx="10"/>
+    <g transform="translate(30 62)">
+      <g transform="translate(0 0) rotate(-8 43 43)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 12 L58 34 L78 26 L70 53 L80 73 L43 82 L6 73 L16 53 L8 26 L28 34 Z"/>
+        <rect class="gold" x="33" y="38" width="20" height="10" rx="5"/>
+      </g>
+      <g transform="translate(102 0) rotate(4 43 43) scale(.9)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M22 12 L33 25 L43 12 L54 25 L64 12 L70 77 L16 77 Z"/>
+        <rect class="red" x="24" y="42" width="38" height="12" rx="6"/>
+      </g>
+      <g transform="translate(204 0) rotate(9 43 43) scale(.8)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M34 14 Q43 4 52 14 L58 76 L28 76 Z"/>
+        <ellipse class="blue" cx="43" cy="61" rx="24" ry="10"/>
+      </g>
+      <g transform="translate(0 102) rotate(5 43 43)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 8 L78 45 L62 78 L43 63 L24 78 L8 45 Z"/>
+        <ellipse class="blue" cx="43" cy="43" rx="10" ry="18"/>
+      </g>
+      <g transform="translate(102 102) rotate(-13 43 43)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M12 47 L49 10 L78 18 L60 43 L78 70 L48 78 Z"/>
+        <ellipse class="blue" cx="56" cy="38" rx="13" ry="9"/>
+      </g>
+      <g transform="translate(204 102) rotate(7 43 43) scale(.9)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q74 18 74 48 Q70 76 43 78 Q16 76 12 48 Q12 18 43 11 Z"/>
+        <circle class="gold" cx="43" cy="42" r="13"/>
+      </g>
+    </g>
+    <text class="card-title ink" x="24" y="315">B. Character Squadrons</text>
+    <text class="body muted" x="24" y="350">More playful angles and</text>
+    <text class="body muted" x="24" y="374">exaggerated personalities.</text>
+    <text class="body muted" x="24" y="412">Livelier, but less crisp at</text>
+    <text class="body muted" x="24" y="436">small board-square sizes.</text>
+  </g>
+
+  <g transform="translate(790 150)">
+    <rect class="card" width="350" height="500" rx="10"/>
+    <rect class="preview-c" x="0" y="0" width="350" height="265" rx="10"/>
+    <g transform="translate(30 62)">
+      <g transform="translate(0 0)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q73 19 72 49 Q68 75 43 78 Q18 75 14 49 Q13 19 43 11 Z"/>
+        <path class="gold" d="M29 35 L37 44 L43 32 L49 44 L57 35 L56 53 L30 53 Z"/>
+      </g>
+      <g transform="translate(102 0)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q73 19 72 49 Q68 75 43 78 Q18 75 14 49 Q13 19 43 11 Z"/>
+        <rect class="red" x="25" y="34" width="36" height="28" rx="5"/>
+      </g>
+      <g transform="translate(204 0)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q73 19 72 49 Q68 75 43 78 Q18 75 14 49 Q13 19 43 11 Z"/>
+        <circle class="blue" cx="43" cy="46" r="15"/>
+      </g>
+      <g transform="translate(0 102)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q73 19 72 49 Q68 75 43 78 Q18 75 14 49 Q13 19 43 11 Z"/>
+        <path class="gold" d="M43 22 L59 47 L43 68 L27 47 Z"/>
+      </g>
+      <g transform="translate(102 102)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q73 19 72 49 Q68 75 43 78 Q18 75 14 49 Q13 19 43 11 Z"/>
+        <path class="blue" d="M24 49 L43 27 L62 49 L43 42 Z"/>
+      </g>
+      <g transform="translate(204 102)">
+        <rect class="cell" width="86" height="86" rx="9"/>
+        <path class="hull" d="M43 11 Q73 19 72 49 Q68 75 43 78 Q18 75 14 49 Q13 19 43 11 Z"/>
+        <ellipse class="green" cx="43" cy="54" rx="20" ry="10"/>
+      </g>
+    </g>
+    <text class="card-title ink" x="24" y="315">C. Emblem Fleet</text>
+    <text class="body muted" x="24" y="350">Similar hulls with crown, tower,</text>
+    <text class="body muted" x="24" y="374">lance, wing, and shield markings.</text>
+    <text class="body muted" x="24" y="412">Most cohesive as a fleet, but</text>
+    <text class="body muted" x="24" y="436">piece identity depends on symbols.</text>
+  </g>
+</svg>

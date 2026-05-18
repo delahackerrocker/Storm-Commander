@@ -1,0 +1,216 @@
+<style>
+  .fleet-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+  }
+
+  .fleet-card {
+    cursor: pointer;
+    border: 2px solid #d8ded4;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fbfcf7;
+    transition: border-color 0.16s ease, transform 0.16s ease;
+  }
+
+  .fleet-card:hover {
+    border-color: #2f6458;
+    transform: translateY(-2px);
+  }
+
+  .fleet-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px;
+    background:
+      linear-gradient(135deg, rgba(47, 100, 88, 0.08), rgba(246, 200, 95, 0.16)),
+      #eef3e8;
+  }
+
+  .ship-cell {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(34, 37, 42, 0.08);
+  }
+
+  .ship {
+    position: relative;
+    width: 62%;
+    height: 62%;
+  }
+
+  .ship::before,
+  .ship::after {
+    content: "";
+    position: absolute;
+    display: block;
+  }
+
+  .ship-scout::before {
+    inset: 12% 31% 4%;
+    border-radius: 55% 55% 28% 28%;
+    background: #f7f3df;
+    border: 3px solid #22252a;
+  }
+
+  .ship-scout::after {
+    left: 15%;
+    right: 15%;
+    bottom: 15%;
+    height: 22%;
+    border-radius: 50%;
+    background: #8aa6d9;
+    border: 3px solid #22252a;
+  }
+
+  .ship-crown::before {
+    inset: 6% 16% 10%;
+    clip-path: polygon(50% 0, 68% 28%, 94% 18%, 82% 54%, 96% 84%, 50% 100%, 4% 84%, 18% 54%, 6% 18%, 32% 28%);
+    background: #f7f3df;
+    border: 3px solid #22252a;
+  }
+
+  .ship-crown::after {
+    left: 31%;
+    top: 34%;
+    width: 38%;
+    height: 18%;
+    border-radius: 999px;
+    background: #f6c85f;
+    box-shadow: 0 20px 0 #8aa6d9;
+  }
+
+  .ship-tower::before {
+    inset: 9% 18% 10%;
+    clip-path: polygon(20% 0, 34% 16%, 50% 0, 66% 16%, 80% 0, 86% 100%, 14% 100%);
+    background: #f7f3df;
+    border: 3px solid #22252a;
+  }
+
+  .ship-tower::after {
+    inset: 39% 21% auto;
+    height: 17%;
+    border-radius: 999px;
+    background: #c54d4d;
+  }
+
+  .ship-swoop::before {
+    inset: 8% 10% 8%;
+    clip-path: polygon(4% 55%, 54% 0, 96% 12%, 72% 49%, 96% 88%, 52% 100%);
+    background: #f7f3df;
+    border: 3px solid #22252a;
+  }
+
+  .ship-swoop::after {
+    right: 17%;
+    top: 33%;
+    width: 30%;
+    height: 18%;
+    border-radius: 50%;
+    background: #8aa6d9;
+  }
+
+  .ship-orb::before {
+    inset: 9%;
+    border-radius: 50% 50% 38% 38%;
+    background: #f7f3df;
+    border: 3px solid #22252a;
+  }
+
+  .ship-orb::after {
+    inset: 31%;
+    border-radius: 50%;
+    background: #f6c85f;
+    box-shadow: 0 27px 0 -8px #2f6458;
+  }
+
+  .ship-mitra::before {
+    inset: 4% 12% 10%;
+    clip-path: polygon(50% 0, 91% 44%, 70% 100%, 50% 78%, 30% 100%, 9% 44%);
+    background: #f7f3df;
+    border: 3px solid #22252a;
+  }
+
+  .ship-mitra::after {
+    left: 37%;
+    top: 28%;
+    width: 26%;
+    height: 35%;
+    border-radius: 50%;
+    background: #8aa6d9;
+  }
+
+  .fleet-body {
+    padding: 16px;
+  }
+
+  .fleet-body h3 {
+    margin-top: 0;
+  }
+
+  .fleet-body p {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 900px) {
+    .fleet-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<h2>Choose A Ship Set Direction</h2>
+<p class="subtitle">Each option keeps the required 12 PNG filenames, but the visual language changes how strongly the ships read as chess pieces versus a fleet.</p>
+
+<div class="fleet-grid">
+  <div class="fleet-card" data-choice="readable-fleet" onclick="toggleSelect(this)">
+    <div class="fleet-preview">
+      <div class="ship-cell"><div class="ship ship-crown"></div></div>
+      <div class="ship-cell"><div class="ship ship-tower"></div></div>
+      <div class="ship-cell"><div class="ship ship-scout"></div></div>
+      <div class="ship-cell"><div class="ship ship-mitra"></div></div>
+      <div class="ship-cell"><div class="ship ship-swoop"></div></div>
+      <div class="ship-cell"><div class="ship ship-orb"></div></div>
+    </div>
+    <div class="fleet-body">
+      <h3>A. Readable Fleet Icons</h3>
+      <p>Bold cartoon silhouettes, thick outline, simple cockpit colors, and rank-specific profiles. Best for board readability.</p>
+    </div>
+  </div>
+
+  <div class="fleet-card" data-choice="character-squadrons" onclick="toggleSelect(this)">
+    <div class="fleet-preview" style="background:linear-gradient(135deg, rgba(138,166,217,.22), rgba(197,77,77,.14)), #edf2f7;">
+      <div class="ship-cell"><div class="ship ship-crown" style="transform:rotate(-8deg) scale(.98)"></div></div>
+      <div class="ship-cell"><div class="ship ship-tower" style="transform:rotate(4deg) scale(.9)"></div></div>
+      <div class="ship-cell"><div class="ship ship-scout" style="transform:rotate(9deg) scale(.78)"></div></div>
+      <div class="ship-cell"><div class="ship ship-mitra" style="transform:rotate(5deg) scale(.95)"></div></div>
+      <div class="ship-cell"><div class="ship ship-swoop" style="transform:rotate(-13deg) scale(.9)"></div></div>
+      <div class="ship-cell"><div class="ship ship-orb" style="transform:rotate(7deg) scale(.88)"></div></div>
+    </div>
+    <div class="fleet-body">
+      <h3>B. Character Squadrons</h3>
+      <p>More playful angles and exaggerated personalities. Livelier, but slightly harder to read at tiny sizes.</p>
+    </div>
+  </div>
+
+  <div class="fleet-card" data-choice="emblem-fleet" onclick="toggleSelect(this)">
+    <div class="fleet-preview" style="background:linear-gradient(135deg, rgba(34,37,42,.1), rgba(47,100,88,.18)), #eef3e8;">
+      <div class="ship-cell"><div class="ship ship-crown"></div></div>
+      <div class="ship-cell"><div class="ship ship-tower"></div></div>
+      <div class="ship-cell"><div class="ship ship-scout"></div></div>
+      <div class="ship-cell"><div class="ship ship-mitra"></div></div>
+      <div class="ship-cell"><div class="ship ship-swoop"></div></div>
+      <div class="ship-cell"><div class="ship ship-orb"></div></div>
+    </div>
+    <div class="fleet-body">
+      <h3>C. Emblem Fleet</h3>
+      <p>Ships share similar hulls and use crown, tower, lance, wing, and shield markings to identify piece roles.</p>
+    </div>
+  </div>
+</div>

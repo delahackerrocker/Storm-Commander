@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import { STORM_COMMANDER_PIECE_ASSETS } from '../chess/stormCommanderPieceAssets'
+import {
+  STORM_COMMANDER_FACTION_IDS,
+  STORM_COMMANDER_FACTION_PIECE_ASSETS,
+  STORM_COMMANDER_PIECE_ASSETS,
+} from '../chess/stormCommanderPieceAssets'
 import App from '../App'
 
 const PIECE_ASSET_PREFIX = '/assets/chess/storm-commander/pieces/'
@@ -41,6 +45,20 @@ describe('Storm Commander variant', () => {
 
     for (const path of paths) {
       expect(path).toMatch(/^\/assets\/chess\/storm-commander\/pieces\/.+\.png$/)
+    }
+  })
+
+  it('provides full faction fleets for Storm Commander', () => {
+    expect(STORM_COMMANDER_FACTION_IDS).toEqual(['pirate', 'imperial', 'robocorp', 'rebel'])
+
+    const factionPaths = STORM_COMMANDER_FACTION_IDS.flatMap((faction) =>
+      Object.values(STORM_COMMANDER_FACTION_PIECE_ASSETS[faction])
+    )
+
+    expect(factionPaths).toHaveLength(24)
+
+    for (const path of factionPaths) {
+      expect(path).toMatch(/^\/assets\/chess\/storm-commander\/factions\/.+\/.+\.png$/)
     }
   })
 

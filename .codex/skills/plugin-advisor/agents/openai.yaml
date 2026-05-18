@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Advisor"
+  short_description: "Advise on useful Codex plugins"
+  default_prompt: "Use $plugin-advisor to check available plugins and ask before enabling helpful ones."
