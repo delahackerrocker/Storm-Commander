@@ -1,5 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createRandomSideFactions } from '../chess/stormCommanderFactions'
+import {
+  STORM_COMMANDER_STARFIELD_TWEEN_MS,
+  advanceStarfieldMotion,
+  createInitialStarfieldMotion,
+  toStarfieldStyle,
+} from '../chess/stormCommanderStarfield'
 import {
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
 } from '../chess/stormCommanderPieceAssets'
@@ -13,28 +19,24 @@ function createSideVisualThemes(sideFactions) {
   }
 }
 
-function createStarfieldDriftStyle() {
-  const driftAngle = Math.random() * 360
-  const radians = (driftAngle * Math.PI) / 180
-  const nearDistance = 220
-  const midDistance = 142
-  const farDistance = 84
-
-  return {
-    '--storm-star-drift-near-x': `${Math.cos(radians) * nearDistance}px`,
-    '--storm-star-drift-near-y': `${Math.sin(radians) * nearDistance}px`,
-    '--storm-star-drift-mid-x': `${Math.cos(radians) * midDistance}px`,
-    '--storm-star-drift-mid-y': `${Math.sin(radians) * midDistance}px`,
-    '--storm-star-drift-far-x': `${Math.cos(radians) * farDistance}px`,
-    '--storm-star-drift-far-y': `${Math.sin(radians) * farDistance}px`,
-    '--storm-piece-rotation': `${driftAngle - 90}deg`,
-  }
-}
-
 export function StormCommanderPage({ onBack }) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
-  const starfieldStyle = useMemo(() => createStarfieldDriftStyle(), [])
+  const [starfieldMotion, setStarfieldMotion] = useState(() => createInitialStarfieldMotion())
+  const starfieldStyle = useMemo(() => toStarfieldStyle(starfieldMotion), [starfieldMotion])
   const sideVisualThemes = useMemo(() => createSideVisualThemes(sideFactions), [sideFactions])
+
+  useEffect(() => {
+    const advanceStarfield = () => {
+      setStarfieldMotion((currentMotion) => advanceStarfieldMotion(currentMotion))
+    }
+    const starterId = window.setTimeout(advanceStarfield, 80)
+    const timerId = window.setInterval(advanceStarfield, STORM_COMMANDER_STARFIELD_TWEEN_MS)
+
+    return () => {
+      window.clearTimeout(starterId)
+      window.clearInterval(timerId)
+    }
+  }, [])
 
   function randomizeSideFactions() {
     setSideFactions((currentSideFactions) =>

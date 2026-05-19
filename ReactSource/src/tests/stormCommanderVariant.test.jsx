@@ -8,6 +8,12 @@ import {
   STORM_COMMANDER_PIECE_ASSETS,
 } from '../chess/stormCommanderPieceAssets'
 import { createRandomSideFactions } from '../chess/stormCommanderFactions'
+import {
+  STORM_COMMANDER_STARFIELD_TWEEN_MS,
+  advanceStarfieldMotion,
+  createInitialStarfieldMotion,
+  toStarfieldStyle,
+} from '../chess/stormCommanderStarfield'
 import App from '../App'
 
 const FACTION_ASSET_PREFIX = '/assets/chess/storm-commander/factions/'
@@ -110,11 +116,14 @@ describe('Storm Commander variant', () => {
 
       expect(board).toHaveAttribute('data-white-faction', 'pirate')
       expect(board).toHaveAttribute('data-black-faction', 'imperial')
+      const initialPair = `${board.dataset.whiteFaction}/${board.dataset.blackFaction}`
 
       await user.click(screen.getByRole('button', { name: /^New Game$/ }))
 
-      expect(board).toHaveAttribute('data-white-faction', 'rebel')
-      expect(board).toHaveAttribute('data-black-faction', 'robocorp')
+      expect(STORM_COMMANDER_FACTION_IDS).toContain(board.dataset.whiteFaction)
+      expect(STORM_COMMANDER_FACTION_IDS).toContain(board.dataset.blackFaction)
+      expect(board.dataset.whiteFaction).not.toBe(board.dataset.blackFaction)
+      expect(`${board.dataset.whiteFaction}/${board.dataset.blackFaction}`).not.toBe(initialPair)
     } finally {
       randomSpy.mockRestore()
     }
@@ -133,8 +142,27 @@ describe('Storm Commander variant', () => {
     expect(root).not.toBeNull()
     expect(effectsRoot).not.toBeNull()
     expect(effectsRoot.style.getPropertyValue('--storm-piece-rotation')).toMatch(/deg$/)
-    expect(effectsRoot.style.getPropertyValue('--storm-star-drift-near-x')).toMatch(/px$/)
-    expect(effectsRoot.style.getPropertyValue('--storm-star-drift-near-y')).toMatch(/px$/)
+    expect(effectsRoot.style.getPropertyValue('--storm-star-tween-ms')).toBe(
+      `${STORM_COMMANDER_STARFIELD_TWEEN_MS}ms`,
+    )
+    expect(effectsRoot.style.getPropertyValue('--storm-star-near-x')).toMatch(/px$/)
+    expect(effectsRoot.style.getPropertyValue('--storm-star-mid-x')).toMatch(/px$/)
+    expect(effectsRoot.style.getPropertyValue('--storm-star-far-x')).toMatch(/px$/)
+    expect(effectsRoot.style.getPropertyValue('--storm-asteroid-near-x')).toMatch(/px$/)
+  })
+
+  it('advances layered starfield motion and rotates ships with the new heading', () => {
+    const initialMotion = createInitialStarfieldMotion(() => 0)
+    const nextMotion = advanceStarfieldMotion(initialMotion, () => 0.25)
+    const nextStyle = toStarfieldStyle(nextMotion)
+
+    expect(nextMotion.angle).toBe(90)
+    expect(nextMotion.nearY).toBeGreaterThan(initialMotion.nearY)
+    expect(nextMotion.midY).toBeGreaterThan(initialMotion.midY)
+    expect(nextMotion.farY).toBeGreaterThan(initialMotion.farY)
+    expect(nextMotion.asteroidNearY).toBeGreaterThan(initialMotion.asteroidNearY)
+    expect(nextStyle['--storm-star-tween-ms']).toBe(`${STORM_COMMANDER_STARFIELD_TWEEN_MS}ms`)
+    expect(nextStyle['--storm-piece-rotation']).toBe('0.00deg')
   })
 
   it('marks the current turn for Storm Commander visual styling without changing moves', async () => {

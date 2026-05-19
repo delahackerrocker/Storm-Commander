@@ -1,11 +1,18 @@
 .storm-commander-effects {
   --storm-piece-rotation: 0deg;
-  --storm-star-drift-near-x: 220px;
-  --storm-star-drift-near-y: 0;
-  --storm-star-drift-mid-x: 142px;
-  --storm-star-drift-mid-y: 0;
-  --storm-star-drift-far-x: 84px;
-  --storm-star-drift-far-y: 0;
+  --storm-star-tween-ms: 7200ms;
+  --storm-star-near-x: 0;
+  --storm-star-near-y: 0;
+  --storm-star-mid-x: 0;
+  --storm-star-mid-y: 0;
+  --storm-star-far-x: 0;
+  --storm-star-far-y: 0;
+  --storm-star-dust-x: 0;
+  --storm-star-dust-y: 0;
+  --storm-asteroid-near-x: 0;
+  --storm-asteroid-near-y: 0;
+  --storm-asteroid-far-x: 0;
+  --storm-asteroid-far-y: 0;
 }
 
 .storm-commander-root {
@@ -108,21 +115,27 @@
   inset: 0;
   z-index: 0;
   background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 1.2px, transparent 1.8px),
-    radial-gradient(circle, rgba(153, 208, 255, 0.75) 0 1.4px, transparent 2px),
-    radial-gradient(circle, rgba(255, 214, 129, 0.58) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.98) 0 1.25px, transparent 1.9px),
+    radial-gradient(circle, rgba(153, 208, 255, 0.76) 0 1.55px, transparent 2.25px),
+    radial-gradient(circle, rgba(255, 214, 129, 0.58) 0 0.95px, transparent 1.8px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.42) 0 0.65px, transparent 1.3px),
+    linear-gradient(112deg, transparent 0 43%, rgba(133, 197, 255, 0.11) 44% 45%, transparent 47% 100%),
     linear-gradient(135deg, rgba(61, 105, 148, 0.28), rgba(11, 15, 34, 0.84));
   background-position:
-    0 0,
-    22px 38px,
-    54px 16px,
+    var(--storm-star-near-x) var(--storm-star-near-y),
+    calc(var(--storm-star-mid-x) + 22px) calc(var(--storm-star-mid-y) + 38px),
+    calc(var(--storm-star-far-x) + 54px) calc(var(--storm-star-far-y) + 16px),
+    calc(var(--storm-star-dust-x) + 8px) calc(var(--storm-star-dust-y) + 17px),
+    calc(var(--storm-star-far-x) + 108px) calc(var(--storm-star-far-y) + 72px),
     0 0;
   background-size:
-    92px 92px,
-    151px 151px,
-    237px 237px,
+    78px 78px,
+    141px 141px,
+    239px 239px,
+    43px 43px,
+    360px 360px,
     100% 100%;
-  animation: storm-starfield-drift 8s linear infinite;
+  transition: background-position var(--storm-star-tween-ms) linear;
   pointer-events: none;
 }
 
@@ -131,21 +144,27 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background:
+  background-image:
+    radial-gradient(ellipse at center, rgba(180, 160, 118, 0.78) 0 2.2px, rgba(71, 61, 48, 0.84) 2.4px 4.7px, transparent 5.2px),
+    radial-gradient(ellipse at center, rgba(128, 113, 86, 0.64) 0 1.6px, rgba(37, 33, 29, 0.72) 1.8px 3.5px, transparent 4.2px),
+    radial-gradient(ellipse at center, rgba(211, 197, 157, 0.56) 0 1.2px, rgba(80, 69, 52, 0.7) 1.4px 2.8px, transparent 3.6px),
     radial-gradient(circle at 35% 24%, rgba(97, 168, 220, 0.22), transparent 24%),
     radial-gradient(circle at 72% 66%, rgba(246, 200, 95, 0.12), transparent 28%);
+  background-position:
+    var(--storm-asteroid-near-x) var(--storm-asteroid-near-y),
+    calc(var(--storm-asteroid-far-x) + 142px) calc(var(--storm-asteroid-far-y) + 86px),
+    calc(var(--storm-asteroid-far-x) + 88px) calc(var(--storm-asteroid-far-y) + 128px),
+    0 0,
+    0 0;
+  background-size:
+    430px 360px,
+    690px 520px,
+    560px 610px,
+    100% 100%,
+    100% 100%;
+  transition: background-position var(--storm-star-tween-ms) linear;
   mix-blend-mode: screen;
   pointer-events: none;
-}
-
-@keyframes storm-starfield-drift {
-  to {
-    background-position:
-      var(--storm-star-drift-near-x) var(--storm-star-drift-near-y),
-      var(--storm-star-drift-mid-x) var(--storm-star-drift-mid-y),
-      var(--storm-star-drift-far-x) var(--storm-star-drift-far-y),
-      0 0;
-  }
 }
 
 .storm-commander-root .chess-square {
@@ -230,7 +249,7 @@
   user-select: none;
   transform: rotate(var(--storm-piece-rotation));
   transform-origin: 50% 50%;
-  transition: transform 260ms ease;
+  transition: transform var(--storm-star-tween-ms) cubic-bezier(0.33, 0, 0.18, 1);
 }
 
 .storm-commander-root .side-panel {
