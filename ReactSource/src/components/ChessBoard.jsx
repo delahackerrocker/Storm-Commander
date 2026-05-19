@@ -41,7 +41,12 @@ export function ChessBoard({
           <span>2</span>
           <span>1</span>
         </div>
-        <div className="chess-board" role="grid" aria-label="Chess board">
+        <div
+          className="chess-board"
+          data-side-to-move={game.turn()}
+          role="grid"
+          aria-label="Chess board"
+        >
           {BOARD_SQUARES.map((square) => {
             const piece = game.get(square)
             const move = legalMoveByDestination.get(square)

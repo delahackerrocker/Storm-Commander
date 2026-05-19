@@ -79,6 +79,10 @@
 }
 
 .storm-commander-root .chess-board {
+  --storm-turn-grid-line: rgba(226, 237, 237, 0.23);
+  --storm-turn-hint: rgba(226, 237, 237, 0.82);
+  --storm-turn-hint-soft: rgba(226, 237, 237, 0.22);
+
   position: relative;
   isolation: isolate;
   aspect-ratio: 1;
@@ -116,8 +120,20 @@
     151px 151px,
     237px 237px,
     100% 100%;
-  animation: storm-starfield-drift 18s linear infinite;
+  animation: storm-starfield-drift 8s linear infinite;
   pointer-events: none;
+}
+
+.storm-commander-root .chess-board[data-side-to-move='w'] {
+  --storm-turn-grid-line: rgba(85, 170, 242, 0.23);
+  --storm-turn-hint: rgba(85, 170, 242, 0.9);
+  --storm-turn-hint-soft: rgba(85, 170, 242, 0.24);
+}
+
+.storm-commander-root .chess-board[data-side-to-move='b'] {
+  --storm-turn-grid-line: rgba(232, 108, 36, 0.23);
+  --storm-turn-hint: rgba(232, 108, 36, 0.9);
+  --storm-turn-hint-soft: rgba(232, 108, 36, 0.24);
 }
 
 .storm-commander-root .chess-board::after {
@@ -149,7 +165,7 @@
   place-items: center;
   min-width: 0;
   min-height: 0;
-  border: 1px solid rgba(226, 237, 237, 0.46);
+  border: 1px solid var(--storm-turn-grid-line);
   border-radius: 0;
   padding: 0;
   cursor: pointer;
@@ -163,7 +179,7 @@
 }
 
 .storm-commander-root .chess-square-light {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .storm-commander-root .chess-square-dark {
@@ -195,14 +211,15 @@
   width: 28%;
   height: 28%;
   inset: auto;
-  background: rgba(45, 138, 138, 0.85);
+  background: var(--storm-turn-hint);
+  box-shadow: 0 0 16px var(--storm-turn-hint-soft);
 }
 
 .storm-commander-root .chess-square.is-capture::after {
   width: auto;
   height: auto;
   inset: 13%;
-  border: 5px solid rgba(197, 77, 77, 0.9);
+  border: 5px solid var(--storm-turn-hint);
   background: transparent;
 }
 

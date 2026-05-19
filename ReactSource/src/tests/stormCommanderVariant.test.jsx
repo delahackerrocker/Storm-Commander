@@ -81,6 +81,28 @@ describe('Storm Commander variant', () => {
     expect(effectsRoot.style.getPropertyValue('--storm-star-drift-near-y')).toMatch(/px$/)
   })
 
+  it('marks the current turn for Storm Commander visual styling without changing moves', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+
+    const board = document.querySelector('.storm-commander-root .chess-board')
+
+    expect(board).toHaveAttribute('data-side-to-move', 'w')
+
+    await user.click(screen.getByRole('button', { name: /b1 white knight square/i }))
+
+    expect(screen.getByRole('button', { name: /a3 empty legal destination/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /c3 empty legal destination/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /a3 empty legal destination/i }))
+
+    expect(board).toHaveAttribute('data-side-to-move', 'b')
+    expect(screen.getByText('Black thinking...')).toBeInTheDocument()
+  })
+
   it('still supports move selection after the piece renderer refactor', async () => {
     const user = userEvent.setup()
 
