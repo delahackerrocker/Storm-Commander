@@ -21,13 +21,25 @@ export function ChessBoard({
   }
 
   const turnVisualTheme = sideVisualThemes?.[game.turn()]
-  const boardStyle = turnVisualTheme
-    ? {
-        '--storm-turn-grid-line': turnVisualTheme.gridLine,
-        '--storm-turn-hint': turnVisualTheme.hint,
-        '--storm-turn-hint-soft': turnVisualTheme.hintSoft,
-      }
-    : undefined
+  const lastMoveVisualTheme = sideVisualThemes?.[lastMove?.color]
+  const boardStyle =
+    turnVisualTheme || lastMoveVisualTheme
+      ? {
+          ...(turnVisualTheme
+            ? {
+                '--storm-turn-grid-line': turnVisualTheme.gridLine,
+                '--storm-turn-hint': turnVisualTheme.hint,
+                '--storm-turn-hint-soft': turnVisualTheme.hintSoft,
+              }
+            : {}),
+          ...(lastMoveVisualTheme
+            ? {
+                '--storm-last-move-ring': lastMoveVisualTheme.hint,
+                '--storm-last-move-ring-soft': lastMoveVisualTheme.hintSoft,
+              }
+            : {}),
+        }
+      : undefined
 
   return (
     <div className="board-wrap">
@@ -56,6 +68,7 @@ export function ChessBoard({
           className="chess-board"
           style={boardStyle}
           data-side-to-move={game.turn()}
+          data-last-move-side={lastMove?.color}
           data-white-faction={sidePieceFactions?.w}
           data-black-faction={sidePieceFactions?.b}
           role="grid"

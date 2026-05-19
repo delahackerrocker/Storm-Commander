@@ -164,11 +164,18 @@ describe('Storm Commander variant', () => {
     await user.click(screen.getByRole('button', { name: /a3 empty legal destination/i }))
 
     expect(board).toHaveAttribute('data-side-to-move', 'b')
+    expect(board).toHaveAttribute('data-last-move-side', 'w')
     expect(board.style.getPropertyValue('--storm-turn-grid-line')).toBe(
       STORM_COMMANDER_FACTION_VISUAL_THEMES[blackFaction].gridLine,
     )
     expect(board.style.getPropertyValue('--storm-turn-hint')).toBe(
       STORM_COMMANDER_FACTION_VISUAL_THEMES[blackFaction].hint,
+    )
+    expect(board.style.getPropertyValue('--storm-last-move-ring')).toBe(
+      STORM_COMMANDER_FACTION_VISUAL_THEMES[whiteFaction].hint,
+    )
+    expect(board.style.getPropertyValue('--storm-last-move-ring-soft')).toBe(
+      STORM_COMMANDER_FACTION_VISUAL_THEMES[whiteFaction].hintSoft,
     )
     expect(screen.getByText('Black thinking...')).toBeInTheDocument()
   })
