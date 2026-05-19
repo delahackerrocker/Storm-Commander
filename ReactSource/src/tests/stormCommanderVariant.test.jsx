@@ -34,6 +34,8 @@ describe('Storm Commander variant', () => {
     await user.click(screen.getByRole('button', { name: /^basic chess$/i }))
 
     expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
+    expect(document.querySelector('.storm-commander-effects')).not.toBeInTheDocument()
+    expect(document.querySelector('.storm-commander-root')).not.toBeInTheDocument()
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 
@@ -60,6 +62,23 @@ describe('Storm Commander variant', () => {
     for (const path of factionPaths) {
       expect(path).toMatch(/^\/assets\/chess\/storm-commander\/factions\/.+\/.+\.png$/)
     }
+  })
+
+  it('assigns starfield drift and piece-facing variables to Storm Commander', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+
+    const effectsRoot = document.querySelector('.storm-commander-effects')
+    const root = screen.getByText('Storm Commander').closest('.storm-commander-root')
+
+    expect(root).not.toBeNull()
+    expect(effectsRoot).not.toBeNull()
+    expect(effectsRoot.style.getPropertyValue('--storm-piece-rotation')).toMatch(/deg$/)
+    expect(effectsRoot.style.getPropertyValue('--storm-star-drift-near-x')).toMatch(/px$/)
+    expect(effectsRoot.style.getPropertyValue('--storm-star-drift-near-y')).toMatch(/px$/)
   })
 
   it('still supports move selection after the piece renderer refactor', async () => {

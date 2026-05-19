@@ -1,3 +1,13 @@
+.storm-commander-effects {
+  --storm-piece-rotation: 0deg;
+  --storm-star-drift-near-x: 220px;
+  --storm-star-drift-near-y: 0;
+  --storm-star-drift-mid-x: 142px;
+  --storm-star-drift-mid-y: 0;
+  --storm-star-drift-far-x: 84px;
+  --storm-star-drift-far-y: 0;
+}
+
 .storm-commander-root {
   --panel: #ffffff;
   --panel-strong: #22252a;
@@ -69,28 +79,83 @@
 }
 
 .storm-commander-root .chess-board {
+  position: relative;
+  isolation: isolate;
   aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
   overflow: hidden;
-  border: 4px solid var(--panel-strong);
+  border: 4px solid rgba(229, 237, 239, 0.82);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  background: var(--panel-strong);
+  box-shadow:
+    0 18px 55px rgba(4, 8, 18, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(74, 115, 164, 0.2), transparent 62%),
+    #050915;
+}
+
+.storm-commander-root .chess-board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 1.2px, transparent 1.8px),
+    radial-gradient(circle, rgba(153, 208, 255, 0.75) 0 1.4px, transparent 2px),
+    radial-gradient(circle, rgba(255, 214, 129, 0.58) 0 1px, transparent 1.8px),
+    linear-gradient(135deg, rgba(61, 105, 148, 0.28), rgba(11, 15, 34, 0.84));
+  background-position:
+    0 0,
+    22px 38px,
+    54px 16px,
+    0 0;
+  background-size:
+    92px 92px,
+    151px 151px,
+    237px 237px,
+    100% 100%;
+  animation: storm-starfield-drift 18s linear infinite;
+  pointer-events: none;
+}
+
+.storm-commander-root .chess-board::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 35% 24%, rgba(97, 168, 220, 0.22), transparent 24%),
+    radial-gradient(circle at 72% 66%, rgba(246, 200, 95, 0.12), transparent 28%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes storm-starfield-drift {
+  to {
+    background-position:
+      var(--storm-star-drift-near-x) var(--storm-star-drift-near-y),
+      var(--storm-star-drift-mid-x) var(--storm-star-drift-mid-y),
+      var(--storm-star-drift-far-x) var(--storm-star-drift-far-y),
+      0 0;
+  }
 }
 
 .storm-commander-root .chess-square {
   position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   min-width: 0;
   min-height: 0;
-  border: 0;
+  border: 1px solid rgba(226, 237, 237, 0.46);
   border-radius: 0;
   padding: 0;
   cursor: pointer;
   color: inherit;
+  background: transparent;
+  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.03);
 }
 
 .storm-commander-root .chess-square:disabled {
@@ -98,15 +163,17 @@
 }
 
 .storm-commander-root .chess-square-light {
-  background: var(--light-square);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .storm-commander-root .chess-square-dark {
-  background: var(--dark-square);
+  background: rgba(4, 8, 18, 0.16);
 }
 
 .storm-commander-root .chess-square.is-selected {
-  box-shadow: inset 0 0 0 5px var(--selected);
+  box-shadow:
+    inset 0 0 0 5px var(--selected),
+    inset 0 0 24px rgba(246, 200, 95, 0.16);
 }
 
 .storm-commander-root .chess-square.is-last-move::before,
@@ -119,10 +186,12 @@
 }
 
 .storm-commander-root .chess-square.is-last-move::before {
+  z-index: 3;
   border: 4px solid rgba(138, 166, 217, 0.82);
 }
 
 .storm-commander-root .chess-square.is-legal-move::after {
+  z-index: 3;
   width: 28%;
   height: 28%;
   inset: auto;
@@ -144,11 +213,16 @@
 }
 
 .storm-commander-root .chess-piece-image {
+  position: relative;
+  z-index: 2;
   width: 82%;
   height: 82%;
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+  transform: rotate(var(--storm-piece-rotation));
+  transform-origin: 50% 50%;
+  transition: transform 260ms ease;
 }
 
 .storm-commander-root .side-panel {
