@@ -124,18 +124,6 @@
   pointer-events: none;
 }
 
-.storm-commander-root .chess-board[data-side-to-move='w'] {
-  --storm-turn-grid-line: rgba(85, 170, 242, 0.23);
-  --storm-turn-hint: rgba(85, 170, 242, 0.9);
-  --storm-turn-hint-soft: rgba(85, 170, 242, 0.24);
-}
-
-.storm-commander-root .chess-board[data-side-to-move='b'] {
-  --storm-turn-grid-line: rgba(232, 108, 36, 0.23);
-  --storm-turn-hint: rgba(232, 108, 36, 0.9);
-  --storm-turn-hint-soft: rgba(232, 108, 36, 0.24);
-}
-
 .storm-commander-root .chess-board::after {
   content: '';
   position: absolute;

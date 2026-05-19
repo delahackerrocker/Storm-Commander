@@ -58,8 +58,11 @@ function getStatusText(game, isBlackThinking) {
 
 export function BasicChessPage({
   onBack,
+  onNewGameVisuals,
   pieceSet = 'unicode',
   rootClassName = '',
+  sidePieceFactions,
+  sideVisualThemes,
   title = 'Chess-ish',
 }) {
   const [game, setGame] = useState(() => new Chess())
@@ -141,6 +144,7 @@ export function BasicChessPage({
   function loadScenario(scenario, notice = '') {
     const nextGame = loadScenarioIntoChess(scenario)
 
+    onNewGameVisuals?.()
     setCurrentScenario(scenario)
     setScenarioNotice(notice || `Loaded ${scenario.id}`)
     setCopyStatus('')
@@ -189,6 +193,7 @@ export function BasicChessPage({
   }
 
   function startNewGame() {
+    onNewGameVisuals?.()
     setGame(new Chess())
     setSelectedSquare(null)
     setLegalMoves([])
@@ -238,6 +243,8 @@ export function BasicChessPage({
             inputDisabled={isBlackThinking || game.isGameOver()}
             onSquareClick={handleSquareClick}
             pieceSet={pieceSet}
+            sidePieceFactions={sidePieceFactions}
+            sideVisualThemes={sideVisualThemes}
           />
         </section>
 

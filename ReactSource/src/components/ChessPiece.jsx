@@ -1,5 +1,8 @@
 import { getPieceName } from '../chess/pieceNames'
-import { STORM_COMMANDER_PIECE_ASSETS } from '../chess/stormCommanderPieceAssets'
+import {
+  STORM_COMMANDER_FACTION_PIECE_ASSETS,
+  STORM_COMMANDER_PIECE_ASSETS,
+} from '../chess/stormCommanderPieceAssets'
 
 const PIECE_GLYPHS = {
   wk: '\u2654',
@@ -16,17 +19,23 @@ const PIECE_GLYPHS = {
   bp: '\u265f',
 }
 
-export function ChessPiece({ piece, pieceSet = 'unicode' }) {
+export function ChessPiece({ piece, pieceSet = 'unicode', sidePieceFactions }) {
   if (!piece) {
     return null
   }
 
   if (pieceSet === 'storm-commander-png') {
+    const faction = sidePieceFactions?.[piece.color]
+    const factionAsset = faction
+      ? STORM_COMMANDER_FACTION_PIECE_ASSETS[faction]?.[piece.type]
+      : null
+
     return (
       <img
         className="chess-piece-image"
-        src={STORM_COMMANDER_PIECE_ASSETS[piece.color][piece.type]}
+        src={factionAsset || STORM_COMMANDER_PIECE_ASSETS[piece.color][piece.type]}
         alt={getPieceName(piece)}
+        data-faction={faction || undefined}
         draggable="false"
       />
     )

@@ -9,6 +9,8 @@ export function ChessBoard({
   onSquareClick,
   pieceSet = 'unicode',
   selectedSquare,
+  sidePieceFactions,
+  sideVisualThemes,
 }) {
   const legalMoveByDestination = new Map()
 
@@ -17,6 +19,15 @@ export function ChessBoard({
       legalMoveByDestination.set(move.to, move)
     }
   }
+
+  const turnVisualTheme = sideVisualThemes?.[game.turn()]
+  const boardStyle = turnVisualTheme
+    ? {
+        '--storm-turn-grid-line': turnVisualTheme.gridLine,
+        '--storm-turn-hint': turnVisualTheme.hint,
+        '--storm-turn-hint-soft': turnVisualTheme.hintSoft,
+      }
+    : undefined
 
   return (
     <div className="board-wrap">
@@ -43,7 +54,10 @@ export function ChessBoard({
         </div>
         <div
           className="chess-board"
+          style={boardStyle}
           data-side-to-move={game.turn()}
+          data-white-faction={sidePieceFactions?.w}
+          data-black-faction={sidePieceFactions?.b}
           role="grid"
           aria-label="Chess board"
         >
@@ -63,6 +77,7 @@ export function ChessBoard({
                 inputDisabled={inputDisabled}
                 onClick={onSquareClick}
                 pieceSet={pieceSet}
+                sidePieceFactions={sidePieceFactions}
               />
             )
           })}
