@@ -39,6 +39,7 @@ Current Storm Commander work includes:
 - Local PNG pieces in `ReactSource/public/assets/chess/storm-commander/pieces/`
 - Four faction fleets in `ReactSource/public/assets/chess/storm-commander/factions/`
 - Faction-dominant generated ship palettes, with Pirate locked as the bright-orange/black player faction and runtime rocket exhaust tinted by faction
+- Regenerated role-distinct ship silhouettes with crisp alpha cutouts and no baked oval shadows, including a WWII-fighter-inspired Knight profile and a smaller one-engine Pawn
 - Faction IDs and visual themes in `ReactSource/src/chess/stormCommanderPieceAssets.js`
 - Random opposing faction selection in `ReactSource/src/chess/stormCommanderFactions.js`
 - Directional starfield motion in `ReactSource/src/chess/stormCommanderStarfield.js`

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import {
+  STORM_COMMANDER_ASSET_VERSION,
   STORM_COMMANDER_FACTION_IDS,
   STORM_COMMANDER_FACTION_PIECE_ASSETS,
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
@@ -93,7 +94,8 @@ describe('Storm Commander variant', () => {
     expect(paths).toHaveLength(12)
 
     for (const path of paths) {
-      expect(path).toMatch(/^\/assets\/chess\/storm-commander\/pieces\/.+\.png$/)
+      expect(path).toMatch(/^\/assets\/chess\/storm-commander\/pieces\/.+\.png\?v=.+$/)
+      expect(path).toContain(`?v=${STORM_COMMANDER_ASSET_VERSION}`)
     }
   })
 
@@ -107,7 +109,8 @@ describe('Storm Commander variant', () => {
     expect(factionPaths).toHaveLength(24)
 
     for (const path of factionPaths) {
-      expect(path).toMatch(/^\/assets\/chess\/storm-commander\/factions\/.+\/.+\.png$/)
+      expect(path).toMatch(/^\/assets\/chess\/storm-commander\/factions\/.+\/.+\.png\?v=.+$/)
+      expect(path).toContain(`?v=${STORM_COMMANDER_ASSET_VERSION}`)
     }
   })
 

@@ -83,6 +83,9 @@ Built pieces:
 - Directional starfield movement.
 - Piece rotation tied to starfield direction.
 - Faction-dominant ship palettes, with Pirate tuned as the bright-orange/black player faction, Imperial pushed richer gold, and runtime rocket exhaust using faction-tinted glow.
+- Regenerated faction fleets with more distinct role silhouettes, crisp alpha cutouts with no baked oval/drop-shadow bases, a WWII-fighter-style Knight, and a smaller one-engine Pawn.
+- Pushed the Queen toward a hammerhead command-ship silhouette so it reads as a distinct high-value piece.
+- Versioned Storm Commander PNG URLs so the browser fetches regenerated ship art instead of reusing stale cached images.
 - Additional visual polish and test updates.
 
 The current effect is that Storm Commander feels more like a space-command board while still using chess legality underneath.

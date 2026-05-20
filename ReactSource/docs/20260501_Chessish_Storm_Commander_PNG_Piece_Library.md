@@ -64,9 +64,22 @@ Robocorp: blue hulls with steel trim and clean technical panels.
 Rebel: purple hulls with cream trim, asymmetric streaks, and agile forms.
 ```
 
+The current silhouettes intentionally push each chess role farther apart:
+
+```text
+King: broad flagship with command bridge and heavy side pods.
+Queen: hammerhead command ship with a wide blunt bow and a handle-like center hull.
+Rook: blocky armored gunship with squared side pods.
+Bishop: narrow spear/interceptor profile.
+Knight: WWII-fighter-inspired frame with long nose, straight wings, tailplane, and cockpit.
+Pawn: small patrol drone with one center engine.
+```
+
 Rocket jets are not baked into these PNGs. The running React app adds faction-tinted exhaust as a runtime particle layer so it can flicker and rotate with the ships. Pawns use one center jet; larger ships use three jets.
 
-The faction ship PNGs also avoid baked drop shadows. Runtime board effects should provide any motion or atmosphere so the ship silhouettes stay crisp.
+The faction ship PNGs also avoid baked drop shadows, oval bases, and static exhaust. The generator hardens the alpha channel into crisp transparent cutouts and rejects partial-alpha ship PNGs so runtime board effects provide motion and atmosphere without a smoky halo around the sprites.
+
+The React asset map appends a version query string to ship image URLs. This forces browsers to fetch regenerated PNGs after art passes instead of reusing older cached ships with stale painted effects.
 
 The generated preview sheet is:
 

@@ -138,29 +138,50 @@ def draw_rect(draw, box, fill, outline=INK, width=5, radius=0):
         draw.rectangle(scaled, fill=paint(fill), outline=paint(outline) if outline else None, width=sc(width))
 
 
+def harden_alpha(image, threshold=192):
+    crisp = image.convert("RGBA")
+    pixels = crisp.load()
+    width, height = crisp.size
+
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, alpha = pixels[x, y]
+            if alpha < threshold:
+                pixels[x, y] = (0, 0, 0, 0)
+            else:
+                pixels[x, y] = (red, green, blue, 255)
+
+    return crisp
+
+
 def draw_cel_panels(draw, role, colors):
     shade = colors["shade"]
     light = colors["hull_light"]
+    metal = colors["metal"]
     if role == "pawn":
-        draw_poly(draw, [(257, 82), (306, 222), (287, 345), (257, 400), (257, 82)], light, outline=None)
-        draw_poly(draw, [(197, 224), (223, 340), (257, 400), (257, 82)], shade, outline=None)
+        draw_poly(draw, [(257, 88), (291, 223), (278, 345), (257, 404), (257, 88)], light, outline=None)
+        draw_poly(draw, [(222, 228), (236, 344), (257, 404), (257, 88)], shade, outline=None)
     elif role == "rook":
-        draw_poly(draw, [(256, 92), (320, 158), (323, 384), (256, 428), (256, 92)], light, outline=None)
-        draw_poly(draw, [(78, 229), (187, 174), (201, 337), (87, 366), (78, 229)], shade, outline=None)
-        draw_poly(draw, [(434, 229), (325, 174), (311, 337), (425, 366), (434, 229)], colors["hull_light"], outline=None)
+        draw_poly(draw, [(256, 96), (310, 159), (308, 383), (256, 429), (256, 96)], light, outline=None)
+        draw_poly(draw, [(112, 227), (190, 190), (195, 334), (116, 357), (112, 227)], shade, outline=None)
+        draw_poly(draw, [(400, 227), (322, 190), (317, 334), (396, 357), (400, 227)], metal, outline=None)
     elif role == "knight":
-        draw_poly(draw, [(256, 72), (322, 235), (256, 438), (256, 72)], light, outline=None)
-        draw_poly(draw, [(92, 280), (223, 177), (256, 438), (188, 360)], shade, outline=None)
+        draw_poly(draw, [(256, 42), (280, 196), (270, 410), (256, 454), (256, 42)], light, outline=None)
+        draw_poly(draw, [(232, 154), (244, 411), (256, 454), (256, 42)], shade, outline=None)
+        draw_poly(draw, [(117, 250), (218, 209), (228, 260), (147, 304)], metal, outline=None)
     elif role == "bishop":
-        draw_poly(draw, [(256, 48), (307, 230), (256, 458), (256, 48)], light, outline=None)
-        draw_poly(draw, [(204, 230), (256, 458), (256, 48), (226, 138)], shade, outline=None)
+        draw_poly(draw, [(256, 40), (302, 215), (271, 426), (256, 462), (256, 40)], light, outline=None)
+        draw_poly(draw, [(211, 214), (241, 424), (256, 462), (256, 40), (232, 137)], shade, outline=None)
     elif role == "queen":
-        draw_poly(draw, [(256, 60), (340, 154), (318, 404), (256, 452), (256, 60)], light, outline=None)
-        draw_poly(draw, [(105, 258), (191, 156), (223, 407), (128, 395)], shade, outline=None)
-        draw_poly(draw, [(407, 258), (321, 156), (289, 407), (384, 395)], colors["hull_light"], outline=None)
+        draw_poly(draw, [(256, 62), (294, 160), (286, 405), (256, 460), (256, 62)], light, outline=None)
+        draw_poly(draw, [(66, 169), (216, 121), (224, 205), (86, 249)], shade, outline=None)
+        draw_poly(draw, [(446, 169), (296, 121), (288, 205), (426, 249)], metal, outline=None)
+        draw_poly(draw, [(177, 316), (227, 276), (235, 383), (193, 414)], shade, outline=None)
+        draw_poly(draw, [(335, 316), (285, 276), (277, 383), (319, 414)], metal, outline=None)
     elif role == "king":
-        draw_poly(draw, [(256, 50), (336, 164), (320, 424), (256, 458), (256, 50)], light, outline=None)
-        draw_poly(draw, [(170, 158), (236, 118), (256, 458), (195, 421)], shade, outline=None)
+        draw_poly(draw, [(256, 48), (334, 150), (313, 421), (256, 462), (256, 48)], light, outline=None)
+        draw_poly(draw, [(166, 151), (235, 118), (247, 421), (193, 425)], shade, outline=None)
+        draw_poly(draw, [(346, 151), (277, 118), (265, 421), (319, 425)], metal, outline=None)
 
 
 def draw_greebles(draw, role, colors):
@@ -189,12 +210,13 @@ def draw_greebles(draw, role, colors):
         for y in (171, 206, 262):
             draw_line(draw, [(232, y), (280, y)], width=4)
     elif role == "knight":
-        draw_rect(draw, (226, 154, 286, 340), body, width=5, radius=10)
-        draw_poly(draw, [(236, 174), (276, 174), (270, 257), (242, 257)], colors["hull_light"], width=4)
-        draw_ellipse(draw, (221, 332, 291, 402), accent_light(colors), width=8)
-        draw_line(draw, [(200, 263), (237, 263)], width=5)
-        draw_line(draw, [(276, 236), (321, 236)], width=5)
-        draw_line(draw, [(238, 287), (275, 287)], dark, width=4)
+        draw_rect(draw, (231, 143, 281, 352), body, width=5, radius=14)
+        draw_poly(draw, [(239, 128), (273, 128), (280, 198), (232, 198)], colors["hull_light"], width=4)
+        draw_rect(draw, (239, 213, 273, 271), metal, width=4, radius=8)
+        draw_ellipse(draw, (224, 330, 288, 394), accent_light(colors), width=7)
+        draw_line(draw, [(139, 258), (225, 258)], width=5)
+        draw_line(draw, [(287, 258), (373, 258)], width=5)
+        draw_line(draw, [(239, 291), (273, 291)], dark, width=4)
     elif role == "bishop":
         draw_rect(draw, (230, 118, 282, 374), body, width=5, radius=12)
         draw_poly(draw, [(242, 74), (270, 74), (279, 154), (233, 154)], colors["hull_light"], width=4)
@@ -203,14 +225,17 @@ def draw_greebles(draw, role, colors):
             draw_line(draw, [(236, y), (276, y)], dark, width=4)
         draw_line(draw, [(256, 58), (256, 443)], accent, width=4)
     elif role == "queen":
-        draw_rect(draw, (217, 116, 295, 375), body, width=5, radius=12)
-        draw_ellipse(draw, (214, 298, 298, 382), accent_light(colors), width=8)
-        draw_poly(draw, [(256, 77), (286, 132), (256, 116), (226, 132)], accent, width=5)
-        for x in (168, 344):
-            draw_ellipse(draw, (x - 36, 254, x + 36, 326), colors["hull_light"], width=5)
-            draw_ellipse(draw, (x - 17, 273, x + 17, 307), accent, width=4)
-        for y in (157, 192, 228, 264):
-            draw_line(draw, [(234, y), (278, y)], dark, width=4)
+        draw_rect(draw, (222, 116, 290, 382), body, width=5, radius=14)
+        draw_rect(draw, (231, 136, 281, 222), colors["hull_light"], width=4, radius=9)
+        draw_ellipse(draw, (219, 316, 293, 390), accent_light(colors), width=8)
+        draw_rect(draw, (101, 148, 208, 214), body, width=5, radius=10)
+        draw_rect(draw, (304, 148, 411, 214), body, width=5, radius=10)
+        for x in (143, 369):
+            draw_rect(draw, (x - 27, 160, x + 27, 199), colors["hull_light"], width=4, radius=6)
+            draw_ellipse(draw, (x - 15, 166, x + 15, 196), accent, width=4)
+        draw_poly(draw, [(256, 72), (288, 122), (256, 111), (224, 122)], accent, width=5)
+        for y in (178, 218, 258, 298):
+            draw_line(draw, [(236, y), (276, y)], dark, width=4)
     elif role == "king":
         draw_rect(draw, (214, 110, 298, 384), body, width=5, radius=12)
         draw_rect(draw, (231, 136, 281, 244), colors["hull_light"], width=4, radius=8)
@@ -262,12 +287,12 @@ def draw_faction_marks(draw, role, faction, colors):
 
 def draw_engines(draw, role, colors):
     positions = {
-        "pawn": [(224, 386, 248, 437), (264, 386, 288, 437)],
-        "rook": [(118, 361, 151, 429), (361, 361, 394, 429), (234, 391, 278, 450)],
-        "knight": [(173, 358, 204, 426), (308, 358, 339, 426), (238, 390, 274, 452)],
-        "bishop": [(190, 356, 221, 428), (291, 356, 322, 428), (240, 393, 272, 462)],
-        "queen": [(112, 379, 145, 442), (367, 379, 400, 442), (238, 400, 274, 462)],
-        "king": [(150, 383, 184, 448), (328, 383, 362, 448), (238, 402, 274, 466)],
+        "pawn": [(236, 386, 276, 448)],
+        "rook": [(104, 350, 142, 425), (370, 350, 408, 425), (231, 390, 281, 456)],
+        "knight": [(137, 315, 169, 383), (343, 315, 375, 383), (236, 397, 276, 458)],
+        "bishop": [(187, 356, 220, 428), (292, 356, 325, 428), (238, 393, 274, 462)],
+        "queen": [(184, 381, 217, 444), (295, 381, 328, 444), (236, 400, 276, 464)],
+        "king": [(139, 383, 179, 450), (333, 383, 373, 450), (236, 402, 276, 468)],
     }[role]
     for box in positions:
         draw_poly(
@@ -284,47 +309,56 @@ def draw_engines(draw, role, colors):
 
 ROLE_SHAPES = {
     "pawn": [
-        ("wing", [(176, 252), (102, 314), (194, 342), (214, 292)]),
-        ("wing", [(336, 252), (410, 314), (318, 342), (298, 292)]),
-        ("hull", [(256, 64), (315, 205), (300, 346), (256, 430), (212, 346), (197, 205)]),
+        ("fin", [(221, 276), (165, 322), (220, 344)]),
+        ("fin", [(291, 276), (347, 322), (292, 344)]),
+        ("hull", [(256, 72), (303, 213), (290, 356), (256, 430), (222, 356), (209, 213)]),
     ],
     "rook": [
-        ("wing", [(70, 226), (184, 166), (202, 326), (86, 370)]),
-        ("wing", [(442, 226), (328, 166), (310, 326), (426, 370)]),
-        ("hull", [(256, 82), (320, 145), (318, 388), (256, 438), (194, 388), (192, 145)]),
-        ("nose", [(226, 82), (286, 82), (300, 127), (212, 127)]),
+        ("pod", [(72, 215), (176, 166), (202, 350), (92, 382)]),
+        ("pod", [(440, 215), (336, 166), (310, 350), (420, 382)]),
+        ("wing", [(141, 254), (218, 198), (226, 323), (153, 360)]),
+        ("wing", [(371, 254), (294, 198), (286, 323), (359, 360)]),
+        ("hull", [(256, 82), (323, 146), (317, 391), (256, 442), (195, 391), (189, 146)]),
+        ("nose", [(224, 80), (288, 80), (302, 129), (210, 129)]),
     ],
     "knight": [
-        ("wing", [(92, 276), (220, 152), (239, 298), (188, 373)]),
-        ("wing", [(420, 214), (296, 157), (278, 317), (363, 358)]),
-        ("hull", [(256, 58), (323, 232), (288, 345), (256, 448), (224, 345), (189, 232)]),
+        ("wing", [(92, 248), (222, 204), (231, 266), (128, 322)]),
+        ("wing", [(420, 248), (290, 204), (281, 266), (384, 322)]),
+        ("tail", [(215, 358), (256, 328), (297, 358), (286, 425), (226, 425)]),
+        ("hull", [(256, 38), (292, 152), (281, 353), (256, 456), (231, 353), (220, 152)]),
+        ("nose", [(241, 36), (271, 36), (281, 99), (231, 99)]),
     ],
     "bishop": [
-        ("wing", [(152, 260), (216, 189), (230, 334), (166, 382)]),
-        ("wing", [(360, 260), (296, 189), (282, 334), (346, 382)]),
-        ("hull", [(256, 38), (307, 223), (284, 380), (256, 462), (228, 380), (205, 223)]),
+        ("wing", [(134, 260), (216, 178), (229, 333), (157, 394)]),
+        ("wing", [(378, 260), (296, 178), (283, 333), (355, 394)]),
+        ("hull", [(256, 36), (308, 219), (283, 384), (256, 464), (229, 384), (204, 219)]),
+        ("spire", [(239, 72), (256, 28), (273, 72), (268, 151), (244, 151)]),
     ],
     "queen": [
-        ("wing", [(78, 254), (188, 145), (224, 404), (126, 408)]),
-        ("wing", [(434, 254), (324, 145), (288, 404), (386, 408)]),
-        ("hull", [(256, 48), (337, 141), (319, 401), (256, 462), (193, 401), (175, 141)]),
-        ("crown", [(209, 97), (234, 59), (256, 96), (278, 59), (303, 97), (285, 125), (227, 125)]),
+        ("hammer", [(62, 150), (213, 108), (231, 202), (88, 253)]),
+        ("hammer", [(450, 150), (299, 108), (281, 202), (424, 253)]),
+        ("wing", [(151, 286), (227, 239), (238, 382), (180, 425)]),
+        ("wing", [(361, 286), (285, 239), (274, 382), (332, 425)]),
+        ("hull", [(256, 47), (304, 137), (294, 395), (256, 466), (218, 395), (208, 137)]),
+        ("crown", [(205, 110), (230, 74), (256, 101), (282, 74), (307, 110), (286, 139), (226, 139)]),
     ],
     "king": [
-        ("wing", [(102, 226), (190, 137), (221, 412), (146, 428)]),
-        ("wing", [(410, 226), (322, 137), (291, 412), (366, 428)]),
-        ("hull", [(256, 42), (344, 152), (323, 423), (256, 466), (189, 423), (168, 152)]),
-        ("bridge", [(210, 97), (256, 48), (302, 97), (287, 134), (225, 134)]),
+        ("wing", [(94, 220), (188, 134), (222, 414), (141, 434)]),
+        ("wing", [(418, 220), (324, 134), (290, 414), (371, 434)]),
+        ("pod", [(145, 290), (200, 262), (215, 390), (158, 421)]),
+        ("pod", [(367, 290), (312, 262), (297, 390), (354, 421)]),
+        ("hull", [(256, 40), (346, 150), (324, 426), (256, 468), (188, 426), (166, 150)]),
+        ("bridge", [(210, 98), (256, 47), (302, 98), (287, 136), (225, 136)]),
     ],
 }
 
 
 def draw_role(draw, role, faction, colors):
     for part, values in ROLE_SHAPES[role]:
-        if part == "wing":
-            fill = colors["hull"] if faction != "pirate" else colors["shade"]
-        elif part in {"crown", "bridge", "nose"}:
+        if part in {"crown", "bridge", "nose", "spire"}:
             fill = colors["accent"]
+        elif part in {"hammer", "pod", "fin", "tail"}:
+            fill = colors["metal"] if faction != "pirate" else colors["hull"]
         else:
             fill = colors["hull"]
         draw_poly(draw, values, fill, width=8 if part == "hull" else 7)
@@ -349,7 +383,64 @@ def render_ship(faction, role):
     draw = ImageDraw.Draw(image)
     draw_role(draw, role, faction, colors)
     image = image.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-    return image
+    return harden_alpha(image)
+
+
+def assert_crisp_ship_alpha(image, faction, role):
+    pixels = image.load()
+    width, height = image.size
+    seen = set()
+    largest_size = 0
+    largest_box = None
+    partial_alpha_count = 0
+
+    def looks_like_shadow_edge(x, y):
+        red, green, blue, alpha = pixels[x, y]
+        return 8 <= alpha < 180 and max(red, green, blue) < 95
+
+    for y in range(height):
+        for x in range(width):
+            alpha = pixels[x, y][3]
+            if 0 < alpha < 255:
+                partial_alpha_count += 1
+            if (x, y) in seen or not looks_like_shadow_edge(x, y):
+                continue
+
+            stack = [(x, y)]
+            seen.add((x, y))
+            xs = []
+            ys = []
+
+            while stack:
+                cx, cy = stack.pop()
+                xs.append(cx)
+                ys.append(cy)
+
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if (
+                        0 <= nx < width
+                        and 0 <= ny < height
+                        and (nx, ny) not in seen
+                        and looks_like_shadow_edge(nx, ny)
+                    ):
+                        seen.add((nx, ny))
+                        stack.append((nx, ny))
+
+            component_size = len(xs)
+            if component_size > largest_size:
+                largest_size = component_size
+                largest_box = (min(xs), min(ys), max(xs), max(ys))
+
+    if largest_size > 900:
+        raise ValueError(
+            f"{faction}/{role} has a large semi-transparent dark blob "
+            f"({largest_size} px at {largest_box}); baked shadows are not allowed."
+        )
+    if partial_alpha_count:
+        raise ValueError(
+            f"{faction}/{role} has {partial_alpha_count} partial-alpha pixels; "
+            "ship PNGs must use crisp transparent cutouts."
+        )
 
 
 def build_assets():
@@ -360,6 +451,7 @@ def build_assets():
         generated[faction] = {}
         for role in PIECES:
             image = render_ship(faction, role)
+            assert_crisp_ship_alpha(image, faction, role)
             path = out_dir / f"{role}.png"
             image.save(path)
             generated[faction][role] = path
@@ -417,6 +509,7 @@ def build_preview_sheet(generated):
             draw.rounded_rectangle((x, y, x + tile, y + tile), radius=10, fill=c("#e9ece4"), outline=c("#d8ded4"), width=2)
             image = Image.open(generated[faction][role]).convert("RGBA")
             image.thumbnail((tile - 12, tile - 12), Image.Resampling.LANCZOS)
+            image = harden_alpha(image, threshold=128)
             sheet.alpha_composite(image, (x + (tile - image.width) // 2, y + (tile - image.height) // 2))
 
     sheet.save(FACTION_ROOT / "preview-sheet.png")
