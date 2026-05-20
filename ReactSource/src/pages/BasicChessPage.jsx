@@ -59,10 +59,12 @@ function getStatusText(game, isBlackThinking) {
 export function BasicChessPage({
   onBack,
   onNewGameVisuals,
+  pieceRotation,
   pieceSet = 'unicode',
   rootClassName = '',
   sidePieceFactions,
   sideVisualThemes,
+  starfieldLayerStyles,
   title = 'Chess-ish',
 }) {
   const [game, setGame] = useState(() => new Chess())
@@ -242,9 +244,11 @@ export function BasicChessPage({
             lastMove={lastMove}
             inputDisabled={isBlackThinking || game.isGameOver()}
             onSquareClick={handleSquareClick}
+            pieceRotation={pieceRotation}
             pieceSet={pieceSet}
             sidePieceFactions={sidePieceFactions}
             sideVisualThemes={sideVisualThemes}
+            starfieldLayerStyles={starfieldLayerStyles}
           />
         </section>
 

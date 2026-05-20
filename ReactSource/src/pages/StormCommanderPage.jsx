@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createRandomSideFactions } from '../chess/stormCommanderFactions'
 import {
-  STORM_COMMANDER_STARFIELD_TWEEN_MS,
+  STORM_COMMANDER_STARFIELD_TICK_MS,
   advanceStarfieldMotion,
   createInitialStarfieldMotion,
+  toStarfieldLayerStyles,
   toStarfieldStyle,
 } from '../chess/stormCommanderStarfield'
 import {
@@ -22,6 +23,10 @@ function createSideVisualThemes(sideFactions) {
 export function StormCommanderPage({ onBack }) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
   const [starfieldMotion, setStarfieldMotion] = useState(() => createInitialStarfieldMotion())
+  const starfieldLayerStyles = useMemo(
+    () => toStarfieldLayerStyles(starfieldMotion),
+    [starfieldMotion],
+  )
   const starfieldStyle = useMemo(() => toStarfieldStyle(starfieldMotion), [starfieldMotion])
   const sideVisualThemes = useMemo(() => createSideVisualThemes(sideFactions), [sideFactions])
 
@@ -29,8 +34,8 @@ export function StormCommanderPage({ onBack }) {
     const advanceStarfield = () => {
       setStarfieldMotion((currentMotion) => advanceStarfieldMotion(currentMotion))
     }
-    const starterId = window.setTimeout(advanceStarfield, 80)
-    const timerId = window.setInterval(advanceStarfield, STORM_COMMANDER_STARFIELD_TWEEN_MS)
+    const starterId = window.setTimeout(advanceStarfield, 40)
+    const timerId = window.setInterval(advanceStarfield, STORM_COMMANDER_STARFIELD_TICK_MS)
 
     return () => {
       window.clearTimeout(starterId)
@@ -53,6 +58,8 @@ export function StormCommanderPage({ onBack }) {
         rootClassName="storm-commander-root"
         sidePieceFactions={sideFactions}
         sideVisualThemes={sideVisualThemes}
+        pieceRotation={starfieldMotion.pieceRotation}
+        starfieldLayerStyles={starfieldLayerStyles}
         title="Storm Commander"
       />
     </div>

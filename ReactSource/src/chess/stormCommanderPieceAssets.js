@@ -2,22 +2,22 @@ export const STORM_COMMANDER_FACTION_IDS = ['pirate', 'imperial', 'robocorp', 'r
 
 export const STORM_COMMANDER_FACTION_VISUAL_THEMES = {
   pirate: {
-    gridLine: 'rgba(232, 108, 36, 0.23)',
+    gridLine: 'rgba(232, 108, 36, 0.1725)',
     hint: 'rgba(232, 108, 36, 0.9)',
     hintSoft: 'rgba(232, 108, 36, 0.24)',
   },
   imperial: {
-    gridLine: 'rgba(213, 166, 14, 0.25)',
+    gridLine: 'rgba(213, 166, 14, 0.1875)',
     hint: 'rgba(213, 166, 14, 0.92)',
     hintSoft: 'rgba(213, 166, 14, 0.26)',
   },
   robocorp: {
-    gridLine: 'rgba(85, 170, 242, 0.23)',
+    gridLine: 'rgba(85, 170, 242, 0.1725)',
     hint: 'rgba(85, 170, 242, 0.9)',
     hintSoft: 'rgba(85, 170, 242, 0.24)',
   },
   rebel: {
-    gridLine: 'rgba(154, 112, 212, 0.25)',
+    gridLine: 'rgba(154, 112, 212, 0.1875)',
     hint: 'rgba(154, 112, 212, 0.92)',
     hintSoft: 'rgba(154, 112, 212, 0.26)',
   },

@@ -19,7 +19,7 @@ const PIECE_GLYPHS = {
   bp: '\u265f',
 }
 
-export function ChessPiece({ piece, pieceSet = 'unicode', sidePieceFactions }) {
+export function ChessPiece({ piece, pieceRotation, pieceSet = 'unicode', sidePieceFactions }) {
   if (!piece) {
     return null
   }
@@ -36,6 +36,7 @@ export function ChessPiece({ piece, pieceSet = 'unicode', sidePieceFactions }) {
         src={factionAsset || STORM_COMMANDER_PIECE_ASSETS[piece.color][piece.type]}
         alt={getPieceName(piece)}
         data-faction={faction || undefined}
+        style={pieceRotation ? { transform: `rotate(${pieceRotation})` } : undefined}
         draggable="false"
       />
     )

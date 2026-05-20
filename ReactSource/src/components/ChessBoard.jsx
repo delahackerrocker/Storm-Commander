@@ -1,16 +1,30 @@
 import { BOARD_SQUARES } from '../chess/squareUtils'
 import { ChessSquare } from './ChessSquare'
 
+const STORM_STARFIELD_LAYERS = [
+  ['nebula', null],
+  ['far', 'far'],
+  ['dust', 'dust'],
+  ['mid', 'mid'],
+  ['streak', 'streak'],
+  ['near', 'near'],
+  ['asteroid-far', 'asteroidFar'],
+  ['asteroid-wide', 'asteroidWide'],
+  ['asteroid-near', 'asteroidNear'],
+]
+
 export function ChessBoard({
   game,
   inputDisabled,
   lastMove,
   legalMoves,
   onSquareClick,
+  pieceRotation,
   pieceSet = 'unicode',
   selectedSquare,
   sidePieceFactions,
   sideVisualThemes,
+  starfieldLayerStyles,
 }) {
   const legalMoveByDestination = new Map()
 
@@ -74,6 +88,17 @@ export function ChessBoard({
           role="grid"
           aria-label="Chess board"
         >
+          {pieceSet === 'storm-commander-png' && starfieldLayerStyles ? (
+            <div className="storm-starfield-layers" aria-hidden="true">
+              {STORM_STARFIELD_LAYERS.map(([layerId, styleId]) => (
+                <span
+                  key={layerId}
+                  className={`storm-starfield-layer storm-starfield-layer-${layerId}`}
+                  style={styleId ? starfieldLayerStyles[styleId] : undefined}
+                />
+              ))}
+            </div>
+          ) : null}
           {BOARD_SQUARES.map((square) => {
             const piece = game.get(square)
             const move = legalMoveByDestination.get(square)
@@ -89,6 +114,7 @@ export function ChessBoard({
                 isLastMove={lastMove?.from === square || lastMove?.to === square}
                 inputDisabled={inputDisabled}
                 onClick={onSquareClick}
+                pieceRotation={pieceRotation}
                 pieceSet={pieceSet}
                 sidePieceFactions={sidePieceFactions}
               />

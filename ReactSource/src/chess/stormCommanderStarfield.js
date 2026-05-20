@@ -1,35 +1,56 @@
-export const STORM_COMMANDER_STARFIELD_TWEEN_MS = 7200
+export const STORM_COMMANDER_STARFIELD_TICK_MS = 180
+export const STORM_COMMANDER_STARFIELD_TWEEN_MS = 320
 
-const LAYER_STEP_DISTANCES = {
-  near: 340,
-  mid: 220,
-  far: 124,
-  dust: 72,
-  asteroidNear: 260,
-  asteroidFar: 154,
+const LAYER_PIXELS_PER_SECOND = {
+  near: 154,
+  mid: 98,
+  far: 54,
+  dust: 36,
+  asteroidNear: 118,
+  asteroidFar: 68,
 }
+
+const MIN_SPEED_MULTIPLIER = 1.08
+const SPEED_MULTIPLIER_RANGE = 1.32
+const MIN_MANEUVER_STEPS = 7
+const MANEUVER_STEP_RANGE = 12
+const TURN_SMOOTHING = 0.14
+const SPEED_SMOOTHING = 0.16
 
 function getRandomAngle(random) {
   return random() * 360
 }
 
-function normalizeAngle(angle) {
-  return ((angle % 360) + 360) % 360
+function getRandomSpeed(random) {
+  return MIN_SPEED_MULTIPLIER + random() * SPEED_MULTIPLIER_RANGE
 }
 
-function getNextAngle(previousAngle, random) {
+function getManeuverStepCount(random) {
+  return MIN_MANEUVER_STEPS + Math.floor(random() * MANEUVER_STEP_RANGE)
+}
+
+function getShortestAngleDelta(fromAngle, toAngle) {
+  return ((toAngle - fromAngle + 540) % 360) - 180
+}
+
+function getNextManeuverHeading(previousAngle, random) {
   const candidate = getRandomAngle(random)
-  const shortestTurn = Math.abs(((candidate - previousAngle + 540) % 360) - 180)
+  const shortestDelta = getShortestAngleDelta(previousAngle, candidate)
 
-  if (shortestTurn < 38) {
-    return normalizeAngle(candidate + 86)
-  }
-
-  return candidate
+  return previousAngle + shortestDelta
 }
 
-function getLayerStep(angle, distance) {
+function moveAngleTowardTarget(fromAngle, toAngle) {
+  return fromAngle + getShortestAngleDelta(fromAngle, toAngle) * TURN_SMOOTHING
+}
+
+function moveSpeedTowardTarget(fromSpeed, toSpeed) {
+  return fromSpeed + (toSpeed - fromSpeed) * SPEED_SMOOTHING
+}
+
+function getLayerStep(angle, pixelsPerSecond, speedMultiplier, elapsedMs) {
   const radians = (angle * Math.PI) / 180
+  const distance = pixelsPerSecond * speedMultiplier * (elapsedMs / 1000)
 
   return {
     x: Math.cos(radians) * distance,
@@ -41,15 +62,24 @@ function px(value) {
   return `${value.toFixed(2)}px`
 }
 
+function position(x, y, offsetX = 0, offsetY = 0) {
+  return `${px(x + offsetX)} ${px(y + offsetY)}`
+}
+
 function rotationForAngle(angle) {
-  return `${normalizeAngle(angle - 90).toFixed(2)}deg`
+  return `${(angle - 90).toFixed(2)}deg`
 }
 
 export function createInitialStarfieldMotion(random = Math.random) {
   const angle = getRandomAngle(random)
+  const speed = getRandomSpeed(random)
 
   return {
     angle,
+    targetAngle: getNextManeuverHeading(angle, random),
+    speed,
+    targetSpeed: getRandomSpeed(random),
+    retargetInSteps: getManeuverStepCount(random),
     nearX: 0,
     nearY: 0,
     midX: 0,
@@ -66,17 +96,44 @@ export function createInitialStarfieldMotion(random = Math.random) {
   }
 }
 
-export function advanceStarfieldMotion(currentMotion, random = Math.random) {
-  const angle = getNextAngle(currentMotion.angle, random)
-  const near = getLayerStep(angle, LAYER_STEP_DISTANCES.near)
-  const mid = getLayerStep(angle, LAYER_STEP_DISTANCES.mid)
-  const far = getLayerStep(angle, LAYER_STEP_DISTANCES.far)
-  const dust = getLayerStep(angle, LAYER_STEP_DISTANCES.dust)
-  const asteroidNear = getLayerStep(angle, LAYER_STEP_DISTANCES.asteroidNear)
-  const asteroidFar = getLayerStep(angle, LAYER_STEP_DISTANCES.asteroidFar)
+export function advanceStarfieldMotion(
+  currentMotion,
+  random = Math.random,
+  elapsedMs = STORM_COMMANDER_STARFIELD_TICK_MS,
+) {
+  const shouldRetarget = currentMotion.retargetInSteps <= 1
+  const targetAngle = shouldRetarget
+    ? getNextManeuverHeading(currentMotion.angle, random)
+    : currentMotion.targetAngle
+  const targetSpeed = shouldRetarget ? getRandomSpeed(random) : currentMotion.targetSpeed
+  const retargetInSteps = shouldRetarget
+    ? getManeuverStepCount(random)
+    : currentMotion.retargetInSteps - 1
+  const angle = moveAngleTowardTarget(currentMotion.angle, targetAngle)
+  const speed = moveSpeedTowardTarget(currentMotion.speed, targetSpeed)
+  const near = getLayerStep(angle, LAYER_PIXELS_PER_SECOND.near, speed, elapsedMs)
+  const mid = getLayerStep(angle, LAYER_PIXELS_PER_SECOND.mid, speed, elapsedMs)
+  const far = getLayerStep(angle, LAYER_PIXELS_PER_SECOND.far, speed, elapsedMs)
+  const dust = getLayerStep(angle, LAYER_PIXELS_PER_SECOND.dust, speed, elapsedMs)
+  const asteroidNear = getLayerStep(
+    angle,
+    LAYER_PIXELS_PER_SECOND.asteroidNear,
+    speed,
+    elapsedMs,
+  )
+  const asteroidFar = getLayerStep(
+    angle,
+    LAYER_PIXELS_PER_SECOND.asteroidFar,
+    speed,
+    elapsedMs,
+  )
 
   return {
     angle,
+    targetAngle,
+    speed,
+    targetSpeed,
+    retargetInSteps,
     nearX: currentMotion.nearX + near.x,
     nearY: currentMotion.nearY + near.y,
     midX: currentMotion.midX + mid.x,
@@ -109,5 +166,47 @@ export function toStarfieldStyle(starfieldMotion) {
     '--storm-asteroid-far-x': px(starfieldMotion.asteroidFarX),
     '--storm-asteroid-far-y': px(starfieldMotion.asteroidFarY),
     '--storm-piece-rotation': starfieldMotion.pieceRotation,
+  }
+}
+
+export function toStarfieldLayerStyles(starfieldMotion) {
+  return {
+    near: {
+      backgroundPosition: position(starfieldMotion.nearX, starfieldMotion.nearY),
+    },
+    mid: {
+      backgroundPosition: position(starfieldMotion.midX, starfieldMotion.midY, 22, 38),
+    },
+    far: {
+      backgroundPosition: position(starfieldMotion.farX, starfieldMotion.farY, 54, 16),
+    },
+    dust: {
+      backgroundPosition: position(starfieldMotion.dustX, starfieldMotion.dustY, 8, 17),
+    },
+    streak: {
+      backgroundPosition: position(starfieldMotion.farX, starfieldMotion.farY, 108, 72),
+    },
+    asteroidNear: {
+      backgroundPosition: position(
+        starfieldMotion.asteroidNearX,
+        starfieldMotion.asteroidNearY,
+      ),
+    },
+    asteroidFar: {
+      backgroundPosition: position(
+        starfieldMotion.asteroidFarX,
+        starfieldMotion.asteroidFarY,
+        142,
+        86,
+      ),
+    },
+    asteroidWide: {
+      backgroundPosition: position(
+        starfieldMotion.asteroidFarX,
+        starfieldMotion.asteroidFarY,
+        88,
+        128,
+      ),
+    },
   }
 }

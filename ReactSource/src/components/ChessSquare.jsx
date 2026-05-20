@@ -11,6 +11,7 @@ export function ChessSquare({
   isSelected,
   inputDisabled,
   onClick,
+  pieceRotation,
   pieceSet,
   sidePieceFactions,
 }) {
@@ -42,7 +43,12 @@ export function ChessSquare({
       aria-label={`${square} ${getPieceName(piece)} ${actionLabel}`}
       onClick={() => onClick(square)}
     >
-      <ChessPiece piece={piece} pieceSet={pieceSet} sidePieceFactions={sidePieceFactions} />
+      <ChessPiece
+        piece={piece}
+        pieceRotation={pieceRotation}
+        pieceSet={pieceSet}
+        sidePieceFactions={sidePieceFactions}
+      />
     </button>
   )
 }

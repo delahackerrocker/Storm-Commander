@@ -1,6 +1,7 @@
 .storm-commander-effects {
   --storm-piece-rotation: 0deg;
-  --storm-star-tween-ms: 7200ms;
+  --storm-star-tween-ms: 320ms;
+  --storm-star-ease: linear;
   --storm-star-near-x: 0;
   --storm-star-near-y: 0;
   --storm-star-mid-x: 0;
@@ -86,7 +87,7 @@
 }
 
 .storm-commander-root .chess-board {
-  --storm-turn-grid-line: rgba(226, 237, 237, 0.23);
+  --storm-turn-grid-line: rgba(226, 237, 237, 0.1725);
   --storm-turn-hint: rgba(226, 237, 237, 0.82);
   --storm-turn-hint-soft: rgba(226, 237, 237, 0.22);
   --storm-last-move-ring: rgba(138, 166, 217, 0.82);
@@ -109,62 +110,96 @@
     #050915;
 }
 
-.storm-commander-root .chess-board::before {
-  content: '';
+.storm-commander-root .storm-starfield-layers,
+.storm-commander-root .storm-starfield-layer {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.98) 0 1.25px, transparent 1.9px),
-    radial-gradient(circle, rgba(153, 208, 255, 0.76) 0 1.55px, transparent 2.25px),
-    radial-gradient(circle, rgba(255, 214, 129, 0.58) 0 0.95px, transparent 1.8px),
-    radial-gradient(circle, rgba(255, 255, 255, 0.42) 0 0.65px, transparent 1.3px),
-    linear-gradient(112deg, transparent 0 43%, rgba(133, 197, 255, 0.11) 44% 45%, transparent 47% 100%),
-    linear-gradient(135deg, rgba(61, 105, 148, 0.28), rgba(11, 15, 34, 0.84));
-  background-position:
-    var(--storm-star-near-x) var(--storm-star-near-y),
-    calc(var(--storm-star-mid-x) + 22px) calc(var(--storm-star-mid-y) + 38px),
-    calc(var(--storm-star-far-x) + 54px) calc(var(--storm-star-far-y) + 16px),
-    calc(var(--storm-star-dust-x) + 8px) calc(var(--storm-star-dust-y) + 17px),
-    calc(var(--storm-star-far-x) + 108px) calc(var(--storm-star-far-y) + 72px),
-    0 0;
-  background-size:
-    78px 78px,
-    141px 141px,
-    239px 239px,
-    43px 43px,
-    360px 360px,
-    100% 100%;
-  transition: background-position var(--storm-star-tween-ms) linear;
   pointer-events: none;
 }
 
-.storm-commander-root .chess-board::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image:
-    radial-gradient(ellipse at center, rgba(180, 160, 118, 0.78) 0 2.2px, rgba(71, 61, 48, 0.84) 2.4px 4.7px, transparent 5.2px),
-    radial-gradient(ellipse at center, rgba(128, 113, 86, 0.64) 0 1.6px, rgba(37, 33, 29, 0.72) 1.8px 3.5px, transparent 4.2px),
-    radial-gradient(ellipse at center, rgba(211, 197, 157, 0.56) 0 1.2px, rgba(80, 69, 52, 0.7) 1.4px 2.8px, transparent 3.6px),
+.storm-commander-root .storm-starfield-layers {
+  overflow: hidden;
+}
+
+.storm-commander-root .storm-starfield-layer {
+  background-repeat: repeat;
+  transition: background-position var(--storm-star-tween-ms) var(--storm-star-ease);
+  will-change: background-position;
+}
+
+.storm-commander-root .storm-starfield-layer-nebula {
+  background:
     radial-gradient(circle at 35% 24%, rgba(97, 168, 220, 0.22), transparent 24%),
-    radial-gradient(circle at 72% 66%, rgba(246, 200, 95, 0.12), transparent 28%);
-  background-position:
-    var(--storm-asteroid-near-x) var(--storm-asteroid-near-y),
-    calc(var(--storm-asteroid-far-x) + 142px) calc(var(--storm-asteroid-far-y) + 86px),
-    calc(var(--storm-asteroid-far-x) + 88px) calc(var(--storm-asteroid-far-y) + 128px),
-    0 0,
-    0 0;
+    radial-gradient(circle at 72% 66%, rgba(246, 200, 95, 0.12), transparent 28%),
+    linear-gradient(135deg, rgba(61, 105, 148, 0.28), rgba(11, 15, 34, 0.84));
   background-size:
-    430px 360px,
-    690px 520px,
-    560px 610px,
+    100% 100%,
     100% 100%,
     100% 100%;
-  transition: background-position var(--storm-star-tween-ms) linear;
+}
+
+.storm-commander-root .storm-starfield-layer-far {
+  opacity: 0.72;
+  background-image:
+    radial-gradient(circle, rgba(255, 214, 129, 0.58) 0 0.95px, transparent 1.8px);
+  background-size: 239px 239px;
+}
+
+.storm-commander-root .storm-starfield-layer-dust {
+  opacity: 0.68;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.42) 0 0.65px, transparent 1.3px);
+  background-size: 43px 43px;
+}
+
+.storm-commander-root .storm-starfield-layer-mid {
+  opacity: 0.78;
+  background-image:
+    radial-gradient(circle, rgba(153, 208, 255, 0.76) 0 1.55px, transparent 2.25px);
+  background-size: 141px 141px;
+}
+
+.storm-commander-root .storm-starfield-layer-streak {
+  opacity: 0.9;
+  background-image:
+    linear-gradient(112deg, transparent 0 43%, rgba(133, 197, 255, 0.11) 44% 45%, transparent 47% 100%);
+  background-size: 360px 360px;
   mix-blend-mode: screen;
-  pointer-events: none;
+}
+
+.storm-commander-root .storm-starfield-layer-near {
+  opacity: 0.94;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.98) 0 1.25px, transparent 1.9px);
+  background-size: 78px 78px;
+}
+
+.storm-commander-root .storm-starfield-layer-asteroid-near,
+.storm-commander-root .storm-starfield-layer-asteroid-far,
+.storm-commander-root .storm-starfield-layer-asteroid-wide {
+  mix-blend-mode: screen;
+}
+
+.storm-commander-root .storm-starfield-layer-asteroid-near {
+  opacity: 0.72;
+  background-image:
+    radial-gradient(ellipse at center, rgba(180, 160, 118, 0.78) 0 2.2px, rgba(71, 61, 48, 0.84) 2.4px 4.7px, transparent 5.2px);
+  background-size: 430px 360px;
+}
+
+.storm-commander-root .storm-starfield-layer-asteroid-far {
+  opacity: 0.56;
+  background-image:
+    radial-gradient(ellipse at center, rgba(128, 113, 86, 0.64) 0 1.6px, rgba(37, 33, 29, 0.72) 1.8px 3.5px, transparent 4.2px);
+  background-size: 690px 520px;
+}
+
+.storm-commander-root .storm-starfield-layer-asteroid-wide {
+  opacity: 0.5;
+  background-image:
+    radial-gradient(ellipse at center, rgba(211, 197, 157, 0.56) 0 1.2px, rgba(80, 69, 52, 0.7) 1.4px 2.8px, transparent 3.6px);
+  background-size: 560px 610px;
 }
 
 .storm-commander-root .chess-square {
@@ -188,7 +223,7 @@
 }
 
 .storm-commander-root .chess-square-light {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.0225);
 }
 
 .storm-commander-root .chess-square-dark {
@@ -249,7 +284,7 @@
   user-select: none;
   transform: rotate(var(--storm-piece-rotation));
   transform-origin: 50% 50%;
-  transition: transform var(--storm-star-tween-ms) cubic-bezier(0.33, 0, 0.18, 1);
+  transition: transform var(--storm-star-tween-ms) var(--storm-star-ease);
 }
 
 .storm-commander-root .side-panel {

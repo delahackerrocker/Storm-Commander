@@ -12,6 +12,7 @@ import {
   STORM_COMMANDER_STARFIELD_TWEEN_MS,
   advanceStarfieldMotion,
   createInitialStarfieldMotion,
+  toStarfieldLayerStyles,
   toStarfieldStyle,
 } from '../chess/stormCommanderStarfield'
 import App from '../App'
@@ -149,20 +150,75 @@ describe('Storm Commander variant', () => {
     expect(effectsRoot.style.getPropertyValue('--storm-star-mid-x')).toMatch(/px$/)
     expect(effectsRoot.style.getPropertyValue('--storm-star-far-x')).toMatch(/px$/)
     expect(effectsRoot.style.getPropertyValue('--storm-asteroid-near-x')).toMatch(/px$/)
+    expect(document.querySelectorAll('.storm-starfield-layer')).toHaveLength(9)
+    expect(document.querySelector('.storm-starfield-layer-asteroid-near')).toBeInTheDocument()
   })
 
   it('advances layered starfield motion and rotates ships with the new heading', () => {
-    const initialMotion = createInitialStarfieldMotion(() => 0)
-    const nextMotion = advanceStarfieldMotion(initialMotion, () => 0.25)
+    const initialMotion = {
+      ...createInitialStarfieldMotion(() => 0),
+      angle: 0,
+      targetAngle: 90,
+      speed: 1,
+      targetSpeed: 1,
+      retargetInSteps: 5,
+    }
+    const nextMotion = advanceStarfieldMotion(initialMotion, () => 0.25, 1000)
+    const layerStyles = toStarfieldLayerStyles(nextMotion)
     const nextStyle = toStarfieldStyle(nextMotion)
 
-    expect(nextMotion.angle).toBe(90)
+    expect(nextMotion.angle).toBeGreaterThan(0)
+    expect(nextMotion.angle).toBeLessThan(90)
+    expect(nextMotion.retargetInSteps).toBe(4)
+    expect(nextMotion.speed).toBe(1)
+    expect(nextMotion.nearX).toBeGreaterThan(initialMotion.nearX)
     expect(nextMotion.nearY).toBeGreaterThan(initialMotion.nearY)
     expect(nextMotion.midY).toBeGreaterThan(initialMotion.midY)
     expect(nextMotion.farY).toBeGreaterThan(initialMotion.farY)
     expect(nextMotion.asteroidNearY).toBeGreaterThan(initialMotion.asteroidNearY)
+    expect(layerStyles.near.backgroundPosition).toMatch(/px .+px$/)
+    expect(layerStyles.asteroidNear.backgroundPosition).toMatch(/px .+px$/)
     expect(nextStyle['--storm-star-tween-ms']).toBe(`${STORM_COMMANDER_STARFIELD_TWEEN_MS}ms`)
-    expect(nextStyle['--storm-piece-rotation']).toBe('0.00deg')
+    expect(nextStyle['--storm-piece-rotation']).toMatch(/deg$/)
+  })
+
+  it('uses the shortest turn across the 360 degree heading wrap', () => {
+    const nextMotion = advanceStarfieldMotion(
+      {
+        ...createInitialStarfieldMotion(() => 0),
+        angle: 350,
+        targetAngle: 10,
+        speed: 1,
+        targetSpeed: 1,
+        retargetInSteps: 5,
+      },
+      () => 0,
+      1000,
+    )
+
+    expect(nextMotion.angle).toBeGreaterThan(350)
+    expect(nextMotion.angle).toBeLessThan(360)
+    expect(toStarfieldStyle(nextMotion)['--storm-piece-rotation']).toBe('262.80deg')
+  })
+
+  it('unwraps new maneuver headings instead of spinning backwards through 360 degrees', () => {
+    const randomValues = [10 / 360, 0.5, 0.5]
+    const nextMotion = advanceStarfieldMotion(
+      {
+        ...createInitialStarfieldMotion(() => 0),
+        angle: 350,
+        targetAngle: 350,
+        speed: 1,
+        targetSpeed: 1,
+        retargetInSteps: 1,
+      },
+      () => randomValues.shift() ?? 0.5,
+      1000,
+    )
+
+    expect(nextMotion.targetAngle).toBeCloseTo(370)
+    expect(nextMotion.angle).toBeGreaterThan(350)
+    expect(nextMotion.angle).toBeLessThan(360)
   })
 
   it('marks the current turn for Storm Commander visual styling without changing moves', async () => {
