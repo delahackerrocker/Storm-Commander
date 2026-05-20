@@ -1,6 +1,6 @@
 export const STORM_COMMANDER_FACTION_IDS = ['pirate', 'imperial', 'robocorp', 'rebel']
 
-export const STORM_COMMANDER_ASSET_VERSION = '20260519-queen-hammerhead'
+export const STORM_COMMANDER_ASSET_VERSION = '20260520-imperial-ivory-gold'
 
 const versionStormCommanderAsset = (path) => `${path}?v=${STORM_COMMANDER_ASSET_VERSION}`
 

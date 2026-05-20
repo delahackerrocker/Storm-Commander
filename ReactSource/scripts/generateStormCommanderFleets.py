@@ -39,11 +39,11 @@ FACTIONS = {
         "name": "Imperial",
         "accent": "#f4bd00",
         "accent_dark": "#9c6800",
-        "accent_light": "#ffca28",
-        "hull": "#c58b00",
-        "hull_light": "#d9a200",
-        "shade": "#6f4b00",
-        "metal": "#c9951a",
+        "accent_light": "#ffd86a",
+        "hull": "#f4f1dc",
+        "hull_light": "#ffffff",
+        "shade": "#c9951a",
+        "metal": "#d5a10a",
         "glow": "#ffd24a",
     },
     "robocorp": {
@@ -85,10 +85,12 @@ def faction_dominant_palette(faction, colors):
         palette["shade"] = colors["shade"]
         palette["metal"] = colors["hull_light"]
     elif faction == "imperial":
-        palette["hull"] = colors["accent"]
-        palette["hull_light"] = colors["accent_light"]
-        palette["shade"] = colors["accent_dark"]
-        palette["metal"] = colors["hull"]
+        palette["trim"] = colors["accent_dark"]
+        palette["trim_light"] = colors["accent_light"]
+        palette["hull"] = colors["hull"]
+        palette["hull_light"] = colors["hull_light"]
+        palette["shade"] = colors["shade"]
+        palette["metal"] = colors["accent"]
     return palette
 
 
@@ -357,7 +359,9 @@ def draw_role(draw, role, faction, colors):
     for part, values in ROLE_SHAPES[role]:
         if part in {"crown", "bridge", "nose", "spire"}:
             fill = colors["accent"]
-        elif part in {"hammer", "pod", "fin", "tail"}:
+        elif part == "hammer":
+            fill = colors["hull"]
+        elif part in {"pod", "fin", "tail"}:
             fill = colors["metal"] if faction != "pirate" else colors["hull"]
         else:
             fill = colors["hull"]

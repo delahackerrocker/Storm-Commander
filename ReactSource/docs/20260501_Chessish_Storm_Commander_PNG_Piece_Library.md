@@ -59,7 +59,7 @@ The faction fleets use role-consistent silhouettes with faction-dominant finishe
 
 ```text
 Pirate: black hulls with bright bold orange panels, engines, and rugged patchwork.
-Imperial: rich gold hulls with darker gold trim and bright command panels.
+Imperial: ivory-white hulls with bold gold panels, engines, and royal trim.
 Robocorp: blue hulls with steel trim and clean technical panels.
 Rebel: purple hulls with cream trim, asymmetric streaks, and agile forms.
 ```
@@ -75,7 +75,7 @@ Knight: WWII-fighter-inspired frame with long nose, straight wings, tailplane, a
 Pawn: small patrol drone with one center engine.
 ```
 
-Rocket jets are not baked into these PNGs. The running React app adds faction-tinted exhaust as a runtime particle layer so it can flicker and rotate with the ships. Pawns use one center jet; larger ships use three jets.
+Rocket jets are not baked into these PNGs. The running React app adds faction-tinted exhaust as a runtime particle layer so it can flicker and rotate with the ships. Pawns use one center jet; larger ships use three jets. Pirate exhaust keeps the orange burn but adds black smoke and a slightly larger runtime jet. Imperial exhaust follows the same ivory/gold read as the ship art, using a white-hot core with gold flame and glow.
 
 The faction ship PNGs also avoid baked drop shadows, oval bases, and static exhaust. The generator hardens the alpha channel into crisp transparent cutouts and rejects partial-alpha ship PNGs so runtime board effects provide motion and atmosphere without a smoky halo around the sprites.
 
