@@ -14,7 +14,7 @@ function complete(encounter) {
   return {
     ...encounter,
     status: 'won',
-    outcome: 'Objective complete.',
+    outcome: 'Victory: objective complete.',
   }
 }
 

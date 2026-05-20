@@ -33,7 +33,7 @@ describe('Storm Commander encounter objectives', () => {
     })
 
     expect(nextEncounter.status).toBe('won')
-    expect(nextEncounter.outcome).toBe('Objective complete.')
+    expect(nextEncounter.outcome).toBe('Victory: objective complete.')
   })
 
   it('wins Capture Value after the player captures enough enemy value', () => {

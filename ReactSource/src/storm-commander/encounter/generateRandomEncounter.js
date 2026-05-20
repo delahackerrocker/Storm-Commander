@@ -190,8 +190,7 @@ function createIntro(enemyFactions) {
 
 export function generateRandomEncounter(random = Math.random) {
   const boardSize = STORM_COMMANDER_BOARD_SIZES[randomIndex(STORM_COMMANDER_BOARD_SIZES.length, random)]
-  const enemyCount = 1 + randomIndex(3, random)
-  const enemyFactions = takeRandomItems(STORM_COMMANDER_ENEMY_FACTIONS, enemyCount, random)
+  const enemyFactions = takeRandomItems(STORM_COMMANDER_ENEMY_FACTIONS, 1, random)
   const profile = ENCOUNTER_PROFILES[randomIndex(ENCOUNTER_PROFILES.length, random)]
   const pirateBudget = randomInt(profile.pirateBudget, random)
   const enemyBudget = randomInt(profile.enemyBudget, random)

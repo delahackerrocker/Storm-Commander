@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import { StormCommanderEncounterPage } from '../storm-commander/components/StormCommanderEncounterPage'
 
 describe('Storm Commander random encounter UI', () => {
   it('generates an encounter and shows the selected Pirate cockpit panel', async () => {
@@ -26,5 +28,93 @@ describe('Storm Commander random encounter UI', () => {
     } finally {
       randomSpy.mockRestore()
     }
+  })
+
+  it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_destroy_target',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'destroyTarget',
+        targetPieceId: 'imperial_queen',
+        text: 'Destroy the Imperial queen.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          onReturnToChess={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    render(<Harness />)
+
+    await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+    await user.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
+
+    expect(screen.getByText('Victory')).toBeInTheDocument()
+    expect(screen.getByText('Victory: objective complete.')).toBeInTheDocument()
+  })
+
+  it('does not mark empty squares as targets for non-target objectives', () => {
+    const encounter = {
+      id: 'test_escape_markers',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'escapeToSquare',
+        extractionSquare: { x: 2, y: 4 },
+        text: 'Move any Pirate ship to the extraction square.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    expect(container.querySelectorAll('.storm-encounter-square.is-target')).toHaveLength(0)
+    expect(container.querySelectorAll('.storm-encounter-square.is-extraction')).toHaveLength(1)
   })
 })

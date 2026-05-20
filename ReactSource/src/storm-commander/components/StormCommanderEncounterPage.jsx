@@ -80,11 +80,11 @@ function getBoardStyle(encounter) {
 
 function getStatusText(encounter, isEnemyThinking) {
   if (encounter.status === 'won') {
-    return 'Objective complete'
+    return 'Victory'
   }
 
   if (encounter.status === 'lost') {
-    return 'Raid failed'
+    return 'Defeat'
   }
 
   if (isEnemyThinking) {
@@ -276,7 +276,9 @@ export function StormCommanderEncounterPage({
               const piece = getEncounterPieceAt(encounter, square)
               const legalMove = legalMoveForSquare.get(`${square.x},${square.y}`)
               const isExtraction = sameSquare(square, encounter.objective.extractionSquare)
-              const isTarget = piece?.id === encounter.objective.targetPieceId
+              const isTarget =
+                Boolean(encounter.objective.targetPieceId) &&
+                piece?.id === encounter.objective.targetPieceId
               const className = [
                 'storm-encounter-square',
                 (square.x + square.y) % 2 === 0 ? 'is-light' : 'is-dark',

@@ -55,13 +55,13 @@ knight.png
 pawn.png
 ```
 
-The faction fleets use role-consistent silhouettes with faction-specific finishes:
+The faction fleets use role-consistent silhouettes with faction-dominant finishes:
 
 ```text
-Pirate: dark charcoal hulls with orange panels and rugged patchwork.
-Imperial: gold and ivory ornament with formal command silhouettes.
-Robocorp: steel hulls with blue circuit accents and clean technical panels.
-Rebel: cream hulls with purple marks, asymmetric streaks, and agile forms.
+Pirate: black hulls with bright bold orange panels, engines, and rugged patchwork.
+Imperial: rich gold hulls with darker gold trim and bright command panels.
+Robocorp: blue hulls with steel trim and clean technical panels.
+Rebel: purple hulls with cream trim, asymmetric streaks, and agile forms.
 ```
 
 The generated preview sheet is:

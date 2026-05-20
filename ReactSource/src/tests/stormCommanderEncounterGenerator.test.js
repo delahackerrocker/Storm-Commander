@@ -23,12 +23,13 @@ describe('Storm Commander random encounter generator', () => {
     expect(encounter.status).toBe('active')
   })
 
-  it('can generate crowded encounters with three enemy factions', () => {
+  it('keeps random encounters to Pirate versus one enemy while the alpha is being tuned', () => {
     const encounter = generateRandomEncounter(() => 0.99)
 
-    expect(encounter.factions).toHaveLength(4)
+    expect(encounter.factions).toHaveLength(2)
     expect(encounter.factions[0]).toBe('pirate')
-    expect(encounter.factions.slice(1).sort()).toEqual(['imperial', 'rebel', 'robocorp'])
+    expect(['imperial', 'rebel', 'robocorp']).toContain(encounter.factions[1])
+    expect(encounter.turnOrder).toEqual(encounter.factions)
   })
 
   it('places every generated piece inside the board without overlap', () => {

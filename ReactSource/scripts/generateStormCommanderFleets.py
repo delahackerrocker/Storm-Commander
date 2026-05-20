@@ -26,24 +26,24 @@ PIECE_CODES = {
 FACTIONS = {
     "pirate": {
         "name": "Pirate",
-        "accent": "#e86c24",
-        "accent_dark": "#843112",
-        "accent_light": "#ffad67",
-        "hull": "#3f4235",
-        "hull_light": "#686b58",
-        "shade": "#23251f",
-        "metal": "#8b897a",
-        "glow": "#ff7b2c",
+        "accent": "#ff6a00",
+        "accent_dark": "#b83a00",
+        "accent_light": "#ff8c00",
+        "hull": "#262820",
+        "hull_light": "#4b4d3e",
+        "shade": "#11130f",
+        "metal": "#6d6b5d",
+        "glow": "#ff7a00",
     },
     "imperial": {
         "name": "Imperial",
-        "accent": "#d5a60e",
-        "accent_dark": "#7c5d05",
-        "accent_light": "#ffe176",
-        "hull": "#b99a59",
-        "hull_light": "#f0dec2",
-        "shade": "#6f5b38",
-        "metal": "#cfc0a4",
+        "accent": "#f4bd00",
+        "accent_dark": "#9c6800",
+        "accent_light": "#ffca28",
+        "hull": "#c58b00",
+        "hull_light": "#d9a200",
+        "shade": "#6f4b00",
+        "metal": "#c9951a",
         "glow": "#ffd24a",
     },
     "robocorp": {
@@ -69,6 +69,27 @@ FACTIONS = {
         "glow": "#c48bff",
     },
 }
+
+
+def faction_dominant_palette(faction, colors):
+    palette = dict(colors)
+    palette["trim"] = colors["hull"]
+    palette["trim_light"] = colors["hull_light"]
+    palette["hull"] = colors["accent"]
+    palette["hull_light"] = colors["accent"]
+    palette["shade"] = colors["accent_dark"]
+    palette["metal"] = colors["hull"]
+    if faction == "pirate":
+        palette["hull"] = colors["hull"]
+        palette["hull_light"] = colors["accent"]
+        palette["shade"] = colors["shade"]
+        palette["metal"] = colors["hull_light"]
+    elif faction == "imperial":
+        palette["hull"] = colors["accent"]
+        palette["hull_light"] = colors["accent_light"]
+        palette["shade"] = colors["accent_dark"]
+        palette["metal"] = colors["hull"]
+    return palette
 
 
 def c(value):
@@ -159,11 +180,12 @@ def draw_cel_panels(draw, role, colors):
 def draw_greebles(draw, role, colors):
     accent = colors["accent"]
     metal = colors["metal"]
+    body = colors["shade"]
     dark = colors["accent_dark"]
     glow = colors["glow"]
 
     if role == "pawn":
-        draw_rect(draw, (232, 178, 280, 315), metal, width=5, radius=10)
+        draw_rect(draw, (232, 178, 280, 315), body, width=5, radius=10)
         draw_rect(draw, (241, 194, 271, 282), colors["hull_light"], width=4, radius=8)
         draw_ellipse(draw, (226, 316, 286, 376), accent_light(colors), width=7)
         draw_line(draw, [(213, 236), (236, 236)], width=5)
@@ -171,7 +193,7 @@ def draw_greebles(draw, role, colors):
         for y in (199, 223, 247):
             draw_line(draw, [(245, y), (267, y)], dark, width=4)
     elif role == "rook":
-        draw_rect(draw, (214, 122, 298, 390), metal, width=5, radius=12)
+        draw_rect(draw, (214, 122, 298, 390), body, width=5, radius=12)
         draw_rect(draw, (230, 144, 282, 248), colors["hull_light"], width=4, radius=8)
         draw_ellipse(draw, (218, 300, 294, 376), accent_light(colors), width=8)
         for x in (145, 367):
@@ -181,21 +203,21 @@ def draw_greebles(draw, role, colors):
         for y in (171, 206, 262):
             draw_line(draw, [(232, y), (280, y)], width=4)
     elif role == "knight":
-        draw_rect(draw, (226, 154, 286, 340), metal, width=5, radius=10)
+        draw_rect(draw, (226, 154, 286, 340), body, width=5, radius=10)
         draw_poly(draw, [(236, 174), (276, 174), (270, 257), (242, 257)], colors["hull_light"], width=4)
         draw_ellipse(draw, (221, 332, 291, 402), accent_light(colors), width=8)
         draw_line(draw, [(200, 263), (237, 263)], width=5)
         draw_line(draw, [(276, 236), (321, 236)], width=5)
         draw_line(draw, [(238, 287), (275, 287)], dark, width=4)
     elif role == "bishop":
-        draw_rect(draw, (230, 118, 282, 374), metal, width=5, radius=12)
+        draw_rect(draw, (230, 118, 282, 374), body, width=5, radius=12)
         draw_poly(draw, [(242, 74), (270, 74), (279, 154), (233, 154)], colors["hull_light"], width=4)
         draw_ellipse(draw, (221, 338, 291, 408), accent_light(colors), width=8)
         for y in (166, 202, 238, 274):
             draw_line(draw, [(236, y), (276, y)], dark, width=4)
         draw_line(draw, [(256, 58), (256, 443)], accent, width=4)
     elif role == "queen":
-        draw_rect(draw, (217, 116, 295, 375), metal, width=5, radius=12)
+        draw_rect(draw, (217, 116, 295, 375), body, width=5, radius=12)
         draw_ellipse(draw, (214, 298, 298, 382), accent_light(colors), width=8)
         draw_poly(draw, [(256, 77), (286, 132), (256, 116), (226, 132)], accent, width=5)
         for x in (168, 344):
@@ -204,7 +226,7 @@ def draw_greebles(draw, role, colors):
         for y in (157, 192, 228, 264):
             draw_line(draw, [(234, y), (278, y)], dark, width=4)
     elif role == "king":
-        draw_rect(draw, (214, 110, 298, 384), metal, width=5, radius=12)
+        draw_rect(draw, (214, 110, 298, 384), body, width=5, radius=12)
         draw_rect(draw, (231, 136, 281, 244), colors["hull_light"], width=4, radius=8)
         draw_ellipse(draw, (213, 303, 299, 389), accent_light(colors), width=8)
         draw_poly(draw, [(256, 55), (283, 103), (256, 91), (229, 103)], accent, width=5)
@@ -347,7 +369,7 @@ def draw_role(draw, role, faction, colors):
 
 
 def render_ship(faction, role):
-    colors = FACTIONS[faction]
+    colors = faction_dominant_palette(faction, FACTIONS[faction])
     image = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
     draw_shadow(image, role)
     draw = ImageDraw.Draw(image)
@@ -401,7 +423,7 @@ def build_preview_sheet(generated):
     draw.text((24, 22), "Storm Commander Faction Ship Pieces", fill=c("#22252a"), font=title_font)
     draw.text(
         (24, 62),
-        "Cel-shaded top-down ships: role silhouettes stay consistent, faction surfaces change.",
+        "Cel-shaded top-down ships: faction color dominates, metal reads as trim.",
         fill=c("#68737a"),
         font=small_font,
     )
@@ -410,11 +432,12 @@ def build_preview_sheet(generated):
         x = side_w + gap + col * (tile + gap)
         draw.text((x + 10, header_h - 34), role.title(), fill=c("#22252a"), font=small_font)
 
-    for row, (faction, colors) in enumerate(FACTIONS.items()):
+    for row, (faction, base_colors) in enumerate(FACTIONS.items()):
+        colors = faction_dominant_palette(faction, base_colors)
         y = header_h + gap + row * (tile + label_h + gap)
         draw.text((24, y + 36), colors["name"], fill=c(colors["accent"]), font=label_font)
         draw.rectangle((24, y + 64, 104, y + 74), fill=c(colors["accent"]))
-        draw.rectangle((24, y + 78, 104, y + 88), fill=c(colors["hull"]))
+        draw.rectangle((24, y + 78, 104, y + 88), fill=c(colors["metal"]))
         for col, role in enumerate(PIECES):
             x = side_w + gap + col * (tile + gap)
             draw.rounded_rectangle((x, y, x + tile, y + tile), radius=10, fill=c("#e9ece4"), outline=c("#d8ded4"), width=2)

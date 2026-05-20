@@ -24,7 +24,7 @@ Robocorp
 Rebel
 ```
 
-Encounters can include Pirate vs 1, 2, or 3 enemy factions.
+For the current tuning pass, random encounters are limited to Pirate vs one enemy faction.
 
 ## Random Scenario Definition
 
