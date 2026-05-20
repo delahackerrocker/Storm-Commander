@@ -82,7 +82,7 @@ Built pieces:
 - Faction tinting for board and highlight accents.
 - Directional starfield movement.
 - Piece rotation tied to starfield direction.
-- Faction-dominant ship palettes, with Pirate tuned as the bright-orange/black player faction, Imperial pushed richer gold, and rocket exhaust using faction-tinted glow.
+- Faction-dominant ship palettes, with Pirate tuned as the bright-orange/black player faction, Imperial pushed richer gold, and runtime rocket exhaust using faction-tinted glow.
 - Additional visual polish and test updates.
 
 The current effect is that Storm Commander feels more like a space-command board while still using chess legality underneath.

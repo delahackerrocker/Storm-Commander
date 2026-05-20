@@ -45,6 +45,34 @@ describe('Storm Commander variant', () => {
     expect(screen.getByAltText('White queen')).toBeInTheDocument()
   })
 
+  it('renders runtime rocket exhaust for Storm Commander ships', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+
+    const board = document.querySelector('.storm-commander-root .chess-board')
+
+    expect(document.querySelectorAll('.storm-ship-piece')).toHaveLength(32)
+    expect(document.querySelectorAll('.storm-ship-piece[data-faction]')).toHaveLength(32)
+    expect(document.querySelectorAll('.storm-ship-piece .storm-rocket-exhaust')).toHaveLength(64)
+    expect(
+      document.querySelectorAll('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust'),
+    ).toHaveLength(16)
+    expect(
+      document.querySelectorAll(
+        '.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust-center',
+      ),
+    ).toHaveLength(16)
+    expect(
+      document.querySelector(`.storm-ship-piece[data-faction="${board.dataset.whiteFaction}"]`),
+    ).toBeInTheDocument()
+    expect(
+      document.querySelector(`.storm-ship-piece[data-faction="${board.dataset.blackFaction}"]`),
+    ).toBeInTheDocument()
+  })
+
   it('keeps main chess in classic piece rendering mode', async () => {
     const user = userEvent.setup()
 

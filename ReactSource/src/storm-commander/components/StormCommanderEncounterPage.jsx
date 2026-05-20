@@ -3,6 +3,7 @@ import {
   STORM_COMMANDER_FACTION_PIECE_ASSETS,
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
 } from '../../chess/stormCommanderPieceAssets'
+import { StormCommanderShipPiece } from '../../components/StormCommanderShipPiece'
 import {
   advanceSloppyAggressiveTurn,
 } from '../encounter/sloppyAggressiveAi'
@@ -120,13 +121,13 @@ function StormCommanderEncounterPiece({ piece, pieceRotation }) {
   }
 
   return (
-    <img
-      className="storm-encounter-piece"
+    <StormCommanderShipPiece
+      imageClassName="storm-encounter-piece"
       src={STORM_COMMANDER_FACTION_PIECE_ASSETS[piece.faction][piece.type]}
       alt={getEncounterPieceLabel(piece)}
-      data-faction={piece.faction}
-      style={pieceRotation ? { transform: `rotate(${pieceRotation})` } : undefined}
-      draggable="false"
+      faction={piece.faction}
+      pieceType={piece.type}
+      pieceRotation={pieceRotation}
     />
   )
 }

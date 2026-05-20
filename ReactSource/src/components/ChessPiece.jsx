@@ -3,6 +3,7 @@ import {
   STORM_COMMANDER_FACTION_PIECE_ASSETS,
   STORM_COMMANDER_PIECE_ASSETS,
 } from '../chess/stormCommanderPieceAssets'
+import { StormCommanderShipPiece } from './StormCommanderShipPiece'
 
 const PIECE_GLYPHS = {
   wk: '\u2654',
@@ -31,13 +32,13 @@ export function ChessPiece({ piece, pieceRotation, pieceSet = 'unicode', sidePie
       : null
 
     return (
-      <img
-        className="chess-piece-image"
+      <StormCommanderShipPiece
+        imageClassName="chess-piece-image"
         src={factionAsset || STORM_COMMANDER_PIECE_ASSETS[piece.color][piece.type]}
         alt={getPieceName(piece)}
-        data-faction={faction || undefined}
-        style={pieceRotation ? { transform: `rotate(${pieceRotation})` } : undefined}
-        draggable="false"
+        faction={faction}
+        pieceType={piece.type}
+        pieceRotation={pieceRotation}
       />
     )
   }

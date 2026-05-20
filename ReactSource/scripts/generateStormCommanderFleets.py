@@ -1,7 +1,7 @@
 from pathlib import Path
 import shutil
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -96,10 +96,6 @@ def c(value):
     return tuple(int(value.lstrip("#")[index : index + 2], 16) for index in (0, 2, 4)) + (255,)
 
 
-def ca(value, alpha):
-    return tuple(int(value.lstrip("#")[index : index + 2], 16) for index in (0, 2, 4)) + (alpha,)
-
-
 def paint(value):
     return c(value) if isinstance(value, str) and value.startswith("#") else value
 
@@ -140,24 +136,6 @@ def draw_rect(draw, box, fill, outline=INK, width=5, radius=0):
         )
     else:
         draw.rectangle(scaled, fill=paint(fill), outline=paint(outline) if outline else None, width=sc(width))
-
-
-def draw_shadow(base, role):
-    shadow = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(shadow)
-    if role in {"king", "queen"}:
-        box = (88, 110, 424, 452)
-    elif role == "rook":
-        box = (58, 142, 454, 412)
-    elif role == "bishop":
-        box = (130, 62, 382, 460)
-    elif role == "knight":
-        box = (78, 96, 434, 446)
-    else:
-        box = (136, 122, 376, 432)
-    draw.ellipse(tuple(sc(v) for v in box), fill=(0, 0, 0, 92))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(sc(11)))
-    base.alpha_composite(shadow, (0, sc(16)))
 
 
 def draw_cel_panels(draw, role, colors):
@@ -282,45 +260,7 @@ def draw_faction_marks(draw, role, faction, colors):
             draw_poly(draw, [(318, 337), (290, 320), (302, 359)], accent, width=4)
 
 
-def draw_exhaust_plumes(draw, positions, colors):
-    glow = colors["glow"]
-    core = colors["accent_light"]
-    for box in positions:
-        cx = (box[0] + box[2]) / 2
-        half_width = (box[2] - box[0]) / 2
-        start_y = box[3] - 2
-        plume_tip_y = min(506, box[3] + max(58, half_width * 4.2))
-        core_tip_y = start_y + (plume_tip_y - start_y) * 0.72
-        draw_poly(
-            draw,
-            [
-                (cx, plume_tip_y),
-                (box[0] + half_width * 0.18, start_y),
-                (box[2] - half_width * 0.18, start_y),
-            ],
-            ca(glow, 126),
-            outline=None,
-        )
-        draw_poly(
-            draw,
-            [
-                (cx, core_tip_y),
-                (box[0] + half_width * 0.48, start_y + 2),
-                (box[2] - half_width * 0.48, start_y + 2),
-            ],
-            ca(core, 196),
-            outline=None,
-        )
-        draw_ellipse(
-            draw,
-            (cx - half_width * 0.38, start_y + 5, cx + half_width * 0.38, start_y + 17),
-            ca(core, 220),
-            outline=None,
-        )
-
-
 def draw_engines(draw, role, colors):
-    accent = colors["glow"]
     positions = {
         "pawn": [(224, 386, 248, 437), (264, 386, 288, 437)],
         "rook": [(118, 361, 151, 429), (361, 361, 394, 429), (234, 391, 278, 450)],
@@ -329,7 +269,6 @@ def draw_engines(draw, role, colors):
         "queen": [(112, 379, 145, 442), (367, 379, 400, 442), (238, 400, 274, 462)],
         "king": [(150, 383, 184, 448), (328, 383, 362, 448), (238, 402, 274, 466)],
     }[role]
-    draw_exhaust_plumes(draw, positions, colors)
     for box in positions:
         draw_poly(
             draw,
@@ -340,16 +279,6 @@ def draw_engines(draw, role, colors):
             ],
             colors["metal"],
             width=5,
-        )
-        draw_poly(
-            draw,
-            [
-                ((box[0] + box[2]) / 2, box[3] + 17),
-                (box[0] + 7, box[3] - 3),
-                (box[2] - 7, box[3] - 3),
-            ],
-            accent,
-            outline=None,
         )
 
 
@@ -417,7 +346,6 @@ def draw_role(draw, role, faction, colors):
 def render_ship(faction, role):
     colors = faction_dominant_palette(faction, FACTIONS[faction])
     image = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-    draw_shadow(image, role)
     draw = ImageDraw.Draw(image)
     draw_role(draw, role, faction, colors)
     image = image.resize((SIZE, SIZE), Image.Resampling.LANCZOS)

@@ -100,6 +100,7 @@ describe('Storm Commander random encounter UI', () => {
       },
       pieces: [
         { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 2, y: 1 } },
         { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
       ],
     }
@@ -116,5 +117,53 @@ describe('Storm Commander random encounter UI', () => {
 
     expect(container.querySelectorAll('.storm-encounter-square.is-target')).toHaveLength(0)
     expect(container.querySelectorAll('.storm-encounter-square.is-extraction')).toHaveLength(1)
+  })
+
+  it('renders runtime faction rocket exhaust on encounter ships', () => {
+    const encounter = {
+      id: 'test_runtime_exhaust',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'destroyTarget',
+        targetPieceId: 'imperial_queen',
+        text: 'Destroy the Imperial queen.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 2, y: 2 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    expect(container.querySelectorAll('.storm-ship-piece')).toHaveLength(3)
+    expect(container.querySelectorAll('.storm-ship-piece .storm-rocket-exhaust')).toHaveLength(7)
+    expect(
+      container.querySelectorAll('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust'),
+    ).toHaveLength(1)
+    expect(
+      container.querySelector('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust-center'),
+    ).toBeInTheDocument()
+    expect(container.querySelector('.storm-ship-piece[data-faction="pirate"]')).toBeInTheDocument()
+    expect(container.querySelector('.storm-ship-piece[data-faction="imperial"]')).toBeInTheDocument()
   })
 })
