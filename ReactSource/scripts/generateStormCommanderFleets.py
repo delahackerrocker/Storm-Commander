@@ -96,6 +96,14 @@ def c(value):
     return tuple(int(value.lstrip("#")[index : index + 2], 16) for index in (0, 2, 4)) + (255,)
 
 
+def ca(value, alpha):
+    return tuple(int(value.lstrip("#")[index : index + 2], 16) for index in (0, 2, 4)) + (alpha,)
+
+
+def paint(value):
+    return c(value) if isinstance(value, str) and value.startswith("#") else value
+
+
 def sc(value):
     return int(round(value * SCALE))
 
@@ -106,18 +114,18 @@ def points(values):
 
 def draw_poly(draw, values, fill, outline=INK, width=7):
     pts = points(values)
-    draw.polygon(pts, fill=c(fill) if isinstance(fill, str) and fill.startswith("#") else fill)
+    draw.polygon(pts, fill=paint(fill))
     if outline:
-        draw.line(pts + [pts[0]], fill=c(outline), width=sc(width), joint="curve")
+        draw.line(pts + [pts[0]], fill=paint(outline), width=sc(width), joint="curve")
 
 
 def draw_line(draw, values, fill=INK, width=5):
-    draw.line(points(values), fill=c(fill), width=sc(width), joint="curve")
+    draw.line(points(values), fill=paint(fill), width=sc(width), joint="curve")
 
 
 def draw_ellipse(draw, box, fill, outline=INK, width=6):
     scaled = tuple(sc(v) for v in box)
-    draw.ellipse(scaled, fill=c(fill), outline=c(outline) if outline else None, width=sc(width))
+    draw.ellipse(scaled, fill=paint(fill), outline=paint(outline) if outline else None, width=sc(width))
 
 
 def draw_rect(draw, box, fill, outline=INK, width=5, radius=0):
@@ -126,12 +134,12 @@ def draw_rect(draw, box, fill, outline=INK, width=5, radius=0):
         draw.rounded_rectangle(
             scaled,
             radius=sc(radius),
-            fill=c(fill),
-            outline=c(outline) if outline else None,
+            fill=paint(fill),
+            outline=paint(outline) if outline else None,
             width=sc(width),
         )
     else:
-        draw.rectangle(scaled, fill=c(fill), outline=c(outline) if outline else None, width=sc(width))
+        draw.rectangle(scaled, fill=paint(fill), outline=paint(outline) if outline else None, width=sc(width))
 
 
 def draw_shadow(base, role):
@@ -274,6 +282,43 @@ def draw_faction_marks(draw, role, faction, colors):
             draw_poly(draw, [(318, 337), (290, 320), (302, 359)], accent, width=4)
 
 
+def draw_exhaust_plumes(draw, positions, colors):
+    glow = colors["glow"]
+    core = colors["accent_light"]
+    for box in positions:
+        cx = (box[0] + box[2]) / 2
+        half_width = (box[2] - box[0]) / 2
+        start_y = box[3] - 2
+        plume_tip_y = min(506, box[3] + max(58, half_width * 4.2))
+        core_tip_y = start_y + (plume_tip_y - start_y) * 0.72
+        draw_poly(
+            draw,
+            [
+                (cx, plume_tip_y),
+                (box[0] + half_width * 0.18, start_y),
+                (box[2] - half_width * 0.18, start_y),
+            ],
+            ca(glow, 126),
+            outline=None,
+        )
+        draw_poly(
+            draw,
+            [
+                (cx, core_tip_y),
+                (box[0] + half_width * 0.48, start_y + 2),
+                (box[2] - half_width * 0.48, start_y + 2),
+            ],
+            ca(core, 196),
+            outline=None,
+        )
+        draw_ellipse(
+            draw,
+            (cx - half_width * 0.38, start_y + 5, cx + half_width * 0.38, start_y + 17),
+            ca(core, 220),
+            outline=None,
+        )
+
+
 def draw_engines(draw, role, colors):
     accent = colors["glow"]
     positions = {
@@ -284,6 +329,7 @@ def draw_engines(draw, role, colors):
         "queen": [(112, 379, 145, 442), (367, 379, 400, 442), (238, 400, 274, 462)],
         "king": [(150, 383, 184, 448), (328, 383, 362, 448), (238, 402, 274, 466)],
     }[role]
+    draw_exhaust_plumes(draw, positions, colors)
     for box in positions:
         draw_poly(
             draw,
