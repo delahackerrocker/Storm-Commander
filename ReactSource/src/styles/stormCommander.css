@@ -160,14 +160,6 @@
   background-size: 141px 141px;
 }
 
-.storm-commander-root .storm-starfield-layer-streak {
-  opacity: 0.9;
-  background-image:
-    linear-gradient(112deg, transparent 0 43%, rgba(133, 197, 255, 0.11) 44% 45%, transparent 47% 100%);
-  background-size: 360px 360px;
-  mix-blend-mode: screen;
-}
-
 .storm-commander-root .storm-starfield-layer-near {
   opacity: 0.94;
   background-image:
@@ -223,7 +215,7 @@
 }
 
 .storm-commander-root .chess-square-light {
-  background: rgba(255, 255, 255, 0.0225);
+  background: rgba(255, 255, 255, 0.016875);
 }
 
 .storm-commander-root .chess-square-dark {

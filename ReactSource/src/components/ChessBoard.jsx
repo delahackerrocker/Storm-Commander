@@ -6,7 +6,6 @@ const STORM_STARFIELD_LAYERS = [
   ['far', 'far'],
   ['dust', 'dust'],
   ['mid', 'mid'],
-  ['streak', 'streak'],
   ['near', 'near'],
   ['asteroid-far', 'asteroidFar'],
   ['asteroid-wide', 'asteroidWide'],

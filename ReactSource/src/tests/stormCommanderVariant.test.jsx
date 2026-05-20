@@ -150,7 +150,8 @@ describe('Storm Commander variant', () => {
     expect(effectsRoot.style.getPropertyValue('--storm-star-mid-x')).toMatch(/px$/)
     expect(effectsRoot.style.getPropertyValue('--storm-star-far-x')).toMatch(/px$/)
     expect(effectsRoot.style.getPropertyValue('--storm-asteroid-near-x')).toMatch(/px$/)
-    expect(document.querySelectorAll('.storm-starfield-layer')).toHaveLength(9)
+    expect(document.querySelectorAll('.storm-starfield-layer')).toHaveLength(8)
+    expect(document.querySelector('.storm-starfield-layer-streak')).not.toBeInTheDocument()
     expect(document.querySelector('.storm-starfield-layer-asteroid-near')).toBeInTheDocument()
   })
 

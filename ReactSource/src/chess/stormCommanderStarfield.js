@@ -183,9 +183,6 @@ export function toStarfieldLayerStyles(starfieldMotion) {
     dust: {
       backgroundPosition: position(starfieldMotion.dustX, starfieldMotion.dustY, 8, 17),
     },
-    streak: {
-      backgroundPosition: position(starfieldMotion.farX, starfieldMotion.farY, 108, 72),
-    },
     asteroidNear: {
       backgroundPosition: position(
         starfieldMotion.asteroidNearX,
