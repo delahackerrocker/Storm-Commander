@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { createReadStream, createWriteStream } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'

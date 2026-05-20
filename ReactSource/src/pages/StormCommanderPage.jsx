@@ -10,6 +10,8 @@ import {
 import {
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
 } from '../chess/stormCommanderPieceAssets'
+import { StormCommanderEncounterPage } from '../storm-commander/components/StormCommanderEncounterPage'
+import { generateRandomEncounter } from '../storm-commander/encounter/generateRandomEncounter'
 import { BasicChessPage } from './BasicChessPage'
 import '../styles/stormCommander.css'
 
@@ -23,6 +25,7 @@ function createSideVisualThemes(sideFactions) {
 export function StormCommanderPage({ onBack }) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
   const [starfieldMotion, setStarfieldMotion] = useState(() => createInitialStarfieldMotion())
+  const [encounter, setEncounter] = useState(null)
   const starfieldLayerStyles = useMemo(
     () => toStarfieldLayerStyles(starfieldMotion),
     [starfieldMotion],
@@ -49,19 +52,40 @@ export function StormCommanderPage({ onBack }) {
     )
   }
 
+  function startRandomEncounter() {
+    setEncounter(generateRandomEncounter())
+  }
+
   return (
     <div className="storm-commander-effects" style={starfieldStyle}>
-      <BasicChessPage
-        onBack={onBack}
-        onNewGameVisuals={randomizeSideFactions}
-        pieceSet="storm-commander-png"
-        rootClassName="storm-commander-root"
-        sidePieceFactions={sideFactions}
-        sideVisualThemes={sideVisualThemes}
-        pieceRotation={starfieldMotion.pieceRotation}
-        starfieldLayerStyles={starfieldLayerStyles}
-        title="Storm Commander"
-      />
+      {encounter ? (
+        <StormCommanderEncounterPage
+          encounter={encounter}
+          onBack={onBack}
+          onNewEncounter={startRandomEncounter}
+          onReturnToChess={() => setEncounter(null)}
+          pieceRotation={starfieldMotion.pieceRotation}
+          setEncounter={setEncounter}
+          starfieldLayerStyles={starfieldLayerStyles}
+        />
+      ) : (
+        <BasicChessPage
+          onBack={onBack}
+          onNewGameVisuals={randomizeSideFactions}
+          pieceSet="storm-commander-png"
+          rootClassName="storm-commander-root"
+          sidePieceFactions={sideFactions}
+          sideVisualThemes={sideVisualThemes}
+          pieceRotation={starfieldMotion.pieceRotation}
+          starfieldLayerStyles={starfieldLayerStyles}
+          title="Storm Commander"
+          topControls={
+            <button type="button" className="storm-primary-button" onClick={startRandomEncounter}>
+              New Random Encounter
+            </button>
+          }
+        />
+      )}
     </div>
   )
 }

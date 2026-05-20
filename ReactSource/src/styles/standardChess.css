@@ -17,7 +17,10 @@
   color: var(--text);
 }
 
-.standard-chess-root > .back-button {
+.standard-chess-root > .page-topbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
   margin-left: max(16px, calc((100vw - 1180px) / 2));
 }
 

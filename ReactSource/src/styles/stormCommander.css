@@ -33,8 +33,48 @@
   color: var(--text);
 }
 
-.storm-commander-root > .back-button {
+.storm-commander-root > .page-topbar,
+.storm-commander-root > .storm-encounter-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
   margin-left: max(16px, calc((100vw - 1180px) / 2));
+  margin-right: 16px;
+}
+
+.storm-commander-root .storm-primary-button,
+.storm-commander-root .storm-mode-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.storm-commander-root .storm-primary-button {
+  background: #7a3f20;
+}
+
+.storm-commander-root .storm-primary-button:hover {
+  background: #65331a;
+}
+
+.storm-commander-root .storm-mode-button {
+  background: #2f6458;
+}
+
+.storm-commander-root .storm-mode-button:hover {
+  background: #275449;
+}
+
+.storm-commander-root .storm-primary-button:focus-visible,
+.storm-commander-root .storm-mode-button:focus-visible {
+  outline: 3px solid var(--selected);
+  outline-offset: 3px;
 }
 
 .storm-commander-root .app-shell {
@@ -532,6 +572,259 @@
   font-weight: 800;
 }
 
+.storm-commander-root.storm-encounter-root {
+  --panel: rgba(249, 250, 246, 0.94);
+  --text: #edf4ef;
+  --muted: #a8b8b2;
+  --line: rgba(228, 238, 231, 0.18);
+
+  color: var(--text);
+}
+
+.storm-commander-root .storm-encounter-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 760px) minmax(300px, 380px);
+  gap: 28px;
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 18px 0 32px;
+  align-items: start;
+}
+
+.storm-commander-root .storm-encounter-play-area {
+  min-width: 0;
+}
+
+.storm-commander-root .storm-encounter-board {
+  --storm-turn-grid-line: rgba(226, 237, 237, 0.1725);
+  --storm-turn-hint: rgba(226, 237, 237, 0.82);
+  --storm-turn-hint-soft: rgba(226, 237, 237, 0.22);
+  --storm-last-move-ring: rgba(138, 166, 217, 0.82);
+  --storm-last-move-ring-soft: rgba(138, 166, 217, 0.22);
+
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--storm-encounter-columns), 1fr);
+  grid-template-rows: repeat(var(--storm-encounter-rows), 1fr);
+  overflow: hidden;
+  border: 4px solid rgba(229, 237, 239, 0.82);
+  border-radius: var(--radius);
+  box-shadow:
+    0 18px 55px rgba(4, 8, 18, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(74, 115, 164, 0.2), transparent 62%),
+    #050915;
+}
+
+.storm-commander-root .storm-encounter-square {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--storm-turn-grid-line);
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+}
+
+.storm-commander-root .storm-encounter-square.is-light {
+  background: rgba(255, 255, 255, 0.016875);
+}
+
+.storm-commander-root .storm-encounter-square.is-dark {
+  background: rgba(4, 8, 18, 0.16);
+}
+
+.storm-commander-root .storm-encounter-square.is-selected {
+  box-shadow:
+    inset 0 0 0 5px var(--selected),
+    inset 0 0 24px rgba(246, 200, 95, 0.16);
+}
+
+.storm-commander-root .storm-encounter-square.is-last-move::before,
+.storm-commander-root .storm-encounter-square.is-legal-move::after,
+.storm-commander-root .storm-encounter-square.is-extraction::before,
+.storm-commander-root .storm-encounter-square.is-target::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.storm-commander-root .storm-encounter-square.is-last-move::before {
+  z-index: 3;
+  inset: 10%;
+  border: 4px solid var(--storm-last-move-ring);
+  border-radius: 50%;
+  box-shadow: 0 0 16px var(--storm-last-move-ring-soft);
+}
+
+.storm-commander-root .storm-encounter-square.is-legal-move::after {
+  z-index: 4;
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: var(--storm-turn-hint);
+  box-shadow: 0 0 16px var(--storm-turn-hint-soft);
+}
+
+.storm-commander-root .storm-encounter-square.is-capture::after {
+  width: auto;
+  height: auto;
+  inset: 13%;
+  border: 5px solid var(--storm-turn-hint);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.storm-commander-root .storm-encounter-square.is-extraction::before {
+  z-index: 2;
+  inset: 8%;
+  border: 2px dashed rgba(128, 226, 190, 0.85);
+}
+
+.storm-commander-root .storm-encounter-square.is-target::before {
+  z-index: 2;
+  inset: 12%;
+  border: 2px solid rgba(232, 108, 36, 0.9);
+  box-shadow: 0 0 20px rgba(232, 108, 36, 0.22);
+}
+
+.storm-commander-root .storm-encounter-square:focus-visible {
+  z-index: 5;
+  outline: 4px solid var(--selected);
+  outline-offset: -4px;
+}
+
+.storm-commander-root .storm-encounter-piece {
+  position: relative;
+  z-index: 3;
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(var(--storm-piece-rotation));
+  transform-origin: 50% 50%;
+  transition: transform var(--storm-star-tween-ms) var(--storm-star-ease);
+}
+
+.storm-commander-root .storm-encounter-panel {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(9, 15, 30, 0.82);
+  box-shadow: 0 18px 55px rgba(4, 8, 18, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.storm-commander-root .storm-encounter-brief h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+
+.storm-commander-root .storm-encounter-brief p,
+.storm-commander-root .storm-objective-panel p,
+.storm-commander-root .storm-movement-hint,
+.storm-commander-root .storm-pilot-bark,
+.storm-commander-root .storm-pilot-empty {
+  margin: 8px 0 0;
+  color: #d9e5df;
+}
+
+.storm-commander-root .storm-objective-panel,
+.storm-commander-root .storm-pilot-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.storm-commander-root .storm-objective-panel h2,
+.storm-commander-root .storm-pilot-panel h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  letter-spacing: 0;
+}
+
+.storm-commander-root .storm-objective-progress {
+  font-weight: 850;
+}
+
+.storm-commander-root .storm-outcome {
+  color: #f6c85f;
+  font-weight: 900;
+}
+
+.storm-commander-root .storm-encounter-stats,
+.storm-commander-root .storm-pilot-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+
+.storm-commander-root .storm-encounter-stats div,
+.storm-commander-root .storm-pilot-list div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.storm-commander-root .storm-encounter-stats dt,
+.storm-commander-root .storm-pilot-list dt {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.storm-commander-root .storm-encounter-stats dd,
+.storm-commander-root .storm-pilot-list dd {
+  margin: 3px 0 0;
+  color: var(--text);
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.storm-commander-root .storm-pilot-panel {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.storm-commander-root .storm-pilot-portrait {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(246, 200, 95, 0.42);
+  border-radius: var(--radius);
+  color: #f6c85f;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(246, 200, 95, 0.22), transparent 52%),
+    linear-gradient(160deg, rgba(122, 63, 32, 0.72), rgba(9, 15, 30, 0.86));
+  font-size: 1.15rem;
+  font-weight: 950;
+}
+
+.storm-commander-root .storm-pilot-bark {
+  color: #f6c85f;
+  font-weight: 800;
+}
+
 @media (max-width: 900px) {
   .storm-commander-root .app-shell {
     grid-template-columns: 1fr;
@@ -546,6 +839,13 @@
 
   .storm-commander-root .game-status h1 {
     font-size: 2rem;
+  }
+
+  .storm-commander-root .storm-encounter-shell {
+    grid-template-columns: 1fr;
+    width: min(720px, calc(100vw - 24px));
+    gap: 22px;
+    padding: 18px 0 28px;
   }
 }
 
@@ -570,7 +870,14 @@
 
   .storm-commander-root .status-list,
   .storm-commander-root .scenario-button-grid,
-  .storm-commander-root .metadata-list {
+  .storm-commander-root .metadata-list,
+  .storm-commander-root .storm-encounter-stats,
+  .storm-commander-root .storm-pilot-list,
+  .storm-commander-root .storm-pilot-panel {
     grid-template-columns: 1fr;
+  }
+
+  .storm-commander-root .storm-encounter-board {
+    border-width: 3px;
   }
 }

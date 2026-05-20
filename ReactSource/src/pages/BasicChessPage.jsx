@@ -66,6 +66,7 @@ export function BasicChessPage({
   sideVisualThemes,
   starfieldLayerStyles,
   title = 'Chess-ish',
+  topControls,
 }) {
   const [game, setGame] = useState(() => new Chess())
   const [selectedSquare, setSelectedSquare] = useState(null)
@@ -231,9 +232,12 @@ export function BasicChessPage({
 
   return (
     <div className={['game-page', rootClassName].filter(Boolean).join(' ')}>
-      <button type="button" className="back-button" onClick={onBack}>
-        Back
-      </button>
+      <div className="page-topbar">
+        <button type="button" className="back-button" onClick={onBack}>
+          Back
+        </button>
+        {topControls}
+      </div>
 
       <main className="app-shell">
         <section className="play-area" aria-label="Chess board">
