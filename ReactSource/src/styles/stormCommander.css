@@ -732,7 +732,7 @@
 }
 
 .storm-commander-root.storm-encounter-root > .storm-encounter-topbar {
-  width: min(1180px, calc(100vw - 32px));
+  width: min(760px, calc(100vw - 32px));
   min-height: 58px;
   justify-content: space-between;
   gap: 16px;
@@ -789,6 +789,58 @@
   box-shadow: inset 0 0 0 1px rgba(243, 240, 223, 0.08);
 }
 
+.storm-commander-root.storm-encounter-root .storm-icon-button {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+.storm-commander-root .storm-dice-icon {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.storm-commander-root .storm-dice-pip {
+  width: 2px;
+  height: 2px;
+  align-self: center;
+  justify-self: center;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.storm-commander-root .storm-dice-pip-one {
+  grid-area: 1 / 1;
+}
+
+.storm-commander-root .storm-dice-pip-two {
+  grid-area: 1 / 3;
+}
+
+.storm-commander-root .storm-dice-pip-three {
+  grid-area: 2 / 2;
+}
+
+.storm-commander-root .storm-dice-pip-four {
+  grid-area: 3 / 1;
+}
+
+.storm-commander-root .storm-dice-pip-five {
+  grid-area: 3 / 3;
+}
+
 .storm-commander-root.storm-encounter-root .storm-primary-button,
 .storm-commander-root.storm-encounter-root .storm-mission-button {
   background: var(--storm-pirate-orange);
@@ -811,12 +863,13 @@
 
 .storm-commander-root .storm-encounter-shell {
   display: grid;
-  grid-template-columns: minmax(320px, 760px) minmax(300px, 380px);
+  grid-template-columns: minmax(320px, 760px);
   gap: 28px;
   width: min(1180px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 18px 0 32px;
   align-items: start;
+  justify-content: center;
 }
 
 .storm-commander-root .storm-encounter-play-area {
@@ -944,6 +997,7 @@
 }
 
 .storm-commander-root .storm-encounter-panel {
+  grid-column: 1;
   display: grid;
   gap: 18px;
   padding: 22px;
@@ -989,16 +1043,6 @@
   color: var(--storm-old-ivory);
   font-weight: 850;
   overflow-wrap: anywhere;
-}
-
-.storm-commander-root .storm-mission-summary-line {
-  margin: 0;
-  padding: 12px 14px;
-  border: 1px solid rgba(107, 110, 58, 0.86);
-  border-radius: var(--radius);
-  color: var(--storm-old-ivory);
-  background: rgba(43, 45, 30, 0.92);
-  font-weight: 850;
 }
 
 .storm-commander-root .storm-objective-panel p,

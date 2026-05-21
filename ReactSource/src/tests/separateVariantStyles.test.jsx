@@ -42,4 +42,38 @@ describe('separate variant style sources', () => {
     expect(globalStyles).not.toMatch(/\.scenario-panel/)
     expect(globalStyles).not.toMatch(/\.move-history/)
   })
+
+  it('keeps the random encounter status panel below a centered board column', () => {
+    const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
+    const topbarRule = stormStyles.match(
+      /\.storm-commander-root\.storm-encounter-root > \.storm-encounter-topbar\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const shellRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-shell\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const panelRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-panel\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const iconButtonRule = stormStyles.match(
+      /\.storm-commander-root\.storm-encounter-root \.storm-icon-button\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const diceIconRule = stormStyles.match(
+      /\.storm-commander-root \.storm-dice-icon\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const dicePipRule = stormStyles.match(
+      /\.storm-commander-root \.storm-dice-pip\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+
+    expect(topbarRule).toContain('width: min(760px, calc(100vw - 32px));')
+    expect(shellRule).toContain('grid-template-columns: minmax(320px, 760px);')
+    expect(shellRule).toContain('justify-content: center;')
+    expect(panelRule).toContain('grid-column: 1;')
+    expect(iconButtonRule).toContain('width: 40px;')
+    expect(iconButtonRule).toContain('height: 40px;')
+    expect(iconButtonRule).toContain('min-width: 40px;')
+    expect(iconButtonRule).toContain('min-height: 40px;')
+    expect(diceIconRule).toContain('border: 1px solid currentColor;')
+    expect(dicePipRule).toContain('width: 2px;')
+    expect(dicePipRule).toContain('height: 2px;')
+  })
 })

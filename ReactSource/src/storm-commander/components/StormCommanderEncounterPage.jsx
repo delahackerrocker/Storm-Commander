@@ -201,7 +201,7 @@ function MissionStatList({ encounter, isEnemyThinking }) {
   )
 }
 
-function MissionSummaryPanel({ encounter, isEnemyThinking }) {
+function MissionSummaryPanel({ encounter }) {
   return (
     <section className="storm-mission-summary" aria-label="Mission quick status">
       <dl className="storm-mission-summary-grid">
@@ -214,10 +214,6 @@ function MissionSummaryPanel({ encounter, isEnemyThinking }) {
           <dd>{getObjectiveProgressText(encounter)}</dd>
         </div>
       </dl>
-      <p className="storm-mission-summary-line">
-        {encounter.factions.map(getFactionDisplayName).join(' / ')} | {encounter.board.width}x
-        {encounter.board.height} | {getStatusText(encounter, isEnemyThinking)}
-      </p>
     </section>
   )
 }
@@ -374,8 +370,20 @@ export function StormCommanderEncounterPage({
           >
             Mission
           </button>
-          <button type="button" className="storm-primary-button" onClick={handleNewEncounter}>
-            New Random Encounter
+          <button
+            type="button"
+            className="storm-primary-button storm-icon-button"
+            aria-label="New Random Encounter"
+            title="New Random Encounter"
+            onClick={handleNewEncounter}
+          >
+            <span className="storm-dice-icon" aria-hidden="true">
+              <span className="storm-dice-pip storm-dice-pip-one" />
+              <span className="storm-dice-pip storm-dice-pip-two" />
+              <span className="storm-dice-pip storm-dice-pip-three" />
+              <span className="storm-dice-pip storm-dice-pip-four" />
+              <span className="storm-dice-pip storm-dice-pip-five" />
+            </span>
           </button>
         </div>
       </div>
@@ -446,7 +454,7 @@ export function StormCommanderEncounterPage({
         </section>
 
         <aside className="storm-encounter-panel" aria-label="Encounter status">
-          <MissionSummaryPanel encounter={encounter} isEnemyThinking={isEnemyThinking} />
+          <MissionSummaryPanel encounter={encounter} />
           <PilotPanel selectedPiece={selectedPiece} />
         </aside>
       </main>

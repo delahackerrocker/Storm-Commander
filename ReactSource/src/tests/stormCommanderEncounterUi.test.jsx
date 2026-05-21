@@ -42,12 +42,17 @@ describe('Storm Commander random encounter UI', () => {
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
 
     try {
-      render(<App />)
+      const { container } = render(<App />)
 
       await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
 
       expect(screen.getByRole('button', { name: /^Mission$/ })).toBeInTheDocument()
+      const newEncounterButton = screen.getByRole('button', { name: /^New Random Encounter$/ })
+      expect(newEncounterButton).toHaveClass('storm-icon-button')
+      expect(newEncounterButton).toHaveTextContent(/^$/)
+      expect(container.querySelector('.storm-dice-icon')).toBeInTheDocument()
       expect(screen.getByText(/Objective/)).toBeInTheDocument()
+      expect(container.querySelector('.storm-mission-summary-line')).not.toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBe(25)
 
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
