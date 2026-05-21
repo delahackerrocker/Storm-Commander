@@ -4,12 +4,17 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from '../App'
 
+async function openDebugPage(user, pageName) {
+  await user.click(screen.getByRole('button', { name: /^Debug$/ }))
+  await user.click(screen.getByRole('button', { name: pageName }))
+}
+
 describe('separate variant style sources', () => {
   it('renders Standard Chess inside the standard style root only', async () => {
     const user = userEvent.setup()
     const { container } = render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^basic chess$/i }))
+    await openDebugPage(user, /^Basic Chess$/)
 
     expect(container.querySelector('.standard-chess-root')).toBeInTheDocument()
     expect(container.querySelector('.storm-commander-root')).not.toBeInTheDocument()
@@ -20,7 +25,7 @@ describe('separate variant style sources', () => {
     const user = userEvent.setup()
     const { container } = render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+    await openDebugPage(user, /^Storm Chess Drill$/)
 
     expect(container.querySelector('.storm-commander-root')).toBeInTheDocument()
     expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()

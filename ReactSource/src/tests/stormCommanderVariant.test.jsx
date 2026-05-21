@@ -20,13 +20,18 @@ import App from '../App'
 
 const FACTION_ASSET_PREFIX = '/assets/chess/storm-commander/factions/'
 
+async function openDebugPage(user, pageName) {
+  await user.click(screen.getByRole('button', { name: /^Debug$/ }))
+  await user.click(screen.getByRole('button', { name: pageName }))
+}
+
 describe('Storm Commander variant', () => {
-  it('opens from the main menu and renders piece images', async () => {
+  it('opens the Storm Commander chess drill from debug mode and renders piece images', async () => {
     const user = userEvent.setup()
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+    await openDebugPage(user, /^Storm Chess Drill$/)
 
     const images = screen.getAllByRole('img')
     const board = document.querySelector('.storm-commander-root .chess-board')
@@ -51,7 +56,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+    await openDebugPage(user, /^Storm Chess Drill$/)
 
     const board = document.querySelector('.storm-commander-root .chess-board')
 
@@ -79,7 +84,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^basic chess$/i }))
+    await openDebugPage(user, /^Basic Chess$/)
 
     expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
     expect(document.querySelector('.storm-commander-effects')).not.toBeInTheDocument()
@@ -133,16 +138,14 @@ describe('Storm Commander variant', () => {
     const user = userEvent.setup()
     const randomSpy = vi.spyOn(Math, 'random')
 
-    randomSpy
-      .mockReturnValue(0.5)
-      .mockReturnValueOnce(0.01)
-      .mockReturnValueOnce(0.25)
-      .mockReturnValueOnce(0.99)
-
     try {
       render(<App />)
 
-      await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+      randomSpy
+        .mockReturnValue(0.5)
+        .mockReturnValueOnce(0.01)
+
+      await openDebugPage(user, /^Storm Chess Drill$/)
 
       const board = document.querySelector('.storm-commander-root .chess-board')
 
@@ -166,7 +169,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+    await openDebugPage(user, /^Storm Chess Drill$/)
 
     const effectsRoot = document.querySelector('.storm-commander-effects')
     const root = screen.getByText('Storm Commander').closest('.storm-commander-root')
@@ -258,7 +261,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+    await openDebugPage(user, /^Storm Chess Drill$/)
 
     const board = document.querySelector('.storm-commander-root .chess-board')
     const whiteFaction = board.dataset.whiteFaction
@@ -301,7 +304,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
+    await openDebugPage(user, /^Storm Chess Drill$/)
     await user.click(screen.getByRole('button', { name: /b1 white knight square/i }))
 
     expect(screen.getByRole('button', { name: /a3 empty legal destination/i })).toBeInTheDocument()

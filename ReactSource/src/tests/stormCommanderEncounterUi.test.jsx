@@ -1,11 +1,42 @@
 import { useState } from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
 import { StormCommanderEncounterPage } from '../storm-commander/components/StormCommanderEncounterPage'
 
 describe('Storm Commander random encounter UI', () => {
+  it('opens mission details as a dismissible briefing that can be restored', async () => {
+    const user = userEvent.setup()
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    try {
+      render(<App />)
+
+      const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
+
+      expect(missionDialog).toBeInTheDocument()
+      expect(
+        within(missionDialog).getByRole('heading', { name: /^Random Pirate Raid$/ }),
+      ).toBeInTheDocument()
+      expect(within(missionDialog).getByText(/Objective:/)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /^Mission$/ })).toBeInTheDocument()
+
+      await user.click(within(missionDialog).getByRole('button', { name: /^Dismiss$/ }))
+
+      expect(screen.queryByRole('dialog', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /^Mission$/ })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Cockpit$/ })).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: /^Mission$/ }))
+
+      expect(screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
+    } finally {
+      randomSpy.mockRestore()
+    }
+  })
+
   it('generates an encounter and shows the selected Pirate cockpit panel', async () => {
     const user = userEvent.setup()
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
@@ -13,11 +44,10 @@ describe('Storm Commander random encounter UI', () => {
     try {
       render(<App />)
 
-      await user.click(screen.getByRole('button', { name: /^Storm Commander$/ }))
-      await user.click(screen.getByRole('button', { name: /^New Random Encounter$/ }))
+      await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
 
-      expect(screen.getByRole('heading', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
-      expect(screen.getByText(/Objective:/)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /^Mission$/ })).toBeInTheDocument()
+      expect(screen.getByText(/Objective/)).toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBe(25)
 
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
@@ -72,11 +102,15 @@ describe('Storm Commander random encounter UI', () => {
 
     render(<Harness />)
 
+    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
     await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
     await user.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
+    await user.click(screen.getByRole('button', { name: /^Mission$/ }))
 
-    expect(screen.getByText('Victory')).toBeInTheDocument()
-    expect(screen.getByText('Victory: objective complete.')).toBeInTheDocument()
+    const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
+
+    expect(within(missionDialog).getByText('Victory')).toBeInTheDocument()
+    expect(within(missionDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
   })
 
   it('does not mark empty squares as targets for non-target objectives', () => {

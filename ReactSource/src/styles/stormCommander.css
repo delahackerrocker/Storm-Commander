@@ -44,7 +44,8 @@
 }
 
 .storm-commander-root .storm-primary-button,
-.storm-commander-root .storm-mode-button {
+.storm-commander-root .storm-mode-button,
+.storm-commander-root .storm-mission-button {
   min-height: 42px;
   border: 0;
   border-radius: var(--radius);
@@ -72,7 +73,8 @@
 }
 
 .storm-commander-root .storm-primary-button:focus-visible,
-.storm-commander-root .storm-mode-button:focus-visible {
+.storm-commander-root .storm-mode-button:focus-visible,
+.storm-commander-root .storm-mission-button:focus-visible {
   outline: 3px solid var(--selected);
   outline-offset: 3px;
 }
@@ -707,12 +709,104 @@
 }
 
 .storm-commander-root.storm-encounter-root {
-  --panel: rgba(249, 250, 246, 0.94);
-  --text: #edf4ef;
-  --muted: #a8b8b2;
-  --line: rgba(228, 238, 231, 0.18);
+  --storm-space-black: #07020c;
+  --storm-rebel-magenta: #591e3a;
+  --storm-hot-nebula: #d264bc;
+  --storm-hull-charcoal: #353330;
+  --storm-olive-steel: #6b6e3a;
+  --storm-worn-parchment: #b19881;
+  --storm-pirate-orange: #d86220;
+  --storm-cannon-cyan: #55d6e8;
+  --storm-old-ivory: #f3f0df;
+  --panel: rgba(17, 19, 3, 0.9);
+  --text: var(--storm-old-ivory);
+  --muted: #c5a17c;
+  --line: rgba(177, 152, 129, 0.36);
+  --selected: var(--storm-pirate-orange);
 
   color: var(--text);
+  background:
+    radial-gradient(circle at 14% 8%, rgba(89, 30, 58, 0.42), transparent 32%),
+    radial-gradient(circle at 68% 52%, rgba(85, 214, 232, 0.16), transparent 36%),
+    var(--storm-space-black);
+}
+
+.storm-commander-root.storm-encounter-root > .storm-encounter-topbar {
+  width: min(1180px, calc(100vw - 32px));
+  min-height: 58px;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 auto;
+  padding: 10px 12px;
+  border: 1px solid rgba(107, 110, 58, 0.86);
+  border-radius: var(--radius);
+  background: rgba(17, 19, 3, 0.9);
+  box-shadow:
+    0 18px 55px rgba(4, 8, 18, 0.32),
+    inset 0 -2px 0 rgba(216, 98, 32, 0.8);
+}
+
+.storm-commander-root .storm-encounter-brand {
+  display: grid;
+  gap: 0;
+  min-width: 210px;
+}
+
+.storm-commander-root .storm-encounter-brand .eyebrow,
+.storm-commander-root .storm-encounter-brand p {
+  margin: 0;
+}
+
+.storm-commander-root .storm-encounter-brand .eyebrow {
+  color: var(--storm-old-ivory);
+  font-size: 0.8rem;
+}
+
+.storm-commander-root .storm-encounter-brand p:not(.eyebrow) {
+  color: var(--storm-worn-parchment);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.storm-commander-root .storm-encounter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.storm-commander-root.storm-encounter-root .storm-primary-button,
+.storm-commander-root.storm-encounter-root .storm-mode-button,
+.storm-commander-root.storm-encounter-root .storm-mission-button,
+.storm-commander-root.storm-encounter-root .back-button {
+  min-height: 38px;
+  border: 1px solid rgba(5, 5, 5, 0.9);
+  border-radius: 7px;
+  padding: 8px 13px;
+  font-size: 0.84rem;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(243, 240, 223, 0.08);
+}
+
+.storm-commander-root.storm-encounter-root .storm-primary-button,
+.storm-commander-root.storm-encounter-root .storm-mission-button {
+  background: var(--storm-pirate-orange);
+}
+
+.storm-commander-root.storm-encounter-root .storm-primary-button:hover,
+.storm-commander-root.storm-encounter-root .storm-mission-button:hover {
+  background: #bd541c;
+}
+
+.storm-commander-root.storm-encounter-root .storm-mode-button,
+.storm-commander-root.storm-encounter-root .back-button {
+  background: #2b2d1e;
+}
+
+.storm-commander-root.storm-encounter-root .storm-mode-button:hover,
+.storm-commander-root.storm-encounter-root .back-button:hover {
+  background: #3d4321;
 }
 
 .storm-commander-root .storm-encounter-shell {
@@ -743,7 +837,7 @@
   grid-template-columns: repeat(var(--storm-encounter-columns), 1fr);
   grid-template-rows: repeat(var(--storm-encounter-rows), 1fr);
   overflow: hidden;
-  border: 4px solid rgba(229, 237, 239, 0.82);
+  border: 4px solid rgba(243, 240, 223, 0.82);
   border-radius: var(--radius);
   box-shadow:
     0 18px 55px rgba(4, 8, 18, 0.32),
@@ -855,19 +949,58 @@
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(9, 15, 30, 0.82);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(89, 30, 58, 0.24), transparent 46%),
+    rgba(17, 19, 3, 0.86);
   box-shadow: 0 18px 55px rgba(4, 8, 18, 0.32);
   backdrop-filter: blur(12px);
 }
 
-.storm-commander-root .storm-encounter-brief h1 {
-  margin: 0;
-  font-size: 2.2rem;
-  line-height: 1.04;
-  letter-spacing: 0;
+.storm-commander-root .storm-mission-summary {
+  display: grid;
+  gap: 12px;
 }
 
-.storm-commander-root .storm-encounter-brief p,
+.storm-commander-root .storm-mission-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+}
+
+.storm-commander-root .storm-mission-summary-grid div {
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(107, 110, 58, 0.86);
+  border-radius: var(--radius);
+  background: rgba(43, 45, 30, 0.94);
+}
+
+.storm-commander-root .storm-mission-summary-grid dt {
+  color: var(--storm-worn-parchment);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.storm-commander-root .storm-mission-summary-grid dd {
+  margin: 5px 0 0;
+  color: var(--storm-old-ivory);
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.storm-commander-root .storm-mission-summary-line {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(107, 110, 58, 0.86);
+  border-radius: var(--radius);
+  color: var(--storm-old-ivory);
+  background: rgba(43, 45, 30, 0.92);
+  font-weight: 850;
+}
+
 .storm-commander-root .storm-objective-panel p,
 .storm-commander-root .storm-movement-hint,
 .storm-commander-root .storm-pilot-bark,
@@ -881,7 +1014,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 14px;
-  background: rgba(255, 255, 255, 0.055);
+  background: rgba(53, 51, 48, 0.86);
 }
 
 .storm-commander-root .storm-objective-panel h2,
@@ -896,7 +1029,7 @@
 }
 
 .storm-commander-root .storm-outcome {
-  color: #f6c85f;
+  color: #ff8c2a;
   font-weight: 900;
 }
 
@@ -914,7 +1047,7 @@
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.055);
+  background: rgba(43, 45, 30, 0.74);
 }
 
 .storm-commander-root .storm-encounter-stats dt,
@@ -945,19 +1078,111 @@
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(246, 200, 95, 0.42);
+  border: 1px solid rgba(216, 98, 32, 0.62);
   border-radius: var(--radius);
-  color: #f6c85f;
+  color: #ff8c2a;
   background:
-    radial-gradient(circle at 50% 30%, rgba(246, 200, 95, 0.22), transparent 52%),
-    linear-gradient(160deg, rgba(122, 63, 32, 0.72), rgba(9, 15, 30, 0.86));
+    radial-gradient(circle at 50% 30%, rgba(216, 98, 32, 0.22), transparent 52%),
+    linear-gradient(160deg, rgba(89, 30, 58, 0.72), rgba(17, 19, 3, 0.9));
   font-size: 1.15rem;
   font-weight: 950;
 }
 
 .storm-commander-root .storm-pilot-bark {
-  color: #f6c85f;
+  color: #ff8c2a;
   font-weight: 800;
+}
+
+.storm-commander-root .storm-mission-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 42% 36%, rgba(89, 30, 58, 0.2), transparent 34%),
+    rgba(0, 0, 0, 0.58);
+}
+
+.storm-commander-root .storm-mission-dialog {
+  position: relative;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  display: grid;
+  gap: 16px;
+  overflow: auto;
+  padding: 28px 30px 30px;
+  border: 4px solid #050505;
+  border-top-color: var(--storm-pirate-orange);
+  border-radius: 10px;
+  color: var(--storm-old-ivory);
+  background:
+    linear-gradient(rgba(177, 152, 129, 0.06), rgba(177, 152, 129, 0.03)),
+    #2b2d1e;
+  box-shadow:
+    0 24px 55px rgba(0, 0, 0, 0.52),
+    inset 0 0 0 1px rgba(177, 152, 129, 0.26);
+}
+
+.storm-commander-root .storm-mission-dialog h1 {
+  max-width: calc(100% - 128px);
+  margin: 0;
+  color: var(--storm-old-ivory);
+  font-size: clamp(1.9rem, 4vw, 2.15rem);
+  line-height: 1.06;
+  letter-spacing: 0;
+}
+
+.storm-commander-root .storm-mission-intro,
+.storm-commander-root .storm-mission-return-note {
+  margin: 0;
+  color: #d9d4c3;
+  font-size: 1rem;
+}
+
+.storm-commander-root .storm-mission-dismiss {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  min-height: 40px;
+  border: 2px solid #050505;
+  border-radius: 7px;
+  padding: 8px 13px;
+  color: #fff;
+  background: var(--storm-pirate-orange);
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.storm-commander-root .storm-mission-dismiss:hover {
+  background: #bd541c;
+}
+
+.storm-commander-root .storm-mission-dismiss:focus-visible {
+  outline: 3px solid var(--storm-cannon-cyan);
+  outline-offset: 3px;
+}
+
+.storm-commander-root .storm-mission-dialog .storm-objective-panel {
+  border-color: rgba(107, 110, 58, 0.88);
+  background: rgba(53, 51, 48, 0.92);
+}
+
+.storm-commander-root .storm-mission-dialog .storm-encounter-stats div {
+  border-color: rgba(107, 110, 58, 0.88);
+}
+
+.storm-commander-root .storm-mission-dialog .storm-encounter-stats div:nth-child(2) {
+  border-color: rgba(85, 214, 232, 0.72);
+}
+
+.storm-commander-root .storm-mission-return-note {
+  padding: 12px 14px;
+  border: 1px solid rgba(107, 110, 58, 0.86);
+  border-radius: var(--radius);
+  background: rgba(17, 19, 3, 0.82);
 }
 
 @media (max-width: 900px) {
@@ -981,6 +1206,10 @@
     width: min(720px, calc(100vw - 24px));
     gap: 22px;
     padding: 18px 0 28px;
+  }
+
+  .storm-commander-root.storm-encounter-root > .storm-encounter-topbar {
+    width: min(720px, calc(100vw - 24px));
   }
 }
 
@@ -1007,6 +1236,7 @@
   .storm-commander-root .scenario-button-grid,
   .storm-commander-root .metadata-list,
   .storm-commander-root .storm-encounter-stats,
+  .storm-commander-root .storm-mission-summary-grid,
   .storm-commander-root .storm-pilot-list,
   .storm-commander-root .storm-pilot-panel {
     grid-template-columns: 1fr;
@@ -1014,5 +1244,13 @@
 
   .storm-commander-root .storm-encounter-board {
     border-width: 3px;
+  }
+
+  .storm-commander-root .storm-mission-dialog {
+    padding: 76px 18px 22px;
+  }
+
+  .storm-commander-root .storm-mission-dialog h1 {
+    max-width: none;
   }
 }

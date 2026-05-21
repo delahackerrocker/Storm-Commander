@@ -22,10 +22,16 @@ function createSideVisualThemes(sideFactions) {
   }
 }
 
-export function StormCommanderPage({ onBack }) {
+export function StormCommanderPage({
+  allowChessDrill = true,
+  onBack,
+  startInRandomEncounter = false,
+}) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
   const [starfieldMotion, setStarfieldMotion] = useState(() => createInitialStarfieldMotion())
-  const [encounter, setEncounter] = useState(null)
+  const [encounter, setEncounter] = useState(() =>
+    startInRandomEncounter ? generateRandomEncounter() : null,
+  )
   const starfieldLayerStyles = useMemo(
     () => toStarfieldLayerStyles(starfieldMotion),
     [starfieldMotion],
@@ -63,7 +69,7 @@ export function StormCommanderPage({ onBack }) {
           encounter={encounter}
           onBack={onBack}
           onNewEncounter={startRandomEncounter}
-          onReturnToChess={() => setEncounter(null)}
+          onReturnToChess={allowChessDrill ? () => setEncounter(null) : undefined}
           pieceRotation={starfieldMotion.pieceRotation}
           setEncounter={setEncounter}
           starfieldLayerStyles={starfieldLayerStyles}

@@ -2,7 +2,10 @@ export const STORM_COMMANDER_FACTION_IDS = ['pirate', 'imperial', 'robocorp', 'r
 
 export const STORM_COMMANDER_ASSET_VERSION = '20260520-imperial-ivory-gold'
 
-const versionStormCommanderAsset = (path) => `${path}?v=${STORM_COMMANDER_ASSET_VERSION}`
+export const STORM_COMMANDER_ASSET_BASE_URL = import.meta.env.BASE_URL || '/'
+
+const versionStormCommanderAsset = (path) =>
+  `${STORM_COMMANDER_ASSET_BASE_URL}${path.replace(/^\/+/, '')}?v=${STORM_COMMANDER_ASSET_VERSION}`
 
 export const STORM_COMMANDER_FACTION_VISUAL_THEMES = {
   pirate: {

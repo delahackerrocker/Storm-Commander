@@ -10,12 +10,13 @@ npm.cmd run build
 npm.cmd run test
 ```
 
+`npm.cmd run build` writes the deployable static site to `dist/` with `/storm_commander/` as the asset base, matching `https://practitioner.digital/storm_commander/`.
+
 ## Play
 
-- The app starts on a small menu.
-- Choose `basic chess` to open the playable chess prototype.
-- Choose `Storm Commander` to open the same chess prototype with local PNG pieces.
-- Use `Back` to return to the menu.
+- The app starts directly in a Storm Commander random encounter.
+- Use the bottom-right `Debug` button to open the legacy `Basic Chess` and `Storm Chess Drill` views.
+- Debug views can use `Back` to return to the random encounter.
 - Use the Scenario Library panel to load random scenarios or puzzles.
 - Use the Theme Filter to choose tactical themes, including `promotion`.
 - Human plays White.
@@ -44,4 +45,4 @@ Standard Chess styling lives in `src/styles/standardChess.css` under `.standard-
 
 Storm Commander styling lives in `src/styles/stormCommander.css` under `.storm-commander-root`.
 
-`src/styles.css` is reserved for global shell styles such as the reset, root font, and main menu.
+`src/styles.css` is reserved for global shell styles such as the reset, root font, and debug dock.

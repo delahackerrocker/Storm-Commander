@@ -176,6 +176,92 @@ function PilotPanel({ selectedPiece }) {
   )
 }
 
+function MissionStatList({ encounter, isEnemyThinking }) {
+  return (
+    <dl className="storm-encounter-stats">
+      <div>
+        <dt>Status</dt>
+        <dd>{getStatusText(encounter, isEnemyThinking)}</dd>
+      </div>
+      <div>
+        <dt>Board</dt>
+        <dd>
+          {encounter.board.width}x{encounter.board.height}
+        </dd>
+      </div>
+      <div>
+        <dt>Factions</dt>
+        <dd>{encounter.factions.map(getFactionDisplayName).join(' / ')}</dd>
+      </div>
+      <div>
+        <dt>AI</dt>
+        <dd>Sloppy Aggressive</dd>
+      </div>
+    </dl>
+  )
+}
+
+function MissionSummaryPanel({ encounter, isEnemyThinking }) {
+  return (
+    <section className="storm-mission-summary" aria-label="Mission quick status">
+      <dl className="storm-mission-summary-grid">
+        <div>
+          <dt>Objective</dt>
+          <dd>{getObjectiveTypeLabel(encounter.objective.type)}</dd>
+        </div>
+        <div>
+          <dt>Progress</dt>
+          <dd>{getObjectiveProgressText(encounter)}</dd>
+        </div>
+      </dl>
+      <p className="storm-mission-summary-line">
+        {encounter.factions.map(getFactionDisplayName).join(' / ')} | {encounter.board.width}x
+        {encounter.board.height} | {getStatusText(encounter, isEnemyThinking)}
+      </p>
+    </section>
+  )
+}
+
+function MissionBriefingDialog({ encounter, isEnemyThinking, onDismiss }) {
+  return (
+    <div className="storm-mission-overlay">
+      <section
+        id="storm-mission-briefing"
+        className="storm-mission-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="storm-mission-briefing-title"
+      >
+        <button
+          type="button"
+          className="storm-mission-dismiss"
+          onClick={onDismiss}
+          autoFocus
+        >
+          Dismiss
+        </button>
+
+        <p className="eyebrow">Storm Commander Alpha</p>
+        <h1 id="storm-mission-briefing-title">{encounter.title}</h1>
+        <p className="storm-mission-intro">{encounter.intro}</p>
+
+        <section className="storm-objective-panel">
+          <h2>Objective: {getObjectiveTypeLabel(encounter.objective.type)}</h2>
+          <p>{encounter.objective.text}</p>
+          <p className="storm-objective-progress">{getObjectiveProgressText(encounter)}</p>
+          {encounter.outcome ? <p className="storm-outcome">{encounter.outcome}</p> : null}
+        </section>
+
+        <MissionStatList encounter={encounter} isEnemyThinking={isEnemyThinking} />
+
+        <p className="storm-mission-return-note">
+          Dismiss this briefing to command the board. Use Mission in the HUD to reopen it.
+        </p>
+      </section>
+    </div>
+  )
+}
+
 export function StormCommanderEncounterPage({
   encounter,
   onBack,
@@ -186,6 +272,7 @@ export function StormCommanderEncounterPage({
   starfieldLayerStyles,
 }) {
   const [selection, setSelection] = useState(null)
+  const [dismissedMissionEncounterId, setDismissedMissionEncounterId] = useState(null)
   const selectedPiece =
     selection?.encounterId === encounter.id
       ? encounter.pieces.find((piece) => piece.id === selection.pieceId) || null
@@ -199,6 +286,7 @@ export function StormCommanderEncounterPage({
   )
   const isEnemyThinking =
     encounter.status === 'active' && encounter.currentFaction !== encounter.playerFaction
+  const isMissionBriefingOpen = dismissedMissionEncounterId !== encounter.id
 
   useEffect(() => {
     if (!isEnemyThinking) {
@@ -211,6 +299,26 @@ export function StormCommanderEncounterPage({
 
     return () => window.clearTimeout(timerId)
   }, [isEnemyThinking, setEncounter])
+
+  useEffect(() => {
+    if (!isMissionBriefingOpen) {
+      return undefined
+    }
+
+    function handleMissionKeyDown(event) {
+      if (event.key === 'Escape') {
+        setDismissedMissionEncounterId(encounter.id)
+      }
+    }
+
+    window.addEventListener('keydown', handleMissionKeyDown)
+
+    return () => window.removeEventListener('keydown', handleMissionKeyDown)
+  }, [encounter.id, isMissionBriefingOpen])
+
+  function handleNewEncounter() {
+    onNewEncounter()
+  }
 
   function handleSquareClick(square) {
     if (encounter.status !== 'active' || encounter.currentFaction !== encounter.playerFaction) {
@@ -241,15 +349,35 @@ export function StormCommanderEncounterPage({
   return (
     <div className="game-page storm-commander-root storm-encounter-root">
       <div className="storm-encounter-topbar">
-        <button type="button" className="back-button" onClick={onBack}>
-          Back
-        </button>
-        <button type="button" className="storm-mode-button" onClick={onReturnToChess}>
-          Return to Chess Drill
-        </button>
-        <button type="button" className="storm-primary-button" onClick={onNewEncounter}>
-          New Random Encounter
-        </button>
+        <div className="storm-encounter-brand">
+          <p className="eyebrow">Storm Commander</p>
+          <p>Pirate raid tactical board</p>
+        </div>
+        <div className="storm-encounter-actions">
+          {onBack ? (
+            <button type="button" className="back-button" onClick={onBack}>
+              Back
+            </button>
+          ) : null}
+          {onReturnToChess ? (
+            <button type="button" className="storm-mode-button" onClick={onReturnToChess}>
+              Return to Chess Drill
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="storm-mission-button"
+            aria-haspopup="dialog"
+            aria-expanded={isMissionBriefingOpen}
+            aria-controls="storm-mission-briefing"
+            onClick={() => setDismissedMissionEncounterId(null)}
+          >
+            Mission
+          </button>
+          <button type="button" className="storm-primary-button" onClick={handleNewEncounter}>
+            New Random Encounter
+          </button>
+        </div>
       </div>
 
       <main className="storm-encounter-shell">
@@ -318,43 +446,18 @@ export function StormCommanderEncounterPage({
         </section>
 
         <aside className="storm-encounter-panel" aria-label="Encounter status">
-          <section className="storm-encounter-brief">
-            <p className="eyebrow">Storm Commander Alpha</p>
-            <h1>{encounter.title}</h1>
-            <p>{encounter.intro}</p>
-          </section>
-
-          <section className="storm-objective-panel">
-            <h2>Objective: {getObjectiveTypeLabel(encounter.objective.type)}</h2>
-            <p>{encounter.objective.text}</p>
-            <p className="storm-objective-progress">{getObjectiveProgressText(encounter)}</p>
-            {encounter.outcome ? <p className="storm-outcome">{encounter.outcome}</p> : null}
-          </section>
-
-          <dl className="storm-encounter-stats">
-            <div>
-              <dt>Status</dt>
-              <dd>{getStatusText(encounter, isEnemyThinking)}</dd>
-            </div>
-            <div>
-              <dt>Board</dt>
-              <dd>
-                {encounter.board.width}x{encounter.board.height}
-              </dd>
-            </div>
-            <div>
-              <dt>Factions</dt>
-              <dd>{encounter.factions.map(getFactionDisplayName).join(' / ')}</dd>
-            </div>
-            <div>
-              <dt>AI</dt>
-              <dd>Sloppy Aggressive</dd>
-            </div>
-          </dl>
-
+          <MissionSummaryPanel encounter={encounter} isEnemyThinking={isEnemyThinking} />
           <PilotPanel selectedPiece={selectedPiece} />
         </aside>
       </main>
+
+      {isMissionBriefingOpen ? (
+        <MissionBriefingDialog
+          encounter={encounter}
+          isEnemyThinking={isEnemyThinking}
+          onDismiss={() => setDismissedMissionEncounterId(encounter.id)}
+        />
+      ) : null}
     </div>
   )
 }

@@ -233,9 +233,11 @@ export function BasicChessPage({
   return (
     <div className={['game-page', rootClassName].filter(Boolean).join(' ')}>
       <div className="page-topbar">
-        <button type="button" className="back-button" onClick={onBack}>
-          Back
-        </button>
+        {onBack ? (
+          <button type="button" className="back-button" onClick={onBack}>
+            Back
+          </button>
+        ) : null}
         {topControls}
       </div>
 

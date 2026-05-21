@@ -75,3 +75,74 @@ button {
   outline: 3px solid #f6c85f;
   outline-offset: 3px;
 }
+
+.debug-dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 30;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.debug-panel {
+  width: min(260px, calc(100vw - 32px));
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(246, 200, 95, 0.46);
+  border-radius: 8px;
+  background: rgba(18, 22, 31, 0.94);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+}
+
+.debug-panel-title {
+  margin: 0 0 2px;
+  color: #f6c85f;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.debug-toggle,
+.debug-option {
+  border: 0;
+  border-radius: 8px;
+  font-weight: 850;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.debug-toggle {
+  min-width: 78px;
+  padding: 9px 12px;
+  color: #101820;
+  background: #f6c85f;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+}
+
+.debug-option {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  color: #f5f6f0;
+  background: rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+
+.debug-option[aria-pressed='true'] {
+  color: #101820;
+  background: #f6c85f;
+}
+
+.debug-toggle:hover,
+.debug-toggle:focus-visible,
+.debug-option:hover,
+.debug-option:focus-visible {
+  outline: 3px solid rgba(246, 200, 95, 0.5);
+  outline-offset: 2px;
+}
