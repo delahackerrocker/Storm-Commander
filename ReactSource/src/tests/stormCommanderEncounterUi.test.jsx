@@ -69,6 +69,9 @@ describe('Storm Commander random encounter UI', () => {
       expect(within(opponentComms).queryByText(/^Ship$/)).not.toBeInTheDocument()
       expect(within(playerComms).queryByText(/^Square$/)).not.toBeInTheDocument()
       expect(within(opponentComms).queryByText(/^Square$/)).not.toBeInTheDocument()
+      expect(container.querySelector('.storm-comms-movement')).not.toBeInTheDocument()
+      expect(playerComms.querySelector('.storm-comms-transmission .storm-movement-pattern'))
+        .toBeInTheDocument()
 
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
 
@@ -233,6 +236,66 @@ describe('Storm Commander random encounter UI', () => {
 
     expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen : E1$/ }))
       .toBeInTheDocument()
+  })
+
+  it('keeps soft rings on each comms ship and upgrades the player ship to active selection', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_soft_selection_rings',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 3, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 4 } },
+      ],
+    }
+
+    render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+
+    const playerSquare = screen.getByRole('button', { name: /B4 Pirate rook square/i })
+    const firstOpponentSquare = screen.getByRole('button', { name: /D4 Imperial pawn square/i })
+    const secondOpponentSquare = screen.getByRole('button', { name: /E1 Imperial queen square/i })
+
+    expect(playerSquare).toHaveClass('is-player-soft-selected')
+    expect(firstOpponentSquare).toHaveClass('is-opponent-soft-selected')
+
+    await user.click(playerSquare)
+
+    expect(playerSquare).toHaveClass('is-selected')
+    expect(playerSquare).not.toHaveClass('is-player-soft-selected')
+
+    await user.click(secondOpponentSquare)
+
+    expect(playerSquare).not.toHaveClass('is-selected')
+    expect(playerSquare).toHaveClass('is-player-soft-selected')
+    expect(firstOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
+    expect(secondOpponentSquare).toHaveClass('is-opponent-soft-selected')
   })
 
   it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {

@@ -243,10 +243,10 @@ function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, ti
         <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
       </div>
       <h2>{pilotTitle} : {squareLabel}</h2>
-      <div className="storm-comms-movement">
+      <div className="storm-comms-transmission">
         <MovementPatternIcon pieceType={piece.type} />
+        <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
       </div>
-      <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
     </aside>
   )
 }
@@ -434,6 +434,7 @@ export function StormCommanderEncounterPage({
       setSelection({ encounterId: encounter.id, pieceId: piece.id })
       setPlayerCommsSelection({ encounterId: encounter.id, pieceId: piece.id })
     } else if (piece) {
+      setSelection(null)
       setOpponentCommsSelection({
         encounterId: encounter.id,
         latestOpponentMovePieceId,
@@ -528,6 +529,18 @@ export function StormCommanderEncounterPage({
             {squares.map((square) => {
               const piece = getEncounterPieceAt(encounter, square)
               const legalMove = legalMoveForSquare.get(`${square.x},${square.y}`)
+              const isActiveSelection = Boolean(
+                selectedPiece && sameSquare(selectedPiece.square, square),
+              )
+              const isPlayerSoftSelection = Boolean(
+                !isActiveSelection &&
+                piece?.id &&
+                playerCommsPiece?.id === piece.id,
+              )
+              const isOpponentSoftSelection = Boolean(
+                piece?.id &&
+                opponentCommsPiece?.id === piece.id,
+              )
               const isExtraction = sameSquare(square, encounter.objective.extractionSquare)
               const isTarget =
                 Boolean(encounter.objective.targetPieceId) &&
@@ -535,7 +548,9 @@ export function StormCommanderEncounterPage({
               const className = [
                 'storm-encounter-square',
                 (square.x + square.y) % 2 === 0 ? 'is-light' : 'is-dark',
-                selectedPiece && sameSquare(selectedPiece.square, square) ? 'is-selected' : '',
+                isPlayerSoftSelection ? 'is-player-soft-selected' : '',
+                isOpponentSoftSelection ? 'is-opponent-soft-selected' : '',
+                isActiveSelection ? 'is-selected' : '',
                 legalMove ? 'is-legal-move' : '',
                 legalMove?.capturedPieceId ? 'is-capture' : '',
                 isExtraction ? 'is-extraction' : '',

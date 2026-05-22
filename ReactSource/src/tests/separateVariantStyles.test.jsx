@@ -72,6 +72,12 @@ describe('separate variant style sources', () => {
     const movementRule = stormStyles.match(
       /\.storm-commander-root \.storm-movement-pattern\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const transmissionRule = stormStyles.match(
+      /\.storm-commander-root \.storm-comms-transmission\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const barkRule = stormStyles.match(
+      /\.storm-commander-root \.storm-comms-bark\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const movementMoveCellRule = stormStyles.match(
       /\.storm-commander-root \.storm-movement-pattern-cell\.is-move\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -93,8 +99,13 @@ describe('separate variant style sources', () => {
     expect(diceIconRule).toContain('border: 1px solid currentColor;')
     expect(dicePipRule).toContain('width: 2px;')
     expect(dicePipRule).toContain('height: 2px;')
+    expect(stormStyles).not.toContain('.storm-commander-root .storm-comms-movement')
+    expect(transmissionRule).toContain('grid-template-columns: 85px minmax(0, 1fr);')
+    expect(movementRule).toContain('justify-self: center;')
+    expect(movementRule).toContain('align-self: center;')
     expect(movementRule).toContain('grid-template-columns: repeat(5, 11px);')
     expect(movementRule).toContain('background-size: 14px 14px;')
+    expect(barkRule).toContain('min-height: 85px;')
     expect(movementMoveCellRule).toContain('background: var(--storm-pirate-orange);')
   })
 })
