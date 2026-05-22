@@ -93,6 +93,17 @@ function getBoardStyle(encounter) {
   }
 }
 
+function getEncounterRootStyle(encounter) {
+  const playerTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[encounter.playerFaction]
+  const opponentFaction = encounter.factions.find((faction) => faction !== encounter.playerFaction)
+  const opponentTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[opponentFaction]
+
+  return {
+    ...(playerTheme ? { '--storm-player-faction-bg': playerTheme.hintSoft } : {}),
+    ...(opponentTheme ? { '--storm-opponent-faction-bg': opponentTheme.hintSoft } : {}),
+  }
+}
+
 function getObjectiveTypeLabel(type) {
   if (type === 'destroyTarget') {
     return 'Destroy Target'
@@ -583,9 +594,10 @@ export function StormCommanderEncounterPage({
   const legalMoveForSquare = new Map(legalMoves.map((move) => [`${move.to.x},${move.to.y}`, move]))
   const squares = createSquares(encounter.board)
   const boardStyle = getBoardStyle(encounter)
+  const rootStyle = getEncounterRootStyle(encounter)
 
   return (
-    <div className="game-page storm-commander-root storm-encounter-root">
+    <div className="game-page storm-commander-root storm-encounter-root" style={rootStyle}>
       <main className="storm-encounter-shell">
         <ShipCommsWindow
           ariaLabel="Player comms"

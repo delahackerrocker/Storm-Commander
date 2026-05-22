@@ -14,7 +14,9 @@ describe('Storm Commander random encounter UI', () => {
       const { container } = render(<App />)
 
       const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
-      const encounterStatus = screen.getByRole('complementary', { name: /^Encounter status$/ })
+      const encounterStatusButton = screen.getByRole('button', {
+        name: /Mission status\. Objective: Escape To Square\. Progress: Extraction at 1,1\./,
+      })
 
       expect(missionDialog).toBeInTheDocument()
       expect(
@@ -35,10 +37,12 @@ describe('Storm Commander random encounter UI', () => {
       expect(within(missionDialog).queryByText(/^Board$/)).not.toBeInTheDocument()
       expect(within(missionDialog).getByText(/^Factions$/)).toBeInTheDocument()
       expect(within(missionDialog).getByText(/^AI$/)).toBeInTheDocument()
-      expect(within(encounterStatus).getByRole('button', { name: /^Mission$/ }))
-        .toBeInTheDocument()
-      expect(within(encounterStatus).getByRole('button', { name: /^New Random Encounter$/ }))
-        .toBeInTheDocument()
+      expect(encounterStatusButton).toHaveTextContent('?')
+      expect(screen.queryByRole('complementary', { name: /^Encounter status$/ }))
+        .not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /^Mission$/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /^New Random Encounter$/ }))
+        .not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar')).not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar .storm-mission-button'))
         .not.toBeInTheDocument()
@@ -49,12 +53,11 @@ describe('Storm Commander random encounter UI', () => {
 
       expect(screen.queryByRole('dialog', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
-      expect(within(encounterStatus).getByRole('button', { name: /^Mission$/ }))
-        .toBeInTheDocument()
+      expect(encounterStatusButton).toBeInTheDocument()
       expect(screen.getByRole('complementary', { name: /^Player comms$/ })).toBeInTheDocument()
       expect(screen.getByRole('complementary', { name: /^Opponent comms$/ })).toBeInTheDocument()
 
-      await user.click(within(encounterStatus).getByRole('button', { name: /^Mission$/ }))
+      await user.click(encounterStatusButton)
 
       expect(screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
     } finally {
@@ -71,21 +74,21 @@ describe('Storm Commander random encounter UI', () => {
 
       await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
-      const encounterStatus = screen.getByRole('complementary', { name: /^Encounter status$/ })
+      const encounterStatusButton = screen.getByRole('button', {
+        name: /Mission status\. Objective: Escape To Square\. Progress: Extraction at 1,1\./,
+      })
 
-      expect(within(encounterStatus).getByRole('button', { name: /^Mission$/ }))
-        .toBeInTheDocument()
+      expect(encounterStatusButton).toHaveTextContent('?')
+      expect(screen.queryByRole('complementary', { name: /^Encounter status$/ }))
+        .not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /^Mission$/ })).not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar')).not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar .storm-mission-button'))
         .not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar .storm-icon-button'))
         .not.toBeInTheDocument()
-      const newEncounterButton = within(encounterStatus).getByRole('button', {
-        name: /^New Random Encounter$/,
-      })
-      expect(newEncounterButton).toHaveClass('storm-icon-button')
-      expect(newEncounterButton).toHaveTextContent(/^$/)
-      expect(container.querySelector('.storm-dice-icon')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /^New Random Encounter$/ }))
+        .not.toBeInTheDocument()
       expect(screen.getByText(/Objective/)).toBeInTheDocument()
       expect(container.querySelector('.storm-mission-summary-line')).not.toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBe(25)
@@ -101,6 +104,12 @@ describe('Storm Commander random encounter UI', () => {
         .toHaveAttribute('data-faction', 'pirate')
       expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
         .toHaveAttribute('data-faction', 'imperial')
+      expect(container.querySelector('.storm-encounter-root')).toHaveStyle(
+        '--storm-player-faction-bg: rgba(232, 108, 36, 0.24)',
+      )
+      expect(container.querySelector('.storm-encounter-root')).toHaveStyle(
+        '--storm-opponent-faction-bg: rgba(213, 166, 14, 0.26)',
+      )
       expect(within(playerComms).queryByText(/^PLAYER COMMS$/)).not.toBeInTheDocument()
       expect(within(opponentComms).queryByText(/^OPPONENT COMMS$/)).not.toBeInTheDocument()
       expect(within(playerComms).queryByText(/^Faction$/)).not.toBeInTheDocument()

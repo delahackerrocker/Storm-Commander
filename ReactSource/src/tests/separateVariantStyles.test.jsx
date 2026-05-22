@@ -48,6 +48,9 @@ describe('separate variant style sources', () => {
     const shellRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-shell\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const encounterRootRule = stormStyles.match(
+      /\.storm-commander-root\.storm-encounter-root\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const panelRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-panel\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -69,8 +72,14 @@ describe('separate variant style sources', () => {
     const dicePipRule = stormStyles.match(
       /\.storm-commander-root \.storm-dice-pip\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
-    const newEncounterSummaryButtonRule = stormStyles.match(
-      /\.storm-commander-root\.storm-encounter-root \.storm-icon-button\.storm-mission-summary-new-encounter\s*\{(?<body>[^}]+)\}/,
+    const missionStatusButtonRule = stormStyles.match(
+      /\.storm-commander-root \.storm-mission-status-button\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const stackedMediaRule = stormStyles.match(
+      /@media \(max-width: 1180px\)\s*\{(?<body>[\s\S]+?)\n\}/,
+    )?.groups.body
+    const verticalMediaRule = stormStyles.match(
+      /@media \(max-width: 900px\)\s*\{(?<body>[\s\S]+?)\n\}/,
     )?.groups.body
     const phoneMediaRule = stormStyles.match(
       /@media \(max-width: 560px\)\s*\{(?<body>[\s\S]+?)\n\}/,
@@ -115,6 +124,12 @@ describe('separate variant style sources', () => {
     const selectionFlashRule = stormStyles.match(
       /\.storm-commander-root \.storm-selection-flash\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const playerSoftSelectionRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-player-soft-selected \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const opponentSoftSelectionRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-opponent-soft-selected \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const activeSelectionRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-selected \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -123,6 +138,9 @@ describe('separate variant style sources', () => {
     )?.groups.body
     const captureRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-capture::after\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const extractionSquareRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-extraction::before\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
     const encounterPieceRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-piece\s*\{(?<body>[^}]+)\}/,
@@ -139,56 +157,51 @@ describe('separate variant style sources', () => {
     expect(stormStyles).not.toContain('storm-encounter-topbar')
     expect(stormStyles).not.toContain('storm-encounter-brand')
     expect(stormStyles).not.toContain('storm-encounter-actions')
+    expect(encounterRootRule).toContain('var(--storm-opponent-faction-bg)')
+    expect(encounterRootRule).toContain('var(--storm-player-faction-bg)')
     expect(shellRule).toContain(
-      'grid-template-columns: minmax(320px, 760px);',
+      'grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);',
     )
-    expect(shellRule).toContain('"player-comms"')
-    expect(shellRule).toContain('"board"')
-    expect(shellRule).toContain('"opponent-comms"')
-    expect(shellRule).toContain('"encounter-status"')
-    expect(shellRule).toContain('width: min(760px, calc(100vw - 32px));')
+    expect(shellRule).toContain('"opponent-comms board player-comms"')
+    expect(shellRule).not.toContain('encounter-status')
+    expect(shellRule).toContain('width: min(1320px, calc(100vw - 32px));')
     expect(shellRule).toContain('justify-content: center;')
-    expect(panelRule).toContain('grid-area: encounter-status;')
+    expect(panelRule).toContain('position: fixed;')
+    expect(panelRule).toContain('left: 16px;')
+    expect(panelRule).toContain('bottom: 16px;')
+    expect(panelRule).toContain('z-index: 30;')
+    expect(missionStatusButtonRule).toContain('width: 48px;')
+    expect(missionStatusButtonRule).toContain('height: 48px;')
+    expect(missionStatusButtonRule).toContain('border-radius: var(--radius);')
     expect(commsWindowRule).toContain('box-sizing: border-box;')
     expect(commsWindowRule).toContain('justify-self: stretch;')
     expect(commsWindowRule).toContain('width: 100%;')
     expect(playerCommsRule).toContain('grid-area: player-comms;')
     expect(opponentCommsRule).toContain('grid-area: opponent-comms;')
-    expect(stormStyles).toContain('.storm-commander-root .storm-mission-summary-row')
-    expect(stormStyles).toContain(
-      'grid-template-columns: max-content minmax(0, 1fr) max-content;',
+    expect(stormStyles).not.toContain('.storm-commander-root .storm-mission-summary-row')
+    expect(stormStyles).not.toContain('.storm-commander-root .storm-mission-summary-button')
+    expect(stormStyles).not.toContain('storm-mission-summary-new-encounter')
+    expect(stackedMediaRule).toContain('.storm-commander-root .storm-encounter-shell')
+    expect(stackedMediaRule).toContain(
+      [
+        'grid-template-areas:',
+        '      "opponent-comms"',
+        '      "board"',
+        '      "player-comms";',
+      ].join('\n'),
     )
-    expect(stormStyles).toContain('.storm-commander-root .storm-mission-summary-button')
-    expect(stormStyles).toContain('min-width: 104px;')
-    expect(stormStyles).toContain(
-      '.storm-commander-root.storm-encounter-root .storm-icon-button.storm-mission-summary-new-encounter',
+    expect(stackedMediaRule).toContain(
+      '.storm-commander-root .storm-comms-window-player',
     )
-    expect(newEncounterSummaryButtonRule).toBeDefined()
-    expect(newEncounterSummaryButtonRule).toContain('width: auto;')
-    expect(newEncounterSummaryButtonRule).toContain('height: auto;')
-    expect(newEncounterSummaryButtonRule).toContain('min-width: 104px;')
-    expect(newEncounterSummaryButtonRule).toContain('align-self: stretch;')
-    expect(stormStyles).toContain(
-      '.storm-commander-root .storm-mission-summary-row .storm-mission-summary-grid',
-    )
+    expect(stackedMediaRule).toContain('grid-template-areas: "title movement portrait";')
+    expect(stackedMediaRule).toContain('text-align: right;')
     expect(stormStyles).toContain('@media (max-width: 560px)')
     expect(stormStyles).toContain('gap: 8px;')
     expect(stormStyles).toContain('width: 36px;')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-encounter-panel')
-    expect(phoneMediaRule).toContain('padding: 14px;')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-summary-row')
-    expect(phoneMediaRule).toContain('grid-template-columns: 76px minmax(0, 1fr) 44px;')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-summary-button')
-    expect(phoneMediaRule).toContain('min-width: 0;')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-summary-grid')
-    expect(phoneMediaRule).toContain('grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-summary-grid div')
-    expect(phoneMediaRule).toContain('padding: 8px;')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-summary-grid dt')
-    expect(phoneMediaRule).toContain('font-size: 0.56rem;')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-summary-grid dd')
-    expect(phoneMediaRule).toContain('font-size: 0.82rem;')
-    expect(phoneMediaRule).toContain('line-height: 1.15;')
+    expect(verticalMediaRule).not.toContain('"player-comms"')
+    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-status-button')
+    expect(phoneMediaRule).toContain('width: 44px;')
+    expect(phoneMediaRule).toContain('height: 44px;')
     expect(iconButtonRule).toContain('width: 40px;')
     expect(iconButtonRule).toContain('height: 40px;')
     expect(iconButtonRule).toContain('min-width: 40px;')
@@ -256,12 +269,21 @@ describe('separate variant style sources', () => {
     expect(movementRule).toContain('grid-template-columns: repeat(5, 11px);')
     expect(movementRule).toContain('background-size: 14px 14px;')
     expect(barkRule).toContain('min-height: 85px;')
-    expect(selectionRingRule).toContain('border-radius: 50%;')
+    expect(selectionRingRule).not.toContain('border-radius: 50%;')
     expect(selectionRingRule).toContain('z-index: 2;')
     expect(selectionFlashRule).toContain('position: fixed;')
     expect(selectionFlashRule).toContain('background: var(--storm-selection-flash-color);')
     expect(selectionFlashRule).toContain('animation: storm-selection-flash 0.3s ease-out forwards;')
+    expect(playerSoftSelectionRule).toContain('border: 3px solid rgba(216, 98, 32, 0.456);')
+    expect(playerSoftSelectionRule).toContain('border-radius: var(--radius);')
+    expect(playerSoftSelectionRule).toContain('inset 0 0 18px rgba(216, 98, 32, 0.072)')
+    expect(playerSoftSelectionRule).toContain('0 0 16px rgba(216, 98, 32, 0.156)')
+    expect(opponentSoftSelectionRule).toContain('border: 3px solid rgba(85, 214, 232, 0.432);')
+    expect(opponentSoftSelectionRule).toContain('border-radius: var(--radius);')
+    expect(opponentSoftSelectionRule).toContain('inset 0 0 18px rgba(85, 214, 232, 0.06)')
+    expect(opponentSoftSelectionRule).toContain('0 0 16px rgba(85, 214, 232, 0.144)')
     expect(activeSelectionRule).toContain('border: 5px solid var(--selected);')
+    expect(activeSelectionRule).toContain('border-radius: 50%;')
     expect(legalMoveRule).toContain('z-index: 2;')
     expect(legalMoveRule).toContain('width: 20%;')
     expect(legalMoveRule).toContain('height: 20%;')
@@ -271,6 +293,9 @@ describe('separate variant style sources', () => {
     expect(captureRule).toContain('45deg')
     expect(captureRule).toContain('-45deg')
     expect(captureRule).toContain('box-shadow: none;')
+    expect(extractionSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
+    expect(extractionSquareRule).toContain('animation: storm-extraction-pulse 3.2s ease-in-out infinite;')
+    expect(stormStyles).toContain('@keyframes storm-extraction-pulse')
     expect(encounterPieceRule).toContain('z-index: 3;')
     expect(movementMoveCellRule).toContain('background: var(--storm-pirate-orange);')
   })

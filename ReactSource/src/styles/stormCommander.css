@@ -722,11 +722,14 @@
   --muted: #c5a17c;
   --line: rgba(177, 152, 129, 0.36);
   --selected: var(--storm-pirate-orange);
+  --storm-player-faction-bg: rgba(232, 108, 36, 0.24);
+  --storm-opponent-faction-bg: rgba(85, 214, 232, 0.16);
 
   color: var(--text);
   background:
+    radial-gradient(circle at 100% 0%, var(--storm-opponent-faction-bg), transparent 42%),
+    radial-gradient(circle at 100% 100%, var(--storm-player-faction-bg), transparent 44%),
     radial-gradient(circle at 14% 8%, rgba(89, 30, 58, 0.42), transparent 32%),
-    radial-gradient(circle at 68% 52%, rgba(85, 214, 232, 0.16), transparent 36%),
     var(--storm-space-black);
 }
 
@@ -817,14 +820,12 @@
 
 .storm-commander-root .storm-encounter-shell {
   display: grid;
-  grid-template-columns: minmax(320px, 760px);
+  grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);
   grid-template-areas:
-    "player-comms"
-    "board"
-    "opponent-comms"
-    "encounter-status";
+    "opponent-comms board player-comms"
+    ". encounter-status .";
   gap: 24px;
-  width: min(760px, calc(100vw - 32px));
+  width: min(1320px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 18px 0 32px;
   align-items: start;
@@ -886,7 +887,6 @@
   position: absolute;
   z-index: 2;
   inset: 12%;
-  border-radius: 50%;
   opacity: 0;
   pointer-events: none;
   transform: scale(0.96);
@@ -912,24 +912,27 @@
 }
 
 .storm-commander-root .storm-encounter-square.is-player-soft-selected .storm-selection-ring {
-  border: 3px solid rgba(216, 98, 32, 0.76);
+  border: 3px solid rgba(216, 98, 32, 0.456);
+  border-radius: var(--radius);
   opacity: 1;
   box-shadow:
-    inset 0 0 18px rgba(216, 98, 32, 0.12),
-    0 0 16px rgba(216, 98, 32, 0.26);
+    inset 0 0 18px rgba(216, 98, 32, 0.072),
+    0 0 16px rgba(216, 98, 32, 0.156);
 }
 
 .storm-commander-root .storm-encounter-square.is-opponent-soft-selected .storm-selection-ring {
-  border: 3px solid rgba(85, 214, 232, 0.72);
+  border: 3px solid rgba(85, 214, 232, 0.432);
+  border-radius: var(--radius);
   opacity: 1;
   box-shadow:
-    inset 0 0 18px rgba(85, 214, 232, 0.1),
-    0 0 16px rgba(85, 214, 232, 0.24);
+    inset 0 0 18px rgba(85, 214, 232, 0.06),
+    0 0 16px rgba(85, 214, 232, 0.144);
 }
 
 .storm-commander-root .storm-encounter-square.is-selected .storm-selection-ring {
   inset: 9%;
   border: 5px solid var(--selected);
+  border-radius: 50%;
   opacity: 1;
   transform: none;
   box-shadow:
@@ -990,7 +993,24 @@
 .storm-commander-root .storm-encounter-square.is-extraction::before {
   z-index: 2;
   inset: 8%;
-  border: 2px dashed rgba(128, 226, 190, 0.85);
+  border: 2px dashed rgba(115, 221, 126, 0.9);
+  box-shadow: 0 0 16px rgba(115, 221, 126, 0.18);
+  animation: storm-extraction-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes storm-extraction-pulse {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(0.985);
+    box-shadow: 0 0 12px rgba(115, 221, 126, 0.12);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.015);
+    box-shadow: 0 0 22px rgba(115, 221, 126, 0.28);
+  }
 }
 
 .storm-commander-root .storm-encounter-square.is-target::before {
@@ -1552,10 +1572,10 @@
   .storm-commander-root .storm-encounter-shell {
     grid-template-columns: minmax(320px, 760px);
     grid-template-areas:
-      "player-comms"
-      "board"
       "opponent-comms"
-      "encounter-status";
+      "board"
+      "encounter-status"
+      "player-comms";
     width: min(760px, calc(100vw - 32px));
   }
 
@@ -1579,6 +1599,15 @@
     font-size: 2rem;
     line-height: 1;
     white-space: nowrap;
+  }
+
+  .storm-commander-root .storm-comms-window-player {
+    grid-template-columns: minmax(130px, 1fr) 85px 85px;
+    grid-template-areas: "title movement portrait";
+  }
+
+  .storm-commander-root .storm-comms-window-player h2 {
+    text-align: right;
   }
 
   .storm-commander-root .storm-comms-transmission {
@@ -1612,11 +1641,6 @@
 
   .storm-commander-root .storm-encounter-shell {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "player-comms"
-      "board"
-      "opponent-comms"
-      "encounter-status";
     width: min(720px, calc(100vw - 24px));
     gap: 22px;
     padding: 18px 0 28px;
@@ -1624,6 +1648,10 @@
 
   .storm-commander-root .storm-comms-window {
     grid-template-columns: 43px 43px minmax(0, 1fr);
+  }
+
+  .storm-commander-root .storm-comms-window-player {
+    grid-template-columns: minmax(0, 1fr) 43px 43px;
   }
 
   .storm-commander-root .storm-comms-portrait {
