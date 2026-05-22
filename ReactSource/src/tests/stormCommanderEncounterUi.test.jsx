@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitForElementToBeRemoved, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
@@ -21,12 +21,31 @@ describe('Storm Commander random encounter UI', () => {
         within(missionDialog).getByRole('heading', { name: /^Random Pirate Raid$/ }),
       ).toBeInTheDocument()
       expect(within(missionDialog).getByText(/Objective:/)).toBeInTheDocument()
+      expect(within(missionDialog).getByRole('button', { name: /^Battle$/ }))
+        .toBeInTheDocument()
+      expect(within(missionDialog).queryByRole('button', { name: /^Dismiss$/ }))
+        .not.toBeInTheDocument()
+      expect(
+        within(missionDialog).queryByText(
+          /^Dismiss this briefing to command the board\. Use Mission in the HUD to reopen it\.$/,
+        ),
+      ).not.toBeInTheDocument()
+      expect(container.querySelector('.storm-mission-return-note')).not.toBeInTheDocument()
+      expect(within(missionDialog).queryByText(/^Status$/)).not.toBeInTheDocument()
+      expect(within(missionDialog).queryByText(/^Board$/)).not.toBeInTheDocument()
+      expect(within(missionDialog).getByText(/^Factions$/)).toBeInTheDocument()
+      expect(within(missionDialog).getByText(/^AI$/)).toBeInTheDocument()
       expect(within(encounterStatus).getByRole('button', { name: /^Mission$/ }))
         .toBeInTheDocument()
+      expect(within(encounterStatus).getByRole('button', { name: /^New Random Encounter$/ }))
+        .toBeInTheDocument()
+      expect(container.querySelector('.storm-encounter-topbar')).not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar .storm-mission-button'))
         .not.toBeInTheDocument()
+      expect(container.querySelector('.storm-encounter-topbar .storm-icon-button'))
+        .not.toBeInTheDocument()
 
-      await user.click(within(missionDialog).getByRole('button', { name: /^Dismiss$/ }))
+      await user.click(within(missionDialog).getByRole('button', { name: /^Battle$/ }))
 
       expect(screen.queryByRole('dialog', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
@@ -50,15 +69,20 @@ describe('Storm Commander random encounter UI', () => {
     try {
       const { container } = render(<App />)
 
-      await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+      await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
       const encounterStatus = screen.getByRole('complementary', { name: /^Encounter status$/ })
 
       expect(within(encounterStatus).getByRole('button', { name: /^Mission$/ }))
         .toBeInTheDocument()
+      expect(container.querySelector('.storm-encounter-topbar')).not.toBeInTheDocument()
       expect(container.querySelector('.storm-encounter-topbar .storm-mission-button'))
         .not.toBeInTheDocument()
-      const newEncounterButton = screen.getByRole('button', { name: /^New Random Encounter$/ })
+      expect(container.querySelector('.storm-encounter-topbar .storm-icon-button'))
+        .not.toBeInTheDocument()
+      const newEncounterButton = within(encounterStatus).getByRole('button', {
+        name: /^New Random Encounter$/,
+      })
       expect(newEncounterButton).toHaveClass('storm-icon-button')
       expect(newEncounterButton).toHaveTextContent(/^$/)
       expect(container.querySelector('.storm-dice-icon')).toBeInTheDocument()
@@ -73,6 +97,10 @@ describe('Storm Commander random encounter UI', () => {
         .toBeInTheDocument()
       expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
         .toBeInTheDocument()
+      expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
+        .toHaveAttribute('data-faction', 'pirate')
+      expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
+        .toHaveAttribute('data-faction', 'imperial')
       expect(within(playerComms).queryByText(/^PLAYER COMMS$/)).not.toBeInTheDocument()
       expect(within(opponentComms).queryByText(/^OPPONENT COMMS$/)).not.toBeInTheDocument()
       expect(within(playerComms).queryByText(/^Faction$/)).not.toBeInTheDocument()
@@ -98,6 +126,96 @@ describe('Storm Commander random encounter UI', () => {
     } finally {
       randomSpy.mockRestore()
     }
+  })
+
+  it('shows an extraction icon on the mission briefing objective panel', () => {
+    const encounter = {
+      id: 'test_escape_briefing_marker',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'escapeToSquare',
+        extractionSquare: { x: 2, y: 4 },
+        text: 'Move any Pirate ship to the extraction square.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
+    const objectivePanel = container.querySelector('.storm-objective-panel')
+
+    expect(within(missionDialog).getByLabelText(/^Extraction target C1$/)).toBeInTheDocument()
+    expect(objectivePanel.querySelector('.storm-objective-copy')).toBeInTheDocument()
+    expect(objectivePanel.querySelector('.storm-objective-target-icon.is-extraction'))
+      .toBeInTheDocument()
+    expect(objectivePanel.querySelector('.storm-objective-target-square'))
+      .not.toBeInTheDocument()
+  })
+
+  it('shows the target ship icon on destroy target mission briefings', () => {
+    const encounter = {
+      id: 'test_destroy_target_briefing_marker',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'destroyTarget',
+        targetPieceId: 'imperial_queen',
+        text: 'Destroy the Imperial Queen.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
+    const objectivePanel = container.querySelector('.storm-objective-panel')
+
+    expect(within(missionDialog).getByRole('img', { name: /^Imperial queen target$/ }))
+      .toBeInTheDocument()
+    expect(objectivePanel.querySelector('.storm-objective-target-icon.is-target'))
+      .toBeInTheDocument()
   })
 
   it('seeds player comms with a player ship at encounter start', async () => {
@@ -138,7 +256,7 @@ describe('Storm Commander random encounter UI', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
     const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
@@ -189,7 +307,7 @@ describe('Storm Commander random encounter UI', () => {
 
     render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
     await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
     await user.click(screen.getByRole('button', { name: /A4 empty legal destination/i }))
 
@@ -237,7 +355,7 @@ describe('Storm Commander random encounter UI', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
     const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
 
@@ -248,6 +366,66 @@ describe('Storm Commander random encounter UI', () => {
 
     expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen : E1$/ }))
       .toBeInTheDocument()
+  })
+
+  it('flashes a full screen faction color overlay when the selected ship changes', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_selection_flash',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
+    await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+
+    const pirateFlash = container.querySelector('.storm-selection-flash')
+
+    expect(pirateFlash).toBeInTheDocument()
+    expect(pirateFlash).toHaveAttribute('data-faction', 'pirate')
+    expect(pirateFlash).toHaveStyle('--storm-selection-flash-color: rgba(232, 108, 36, 0.9)')
+
+    await waitForElementToBeRemoved(() => container.querySelector('.storm-selection-flash'), {
+      timeout: 500,
+    })
+
+    await user.click(screen.getByRole('button', { name: /C5 empty square/i }))
+    await user.click(screen.getByRole('button', { name: /Imperial queen square/i }))
+
+    const imperialFlash = container.querySelector('.storm-selection-flash')
+
+    expect(imperialFlash).toBeInTheDocument()
+    expect(imperialFlash).toHaveAttribute('data-faction', 'imperial')
+    expect(imperialFlash).toHaveStyle('--storm-selection-flash-color: rgba(213, 166, 14, 0.92)')
   })
 
   it('keeps soft rings on each comms ship and upgrades the player ship to active selection', async () => {
@@ -288,7 +466,7 @@ describe('Storm Commander random encounter UI', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
     const playerSquare = screen.getByRole('button', { name: /B4 Pirate rook square/i })
     const firstOpponentSquare = screen.getByRole('button', { name: /D4 Imperial pawn square/i })
@@ -353,15 +531,13 @@ describe('Storm Commander random encounter UI', () => {
 
     render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
     await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
     await user.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
-    await user.click(screen.getByRole('button', { name: /^Mission$/ }))
 
-    const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
+    const resultDialog = screen.getByRole('dialog', { name: /^Objective Succeeded$/ })
 
-    expect(within(missionDialog).getByText('Victory')).toBeInTheDocument()
-    expect(within(missionDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
+    expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
   })
 
   it('shows an objective result popup with a next mission action when the encounter is won', async () => {
@@ -407,7 +583,7 @@ describe('Storm Commander random encounter UI', () => {
 
     render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
     await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
     await user.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
 
@@ -418,6 +594,53 @@ describe('Storm Commander random encounter UI', () => {
     await user.click(within(resultDialog).getByRole('button', { name: /^Next Mission$/ }))
 
     expect(onNewEncounter).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens the objective result popup when an active encounter already satisfies the objective', async () => {
+    const onNewEncounter = vi.fn()
+    const encounter = {
+      id: 'test_completed_active_result',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'destroyTarget',
+        targetPieceId: 'imperial_queen',
+        text: 'Destroy the Imperial queen.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={onNewEncounter}
+          onReturnToChess={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    render(<Harness />)
+
+    const resultDialog = await screen.findByRole('dialog', { name: /^Objective Succeeded$/ })
+
+    expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
   })
 
   it('shows an objective failed popup for lost encounters', async () => {
@@ -456,8 +679,6 @@ describe('Storm Commander random encounter UI', () => {
         setEncounter={() => {}}
       />,
     )
-
-    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
 
     const resultDialog = screen.getByRole('dialog', { name: /^Objective Failed$/ })
 
