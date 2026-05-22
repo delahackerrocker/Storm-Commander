@@ -43,7 +43,7 @@ describe('separate variant style sources', () => {
     expect(globalStyles).not.toMatch(/\.move-history/)
   })
 
-  it('keeps the random encounter status panel below a centered board column', () => {
+  it('keeps random encounter comms around a centered board column', () => {
     const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
     const topbarRule = stormStyles.match(
       /\.storm-commander-root\.storm-encounter-root > \.storm-encounter-topbar\s*\{(?<body>[^}]+)\}/,
@@ -53,6 +53,12 @@ describe('separate variant style sources', () => {
     )?.groups.body
     const panelRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-panel\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const playerCommsRule = stormStyles.match(
+      /\.storm-commander-root \.storm-comms-window-player\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const opponentCommsRule = stormStyles.match(
+      /\.storm-commander-root \.storm-comms-window-opponent\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
     const iconButtonRule = stormStyles.match(
       /\.storm-commander-root\.storm-encounter-root \.storm-icon-button\s*\{(?<body>[^}]+)\}/,
@@ -65,9 +71,15 @@ describe('separate variant style sources', () => {
     )?.groups.body
 
     expect(topbarRule).toContain('width: min(760px, calc(100vw - 32px));')
-    expect(shellRule).toContain('grid-template-columns: minmax(320px, 760px);')
+    expect(shellRule).toContain(
+      'grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);',
+    )
+    expect(shellRule).toContain('"player-comms board opponent-comms"')
+    expect(shellRule).toContain('". encounter-status ."')
     expect(shellRule).toContain('justify-content: center;')
-    expect(panelRule).toContain('grid-column: 1;')
+    expect(panelRule).toContain('grid-area: encounter-status;')
+    expect(playerCommsRule).toContain('grid-area: player-comms;')
+    expect(opponentCommsRule).toContain('grid-area: opponent-comms;')
     expect(iconButtonRule).toContain('width: 40px;')
     expect(iconButtonRule).toContain('height: 40px;')
     expect(iconButtonRule).toContain('min-width: 40px;')

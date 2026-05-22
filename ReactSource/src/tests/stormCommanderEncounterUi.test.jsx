@@ -27,7 +27,8 @@ describe('Storm Commander random encounter UI', () => {
       expect(screen.queryByRole('dialog', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: /^Random Pirate Raid$/ })).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: /^Mission$/ })).toBeInTheDocument()
-      expect(screen.getByRole('heading', { name: /^Cockpit$/ })).toBeInTheDocument()
+      expect(screen.getByRole('complementary', { name: /^Player comms$/ })).toBeInTheDocument()
+      expect(screen.getByRole('complementary', { name: /^Opponent comms$/ })).toBeInTheDocument()
 
       await user.click(screen.getByRole('button', { name: /^Mission$/ }))
 
@@ -37,7 +38,7 @@ describe('Storm Commander random encounter UI', () => {
     }
   })
 
-  it('generates an encounter and shows the selected Pirate cockpit panel', async () => {
+  it('generates an encounter and shows player and opponent comms panels', async () => {
     const user = userEvent.setup()
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
 
@@ -55,14 +56,175 @@ describe('Storm Commander random encounter UI', () => {
       expect(container.querySelector('.storm-mission-summary-line')).not.toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBe(25)
 
+      const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+      const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
+
+      expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
+        .toBeInTheDocument()
+      expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
+        .toBeInTheDocument()
+
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
 
-      expect(screen.getByRole('img', { name: /Pirate .* cockpit placeholder/i })).toBeInTheDocument()
-      expect(screen.getByText(/Movement:/)).toBeInTheDocument()
-      expect(screen.getByText(/Pirate .* Pilot/i)).toBeInTheDocument()
+      expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
+        .toBeInTheDocument()
+      expect(within(playerComms).getByText(/^Movement$/)).toBeInTheDocument()
+      expect(within(playerComms).getByRole('heading', { name: /Pirate .*/i })).toBeInTheDocument()
     } finally {
       randomSpy.mockRestore()
     }
+  })
+
+  it('seeds player comms with a player ship at encounter start', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'a',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'pirate_queen', faction: 'pirate', type: 'q', square: { x: 2, y: 1 } },
+        { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+
+    const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+
+    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen$/ }))
+      .toBeInTheDocument()
+  })
+
+  it('keeps the last selected player ship in comms after the move selection clears', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_player_comms_persist',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 3, y: 4 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          onReturnToChess={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    render(<Harness />)
+
+    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+    await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+    await user.click(screen.getByRole('button', { name: /A4 empty legal destination/i }))
+
+    const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+
+    expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook$/ }))
+      .toBeInTheDocument()
+    expect(within(playerComms).getByText('A4')).toBeInTheDocument()
+  })
+
+  it('updates opponent comms when the player inspects an opponent ship', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_opponent_comms',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 3, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 4 } },
+      ],
+    }
+
+    render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Dismiss$/ }))
+
+    const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
+
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn$/ }))
+      .toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /Imperial queen square/i }))
+
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen$/ }))
+      .toBeInTheDocument()
+    expect(within(opponentComms).getByText('E1')).toBeInTheDocument()
   })
 
   it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {
@@ -194,15 +356,17 @@ describe('Storm Commander random encounter UI', () => {
       />,
     )
 
-    expect(container.querySelectorAll('.storm-ship-piece')).toHaveLength(3)
-    expect(container.querySelectorAll('.storm-ship-piece .storm-rocket-exhaust')).toHaveLength(7)
+    const board = container.querySelector('.storm-encounter-board')
+
+    expect(board.querySelectorAll('.storm-ship-piece')).toHaveLength(3)
+    expect(board.querySelectorAll('.storm-ship-piece .storm-rocket-exhaust')).toHaveLength(7)
     expect(
-      container.querySelectorAll('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust'),
+      board.querySelectorAll('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust'),
     ).toHaveLength(1)
     expect(
-      container.querySelector('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust-center'),
+      board.querySelector('.storm-ship-piece[data-piece-type="p"] .storm-rocket-exhaust-center'),
     ).toBeInTheDocument()
-    expect(container.querySelector('.storm-ship-piece[data-faction="pirate"]')).toBeInTheDocument()
-    expect(container.querySelector('.storm-ship-piece[data-faction="imperial"]')).toBeInTheDocument()
+    expect(board.querySelector('.storm-ship-piece[data-faction="pirate"]')).toBeInTheDocument()
+    expect(board.querySelector('.storm-ship-piece[data-faction="imperial"]')).toBeInTheDocument()
   })
 })

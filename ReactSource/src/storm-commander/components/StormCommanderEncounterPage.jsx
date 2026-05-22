@@ -56,6 +56,18 @@ function getSquareLabel(square, board) {
   return `${String.fromCharCode(65 + square.x)}${board.height - square.y}`
 }
 
+function getInitialCommsPiece(pieces, encounterId) {
+  if (pieces.length === 0) {
+    return null
+  }
+
+  const seed = String(encounterId)
+    .split('')
+    .reduce((total, character) => total + character.charCodeAt(0), 0)
+
+  return pieces[seed % pieces.length]
+}
+
 function getBoardStyle(encounter) {
   const currentTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[encounter.currentFaction]
   const lastMoveTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[encounter.lastMove?.faction]
@@ -132,47 +144,123 @@ function StormCommanderEncounterPiece({ piece, pieceRotation }) {
   )
 }
 
-function PilotPanel({ selectedPiece }) {
-  if (!selectedPiece) {
+function getMovementPatternSquares(pieceType) {
+  if (pieceType === 'p') {
+    return new Set(['2,1', '1,1', '3,1', '2,3', '1,3', '3,3'])
+  }
+
+  if (pieceType === 'b') {
+    return new Set(['0,0', '1,1', '3,1', '4,0', '1,3', '0,4', '3,3', '4,4'])
+  }
+
+  if (pieceType === 'n') {
+    return new Set(['1,0', '3,0', '0,1', '4,1', '0,3', '4,3', '1,4', '3,4'])
+  }
+
+  if (pieceType === 'r') {
+    return new Set(['2,0', '2,1', '0,2', '1,2', '3,2', '4,2', '2,3', '2,4'])
+  }
+
+  if (pieceType === 'q') {
+    return new Set([
+      '0,0',
+      '2,0',
+      '4,0',
+      '1,1',
+      '2,1',
+      '3,1',
+      '0,2',
+      '1,2',
+      '3,2',
+      '4,2',
+      '1,3',
+      '2,3',
+      '3,3',
+      '0,4',
+      '2,4',
+      '4,4',
+    ])
+  }
+
+  return new Set(['1,1', '2,1', '3,1', '1,2', '3,2', '1,3', '2,3', '3,3'])
+}
+
+function MovementPatternIcon({ pieceType }) {
+  const movementSquares = getMovementPatternSquares(pieceType)
+  const cells = []
+
+  for (let y = 0; y < 5; y += 1) {
+    for (let x = 0; x < 5; x += 1) {
+      const isOrigin = x === 2 && y === 2
+      const isMovementSquare = movementSquares.has(`${x},${y}`)
+      const className = [
+        'storm-movement-pattern-cell',
+        isOrigin ? 'is-origin' : '',
+        isMovementSquare ? 'is-move' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')
+
+      cells.push(<span key={`${x},${y}`} className={className} />)
+    }
+  }
+
+  return (
+    <div
+      className="storm-movement-pattern"
+      role="img"
+      aria-label={STORM_COMMANDER_MOVEMENT_HINTS[pieceType]}
+    >
+      {cells}
+    </div>
+  )
+}
+
+function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, title, variant }) {
+  if (!piece) {
     return (
-      <section className="storm-pilot-panel" aria-label="Cockpit panel">
-        <h2>Cockpit</h2>
-        <p className="storm-pilot-empty">Select a Pirate ship to open comms.</p>
-      </section>
+      <aside
+        className={`storm-comms-window storm-comms-window-${variant} is-empty`}
+        aria-label={ariaLabel}
+      >
+        <p className="eyebrow">{title}</p>
+        <h2>No ship selected</h2>
+        <p className="storm-comms-empty">{emptyText}</p>
+      </aside>
     )
   }
 
-  const pieceName = getPieceDisplayName(selectedPiece.type)
-  const title = `Pirate ${pieceName[0].toUpperCase()}${pieceName.slice(1)} Pilot`
+  const pieceName = getPieceDisplayName(piece.type)
+  const factionName = getFactionDisplayName(piece.faction)
+  const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
+  const pilotTitle = `${factionName} ${displayPieceName}`
 
   return (
-    <section className="storm-pilot-panel" aria-label="Cockpit panel">
-      <div
-        className="storm-pilot-portrait"
-        role="img"
-        aria-label={`Pirate ${pieceName} cockpit placeholder`}
-      >
-        <span>{pieceName.slice(0, 2).toUpperCase()}</span>
+    <aside className={`storm-comms-window storm-comms-window-${variant}`} aria-label={ariaLabel}>
+      <p className="eyebrow">{title}</p>
+      <div className="storm-comms-portrait" role="img" aria-label={`${pilotTitle} comms portrait`}>
+        <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
       </div>
-      <div>
-        <p className="eyebrow">Cockpit Link</p>
-        <h2>{title}</h2>
-        <dl className="storm-pilot-list">
-          <div>
-            <dt>Faction</dt>
-            <dd>Pirate</dd>
-          </div>
-          <div>
-            <dt>Piece</dt>
-            <dd>{pieceName}</dd>
-          </div>
-        </dl>
-        <p className="storm-movement-hint">
-          <strong>Movement:</strong> {STORM_COMMANDER_MOVEMENT_HINTS[selectedPiece.type]}
-        </p>
-        <p className="storm-pilot-bark">"{STORM_COMMANDER_PILOT_BARKS[selectedPiece.type]}"</p>
+      <h2>{pilotTitle}</h2>
+      <dl className="storm-comms-details">
+        <div>
+          <dt>Faction</dt>
+          <dd>{factionName}</dd>
+        </div>
+        <div>
+          <dt>Ship</dt>
+          <dd>{displayPieceName}</dd>
+        </div>
+        <div>
+          <dt>Square</dt>
+          <dd>{getSquareLabel(piece.square, board)}</dd>
+        </div>
+      </dl>
+      <div className="storm-comms-movement">
+        <MovementPatternIcon pieceType={piece.type} />
       </div>
-    </section>
+      <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
+    </aside>
   )
 }
 
@@ -268,11 +356,35 @@ export function StormCommanderEncounterPage({
   starfieldLayerStyles,
 }) {
   const [selection, setSelection] = useState(null)
+  const [playerCommsSelection, setPlayerCommsSelection] = useState(null)
+  const [opponentCommsSelection, setOpponentCommsSelection] = useState(null)
   const [dismissedMissionEncounterId, setDismissedMissionEncounterId] = useState(null)
   const selectedPiece =
     selection?.encounterId === encounter.id
       ? encounter.pieces.find((piece) => piece.id === selection.pieceId) || null
       : null
+  const playerPieces = encounter.pieces.filter((piece) => piece.faction === encounter.playerFaction)
+  const playerCommsPiece =
+    playerCommsSelection?.encounterId === encounter.id
+      ? playerPieces.find((piece) => piece.id === playerCommsSelection.pieceId) ||
+        getInitialCommsPiece(playerPieces, encounter.id)
+      : getInitialCommsPiece(playerPieces, encounter.id)
+  const opponentPieces = encounter.pieces.filter((piece) => piece.faction !== encounter.playerFaction)
+  const latestOpponentMovePiece =
+    encounter.lastMove?.faction && encounter.lastMove.faction !== encounter.playerFaction
+      ? encounter.pieces.find((piece) => piece.id === encounter.lastMove.pieceId) || null
+      : null
+  const latestOpponentMovePieceId = latestOpponentMovePiece?.id || null
+  const manuallySelectedOpponentPiece =
+    opponentCommsSelection?.encounterId === encounter.id &&
+    opponentCommsSelection.latestOpponentMovePieceId === latestOpponentMovePieceId
+      ? opponentPieces.find((piece) => piece.id === opponentCommsSelection.pieceId) || null
+      : null
+  const opponentCommsPiece =
+    manuallySelectedOpponentPiece ||
+    latestOpponentMovePiece ||
+    opponentPieces[0] ||
+    null
   const legalMoves = useMemo(
     () =>
       selectedPiece && encounter.currentFaction === encounter.playerFaction
@@ -333,6 +445,13 @@ export function StormCommanderEncounterPage({
 
     if (piece?.faction === encounter.playerFaction) {
       setSelection({ encounterId: encounter.id, pieceId: piece.id })
+      setPlayerCommsSelection({ encounterId: encounter.id, pieceId: piece.id })
+    } else if (piece) {
+      setOpponentCommsSelection({
+        encounterId: encounter.id,
+        latestOpponentMovePieceId,
+        pieceId: piece.id,
+      })
     } else {
       setSelection(null)
     }
@@ -389,6 +508,16 @@ export function StormCommanderEncounterPage({
       </div>
 
       <main className="storm-encounter-shell">
+        <ShipCommsWindow
+          ariaLabel="Player comms"
+          board={encounter.board}
+          emptyText="Select a Pirate ship to open player comms."
+          piece={playerCommsPiece}
+          pieceRotation={pieceRotation}
+          title="Player Comms"
+          variant="player"
+        />
+
         <section className="storm-encounter-play-area" aria-label="Random encounter board">
           <div
             className="storm-encounter-board"
@@ -453,9 +582,18 @@ export function StormCommanderEncounterPage({
           </div>
         </section>
 
+        <ShipCommsWindow
+          ariaLabel="Opponent comms"
+          board={encounter.board}
+          emptyText="Touch an opponent ship to scan their comms."
+          piece={opponentCommsPiece}
+          pieceRotation={pieceRotation}
+          title="Opponent Comms"
+          variant="opponent"
+        />
+
         <aside className="storm-encounter-panel" aria-label="Encounter status">
           <MissionSummaryPanel encounter={encounter} />
-          <PilotPanel selectedPiece={selectedPiece} />
         </aside>
       </main>
 
