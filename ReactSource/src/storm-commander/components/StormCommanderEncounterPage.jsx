@@ -216,14 +216,13 @@ function MovementPatternIcon({ pieceType }) {
   )
 }
 
-function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, title, variant }) {
+function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, variant }) {
   if (!piece) {
     return (
       <aside
         className={`storm-comms-window storm-comms-window-${variant} is-empty`}
         aria-label={ariaLabel}
       >
-        <p className="eyebrow">{title}</p>
         <h2>No ship selected</h2>
         <p className="storm-comms-empty">{emptyText}</p>
       </aside>
@@ -238,7 +237,6 @@ function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, ti
 
   return (
     <aside className={`storm-comms-window storm-comms-window-${variant}`} aria-label={ariaLabel}>
-      <p className="eyebrow">{title}</p>
       <div className="storm-comms-portrait" role="img" aria-label={`${pilotTitle} comms portrait`}>
         <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
       </div>
@@ -276,19 +274,31 @@ function MissionStatList({ encounter, isEnemyThinking }) {
   )
 }
 
-function MissionSummaryPanel({ encounter }) {
+function MissionSummaryPanel({ encounter, isMissionBriefingOpen, onOpenMission }) {
   return (
     <section className="storm-mission-summary" aria-label="Mission quick status">
-      <dl className="storm-mission-summary-grid">
-        <div>
-          <dt>Objective</dt>
-          <dd>{getObjectiveTypeLabel(encounter.objective.type)}</dd>
-        </div>
-        <div>
-          <dt>Progress</dt>
-          <dd>{getObjectiveProgressText(encounter)}</dd>
-        </div>
-      </dl>
+      <div className="storm-mission-summary-row">
+        <button
+          type="button"
+          className="storm-mission-button storm-mission-summary-button"
+          aria-haspopup="dialog"
+          aria-expanded={isMissionBriefingOpen}
+          aria-controls="storm-mission-briefing"
+          onClick={onOpenMission}
+        >
+          Mission
+        </button>
+        <dl className="storm-mission-summary-grid">
+          <div>
+            <dt>Objective</dt>
+            <dd>{getObjectiveTypeLabel(encounter.objective.type)}</dd>
+          </div>
+          <div>
+            <dt>Progress</dt>
+            <dd>{getObjectiveProgressText(encounter)}</dd>
+          </div>
+        </dl>
+      </div>
     </section>
   )
 }
@@ -328,6 +338,35 @@ function MissionBriefingDialog({ encounter, isEnemyThinking, onDismiss }) {
         <p className="storm-mission-return-note">
           Dismiss this briefing to command the board. Use Mission in the HUD to reopen it.
         </p>
+      </section>
+    </div>
+  )
+}
+
+function MissionResultDialog({ encounter, onNextMission }) {
+  const isVictory = encounter.status === 'won'
+  const title = isVictory ? 'Objective Succeeded' : 'Objective Failed'
+  const outcome = encounter.outcome || (isVictory ? 'Mission objective complete.' : 'Mission objective failed.')
+
+  return (
+    <div className="storm-result-overlay">
+      <section
+        className={`storm-result-dialog ${isVictory ? 'is-success' : 'is-failure'}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="storm-result-title"
+      >
+        <p className="eyebrow">{isVictory ? 'Mission Complete' : 'Mission Failed'}</p>
+        <h1 id="storm-result-title">{title}</h1>
+        <p className="storm-result-outcome">{outcome}</p>
+        <button
+          type="button"
+          className="storm-primary-button storm-result-action"
+          onClick={onNextMission}
+          autoFocus
+        >
+          Next Mission
+        </button>
       </section>
     </div>
   )
@@ -382,6 +421,7 @@ export function StormCommanderEncounterPage({
   const isEnemyThinking =
     encounter.status === 'active' && encounter.currentFaction !== encounter.playerFaction
   const isMissionBriefingOpen = dismissedMissionEncounterId !== encounter.id
+  const isMissionResultOpen = encounter.status !== 'active' && !isMissionBriefingOpen
 
   useEffect(() => {
     if (!isEnemyThinking) {
@@ -469,16 +509,6 @@ export function StormCommanderEncounterPage({
           ) : null}
           <button
             type="button"
-            className="storm-mission-button"
-            aria-haspopup="dialog"
-            aria-expanded={isMissionBriefingOpen}
-            aria-controls="storm-mission-briefing"
-            onClick={() => setDismissedMissionEncounterId(null)}
-          >
-            Mission
-          </button>
-          <button
-            type="button"
             className="storm-primary-button storm-icon-button"
             aria-label="New Random Encounter"
             title="New Random Encounter"
@@ -502,7 +532,6 @@ export function StormCommanderEncounterPage({
           emptyText="Select a Pirate ship to open player comms."
           piece={playerCommsPiece}
           pieceRotation={pieceRotation}
-          title="Player Comms"
           variant="player"
         />
 
@@ -591,12 +620,15 @@ export function StormCommanderEncounterPage({
           emptyText="Touch an opponent ship to scan their comms."
           piece={opponentCommsPiece}
           pieceRotation={pieceRotation}
-          title="Opponent Comms"
           variant="opponent"
         />
 
         <aside className="storm-encounter-panel" aria-label="Encounter status">
-          <MissionSummaryPanel encounter={encounter} />
+          <MissionSummaryPanel
+            encounter={encounter}
+            isMissionBriefingOpen={isMissionBriefingOpen}
+            onOpenMission={() => setDismissedMissionEncounterId(null)}
+          />
         </aside>
       </main>
 
@@ -606,6 +638,10 @@ export function StormCommanderEncounterPage({
           isEnemyThinking={isEnemyThinking}
           onDismiss={() => setDismissedMissionEncounterId(encounter.id)}
         />
+      ) : null}
+
+      {isMissionResultOpen ? (
+        <MissionResultDialog encounter={encounter} onNextMission={handleNewEncounter} />
       ) : null}
     </div>
   )

@@ -78,6 +78,18 @@ describe('separate variant style sources', () => {
     const barkRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-bark\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const missionOverlayRule = stormStyles.match(
+      /\.storm-commander-root \.storm-mission-overlay\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const missionDialogRule = stormStyles.match(
+      /\.storm-commander-root \.storm-mission-dialog\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const resultOverlayRule = stormStyles.match(
+      /\.storm-commander-root \.storm-result-overlay\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const resultDialogRule = stormStyles.match(
+      /\.storm-commander-root \.storm-result-dialog\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const selectionRingRule = stormStyles.match(
       /\.storm-commander-root \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -98,6 +110,7 @@ describe('separate variant style sources', () => {
     )?.groups.body
 
     expect(topbarRule).toContain('width: min(760px, calc(100vw - 32px));')
+    expect(topbarRule).toContain('flex-wrap: nowrap;')
     expect(shellRule).toContain(
       'grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);',
     )
@@ -107,6 +120,16 @@ describe('separate variant style sources', () => {
     expect(panelRule).toContain('grid-area: encounter-status;')
     expect(playerCommsRule).toContain('grid-area: player-comms;')
     expect(opponentCommsRule).toContain('grid-area: opponent-comms;')
+    expect(stormStyles).toContain('.storm-commander-root .storm-mission-summary-row')
+    expect(stormStyles).toContain('grid-template-columns: max-content minmax(0, 1fr);')
+    expect(stormStyles).toContain('.storm-commander-root .storm-mission-summary-button')
+    expect(stormStyles).toContain('min-width: 104px;')
+    expect(stormStyles).toContain(
+      '.storm-commander-root .storm-mission-summary-row .storm-mission-summary-grid',
+    )
+    expect(stormStyles).toContain('@media (max-width: 560px)')
+    expect(stormStyles).toContain('gap: 8px;')
+    expect(stormStyles).toContain('width: 36px;')
     expect(iconButtonRule).toContain('width: 40px;')
     expect(iconButtonRule).toContain('height: 40px;')
     expect(iconButtonRule).toContain('min-width: 40px;')
@@ -116,6 +139,31 @@ describe('separate variant style sources', () => {
     expect(dicePipRule).toContain('height: 2px;')
     expect(stormStyles).not.toContain('.storm-commander-root .storm-comms-movement')
     expect(transmissionRule).toContain('grid-template-columns: 85px minmax(0, 1fr);')
+    expect(stormStyles).toContain('grid-template-columns: 85px minmax(130px, 1fr) 85px;')
+    expect(stormStyles).toContain('grid-template-areas: "portrait title movement";')
+    expect(stormStyles).toContain('grid-area: portrait;')
+    expect(stormStyles).toContain('font-size: 1.55rem;')
+    expect(stormStyles).toContain('display: contents;')
+    expect(stormStyles).toContain('grid-template-columns: 85px max-content 85px;')
+    expect(stormStyles).toContain('width: max-content;')
+    expect(stormStyles).toContain('overflow-x: visible;')
+    expect(stormStyles).toContain('font-size: 1.28rem;')
+    expect(stormStyles).toContain('display: none;')
+    expect(missionOverlayRule).toContain('place-items: stretch;')
+    expect(missionOverlayRule).toContain('padding: 0;')
+    expect(missionOverlayRule).toContain('overflow: hidden;')
+    expect(missionDialogRule).toContain('box-sizing: border-box;')
+    expect(missionDialogRule).toContain('width: 100vw;')
+    expect(missionDialogRule).toContain('height: 100dvh;')
+    expect(missionDialogRule).toContain('max-height: none;')
+    expect(missionDialogRule).toContain('border-radius: 0;')
+    expect(resultOverlayRule).toContain('z-index: 70;')
+    expect(resultOverlayRule).toContain('place-items: center;')
+    expect(resultDialogRule).toContain('width: min(520px, calc(100vw - 32px));')
+    expect(resultDialogRule).toContain('border-radius: var(--radius);')
+    expect(stormStyles).toContain('.storm-commander-root .storm-result-dialog.is-success')
+    expect(stormStyles).toContain('.storm-commander-root .storm-result-dialog.is-failure')
+    expect(stormStyles).toContain('.storm-commander-root .storm-result-action')
     expect(movementRule).toContain('justify-self: center;')
     expect(movementRule).toContain('align-self: center;')
     expect(movementRule).toContain('grid-template-columns: repeat(5, 11px);')
