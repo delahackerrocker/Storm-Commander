@@ -63,13 +63,23 @@ describe('Storm Commander random encounter UI', () => {
         .toBeInTheDocument()
       expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
         .toBeInTheDocument()
+      expect(within(playerComms).queryByText(/^Faction$/)).not.toBeInTheDocument()
+      expect(within(opponentComms).queryByText(/^Faction$/)).not.toBeInTheDocument()
+      expect(within(playerComms).queryByText(/^Ship$/)).not.toBeInTheDocument()
+      expect(within(opponentComms).queryByText(/^Ship$/)).not.toBeInTheDocument()
+      expect(within(playerComms).queryByText(/^Square$/)).not.toBeInTheDocument()
+      expect(within(opponentComms).queryByText(/^Square$/)).not.toBeInTheDocument()
 
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
 
       expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
         .toBeInTheDocument()
-      expect(within(playerComms).getByText(/^Movement$/)).toBeInTheDocument()
-      expect(within(playerComms).getByRole('heading', { name: /Pirate .*/i })).toBeInTheDocument()
+      expect(within(playerComms).getByRole('img', { name: /Moves/i })).toHaveClass(
+        'storm-movement-pattern',
+      )
+      expect(within(playerComms).queryByText(/^Movement$/)).not.toBeInTheDocument()
+      expect(within(playerComms).getByRole('heading', { name: /Pirate .* : [A-Z][1-9]/i }))
+        .toBeInTheDocument()
     } finally {
       randomSpy.mockRestore()
     }
@@ -117,7 +127,7 @@ describe('Storm Commander random encounter UI', () => {
 
     const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
-    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen$/ }))
+    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen : C4$/ }))
       .toBeInTheDocument()
   })
 
@@ -170,9 +180,8 @@ describe('Storm Commander random encounter UI', () => {
 
     const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
-    expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook$/ }))
+    expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook : A4$/ }))
       .toBeInTheDocument()
-    expect(within(playerComms).getByText('A4')).toBeInTheDocument()
   })
 
   it('updates opponent comms when the player inspects an opponent ship', async () => {
@@ -217,14 +226,13 @@ describe('Storm Commander random encounter UI', () => {
 
     const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
 
-    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn$/ }))
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn : D4$/ }))
       .toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Imperial queen square/i }))
 
-    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen$/ }))
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen : E1$/ }))
       .toBeInTheDocument()
-    expect(within(opponentComms).getByText('E1')).toBeInTheDocument()
   })
 
   it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {

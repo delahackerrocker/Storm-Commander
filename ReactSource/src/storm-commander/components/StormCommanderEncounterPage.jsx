@@ -234,6 +234,7 @@ function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, ti
   const factionName = getFactionDisplayName(piece.faction)
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
   const pilotTitle = `${factionName} ${displayPieceName}`
+  const squareLabel = getSquareLabel(piece.square, board)
 
   return (
     <aside className={`storm-comms-window storm-comms-window-${variant}`} aria-label={ariaLabel}>
@@ -241,21 +242,7 @@ function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, ti
       <div className="storm-comms-portrait" role="img" aria-label={`${pilotTitle} comms portrait`}>
         <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
       </div>
-      <h2>{pilotTitle}</h2>
-      <dl className="storm-comms-details">
-        <div>
-          <dt>Faction</dt>
-          <dd>{factionName}</dd>
-        </div>
-        <div>
-          <dt>Ship</dt>
-          <dd>{displayPieceName}</dd>
-        </div>
-        <div>
-          <dt>Square</dt>
-          <dd>{getSquareLabel(piece.square, board)}</dd>
-        </div>
-      </dl>
+      <h2>{pilotTitle} : {squareLabel}</h2>
       <div className="storm-comms-movement">
         <MovementPatternIcon pieceType={piece.type} />
       </div>

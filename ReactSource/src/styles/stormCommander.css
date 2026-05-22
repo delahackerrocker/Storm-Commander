@@ -1106,40 +1106,42 @@
 
 .storm-commander-root .storm-comms-movement {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
+  place-items: center;
   padding: 10px;
   border: 1px solid rgba(177, 152, 129, 0.32);
   border-radius: var(--radius);
   background: rgba(53, 51, 48, 0.72);
 }
 
-.storm-commander-root .storm-comms-movement-icon {
-  aspect-ratio: 1;
+.storm-commander-root .storm-movement-pattern {
   display: grid;
-  place-items: center;
-  border: 1px solid rgba(85, 214, 232, 0.58);
+  grid-template-columns: repeat(5, 11px);
+  grid-template-rows: repeat(5, 11px);
+  gap: 3px;
+  padding: 8px;
+  border: 1px solid rgba(107, 110, 58, 0.72);
   border-radius: 7px;
-  color: var(--storm-cannon-cyan);
-  background: rgba(7, 2, 12, 0.62);
-  font-size: 1rem;
-  font-weight: 950;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    rgba(7, 2, 12, 0.62);
+  background-size: 14px 14px;
 }
 
-.storm-commander-root .storm-comms-movement p {
-  display: grid;
-  gap: 4px;
-  color: #d9e5df;
-  font-size: 0.84rem;
-  line-height: 1.35;
+.storm-commander-root .storm-movement-pattern-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
 }
 
-.storm-commander-root .storm-comms-movement strong {
-  color: var(--storm-old-ivory);
-  font-size: 0.7rem;
-  line-height: 1;
-  text-transform: uppercase;
+.storm-commander-root .storm-movement-pattern-cell.is-move {
+  background: var(--storm-pirate-orange);
+  box-shadow: 0 0 8px rgba(216, 98, 32, 0.45);
+}
+
+.storm-commander-root .storm-movement-pattern-cell.is-origin {
+  background: var(--storm-old-ivory);
+  box-shadow: 0 0 10px rgba(243, 240, 223, 0.45);
 }
 
 .storm-commander-root .storm-comms-bark,

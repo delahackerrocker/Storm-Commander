@@ -69,6 +69,12 @@ describe('separate variant style sources', () => {
     const dicePipRule = stormStyles.match(
       /\.storm-commander-root \.storm-dice-pip\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const movementRule = stormStyles.match(
+      /\.storm-commander-root \.storm-movement-pattern\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const movementMoveCellRule = stormStyles.match(
+      /\.storm-commander-root \.storm-movement-pattern-cell\.is-move\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
 
     expect(topbarRule).toContain('width: min(760px, calc(100vw - 32px));')
     expect(shellRule).toContain(
@@ -87,5 +93,8 @@ describe('separate variant style sources', () => {
     expect(diceIconRule).toContain('border: 1px solid currentColor;')
     expect(dicePipRule).toContain('width: 2px;')
     expect(dicePipRule).toContain('height: 2px;')
+    expect(movementRule).toContain('grid-template-columns: repeat(5, 11px);')
+    expect(movementRule).toContain('background-size: 14px 14px;')
+    expect(movementMoveCellRule).toContain('background: var(--storm-pirate-orange);')
   })
 })
