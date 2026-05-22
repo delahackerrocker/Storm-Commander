@@ -78,6 +78,21 @@ describe('separate variant style sources', () => {
     const barkRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-bark\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const selectionRingRule = stormStyles.match(
+      /\.storm-commander-root \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const activeSelectionRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-selected \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const legalMoveRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-legal-move::after\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const captureRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-capture::after\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const encounterPieceRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-piece\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const movementMoveCellRule = stormStyles.match(
       /\.storm-commander-root \.storm-movement-pattern-cell\.is-move\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -106,6 +121,19 @@ describe('separate variant style sources', () => {
     expect(movementRule).toContain('grid-template-columns: repeat(5, 11px);')
     expect(movementRule).toContain('background-size: 14px 14px;')
     expect(barkRule).toContain('min-height: 85px;')
+    expect(selectionRingRule).toContain('border-radius: 50%;')
+    expect(selectionRingRule).toContain('z-index: 2;')
+    expect(activeSelectionRule).toContain('border: 5px solid var(--selected);')
+    expect(legalMoveRule).toContain('z-index: 2;')
+    expect(legalMoveRule).toContain('width: 20%;')
+    expect(legalMoveRule).toContain('height: 20%;')
+    expect(captureRule).toContain('border: 5px solid var(--storm-turn-hint);')
+    expect(captureRule).toContain('border-radius: 50%;')
+    expect(captureRule).toContain('linear-gradient(')
+    expect(captureRule).toContain('45deg')
+    expect(captureRule).toContain('-45deg')
+    expect(captureRule).toContain('box-shadow: none;')
+    expect(encounterPieceRule).toContain('z-index: 3;')
     expect(movementMoveCellRule).toContain('background: var(--storm-pirate-orange);')
   })
 })

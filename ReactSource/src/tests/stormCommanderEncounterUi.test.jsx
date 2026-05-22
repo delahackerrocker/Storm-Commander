@@ -282,6 +282,7 @@ describe('Storm Commander random encounter UI', () => {
     const firstOpponentSquare = screen.getByRole('button', { name: /D4 Imperial pawn square/i })
     const secondOpponentSquare = screen.getByRole('button', { name: /E1 Imperial queen square/i })
 
+    expect(playerSquare.querySelector('.storm-selection-ring')).toBeInTheDocument()
     expect(playerSquare).toHaveClass('is-player-soft-selected')
     expect(firstOpponentSquare).toHaveClass('is-opponent-soft-selected')
 

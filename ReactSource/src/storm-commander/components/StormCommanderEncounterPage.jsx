@@ -577,6 +577,7 @@ export function StormCommanderEncounterPage({
                   aria-label={`${getSquareLabel(square, encounter.board)} ${getEncounterPieceLabel(piece)} ${actionLabel}`}
                   onClick={() => handleSquareClick(square)}
                 >
+                  <span className="storm-selection-ring" aria-hidden="true" />
                   <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
                 </button>
               )

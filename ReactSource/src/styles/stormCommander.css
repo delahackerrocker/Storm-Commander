@@ -926,24 +926,40 @@
   background: rgba(4, 8, 18, 0.16);
 }
 
-.storm-commander-root .storm-encounter-square.is-player-soft-selected {
-  box-shadow:
-    inset 0 0 0 3px rgba(216, 98, 32, 0.72),
-    inset 0 0 20px rgba(216, 98, 32, 0.14),
-    0 0 16px rgba(216, 98, 32, 0.24);
+.storm-commander-root .storm-selection-ring {
+  position: absolute;
+  z-index: 2;
+  inset: 12%;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
 }
 
-.storm-commander-root .storm-encounter-square.is-opponent-soft-selected {
+.storm-commander-root .storm-encounter-square.is-player-soft-selected .storm-selection-ring {
+  border: 3px solid rgba(216, 98, 32, 0.76);
+  opacity: 1;
   box-shadow:
-    inset 0 0 0 3px rgba(85, 214, 232, 0.68),
-    inset 0 0 20px rgba(85, 214, 232, 0.12),
-    0 0 16px rgba(85, 214, 232, 0.22);
+    inset 0 0 18px rgba(216, 98, 32, 0.12),
+    0 0 16px rgba(216, 98, 32, 0.26);
 }
 
-.storm-commander-root .storm-encounter-square.is-selected {
+.storm-commander-root .storm-encounter-square.is-opponent-soft-selected .storm-selection-ring {
+  border: 3px solid rgba(85, 214, 232, 0.72);
+  opacity: 1;
   box-shadow:
-    inset 0 0 0 5px var(--selected),
-    inset 0 0 24px rgba(246, 200, 95, 0.16);
+    inset 0 0 18px rgba(85, 214, 232, 0.1),
+    0 0 16px rgba(85, 214, 232, 0.24);
+}
+
+.storm-commander-root .storm-encounter-square.is-selected .storm-selection-ring {
+  inset: 9%;
+  border: 5px solid var(--selected);
+  opacity: 1;
+  transform: none;
+  box-shadow:
+    inset 0 0 22px rgba(246, 200, 95, 0.14),
+    0 0 18px rgba(246, 200, 95, 0.34);
 }
 
 .storm-commander-root .storm-encounter-square.is-last-move::before,
@@ -964,9 +980,9 @@
 }
 
 .storm-commander-root .storm-encounter-square.is-legal-move::after {
-  z-index: 4;
-  width: 28%;
-  height: 28%;
+  z-index: 2;
+  width: 20%;
+  height: 20%;
   border-radius: 50%;
   background: var(--storm-turn-hint);
   box-shadow: 0 0 16px var(--storm-turn-hint-soft);
@@ -978,7 +994,22 @@
   inset: 13%;
   border: 5px solid var(--storm-turn-hint);
   border-radius: 50%;
-  background: transparent;
+  background:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% + 2.5px),
+      transparent calc(50% + 2.5px)
+    ),
+    linear-gradient(
+      -45deg,
+      transparent calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% + 2.5px),
+      transparent calc(50% + 2.5px)
+    );
+  box-shadow: none;
 }
 
 .storm-commander-root .storm-encounter-square.is-extraction::before {
