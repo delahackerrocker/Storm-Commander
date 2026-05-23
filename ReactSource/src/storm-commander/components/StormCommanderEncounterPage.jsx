@@ -26,6 +26,7 @@ import {
 
 const ENEMY_MOVE_DELAY_MS = 320
 const SELECTION_FLASH_DURATION_MS = 300
+const MOVE_ANIMATION_DURATION_MS = 1200
 
 const STORM_STARFIELD_LAYERS = [
   ['nebula', null],
@@ -181,6 +182,80 @@ function StormCommanderEncounterPiece({ piece, pieceRotation }) {
       pieceType={piece.type}
       pieceRotation={pieceRotation}
     />
+  )
+}
+
+function getMoveAngle(from, to) {
+  const deltaX = to.x - from.x
+  const deltaY = to.y - from.y
+
+  if (deltaX === 0 && deltaY === 0) {
+    return '0deg'
+  }
+
+  return `${Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90}deg`
+}
+
+function getMoveAnimationStyle(animation, encounter) {
+  const theme = STORM_COMMANDER_FACTION_VISUAL_THEMES[animation.movingPiece.faction]
+  const fromLeft = `${((animation.move.from.x + 0.5) / encounter.board.width) * 100}%`
+  const fromTop = `${((animation.move.from.y + 0.5) / encounter.board.height) * 100}%`
+  const toLeft = `${((animation.move.to.x + 0.5) / encounter.board.width) * 100}%`
+  const toTop = `${((animation.move.to.y + 0.5) / encounter.board.height) * 100}%`
+
+  return {
+    '--storm-move-cell-width': `${100 / encounter.board.width}%`,
+    '--storm-move-explosion-width': `${54 / encounter.board.width}%`,
+    '--storm-move-from-left': fromLeft,
+    '--storm-move-from-top': fromTop,
+    '--storm-move-to-left': toLeft,
+    '--storm-move-to-top': toTop,
+    '--storm-move-angle': getMoveAngle(animation.move.from, animation.move.to),
+    '--storm-attack-color': theme?.hint || 'rgba(232, 108, 36, 0.9)',
+  }
+}
+
+function MoveAnimationLayer({ animation, encounter }) {
+  if (!animation) {
+    return null
+  }
+
+  const isCapture = Boolean(animation.capturedPiece)
+
+  return (
+    <div
+      className={`storm-capture-animation-layer ${isCapture ? 'is-capture' : 'is-quiet'}`}
+      data-faction={animation.movingPiece.faction}
+      style={getMoveAnimationStyle(animation, encounter)}
+      aria-hidden="true"
+    >
+      <div className="storm-capture-attacker" data-faction={animation.movingPiece.faction}>
+        <StormCommanderEncounterPiece piece={animation.movingPiece} />
+      </div>
+      {isCapture ? (
+        <>
+          <div className="storm-capture-lasers">
+            {Array.from({ length: 5 }, (_, index) => (
+              <span
+                key={index}
+                className="storm-capture-laser"
+                style={{ '--storm-laser-index': index }}
+              />
+            ))}
+          </div>
+          <div className="storm-capture-hit-sparks">
+            {Array.from({ length: 4 }, (_, index) => (
+              <span
+                key={index}
+                className="storm-capture-hit-spark"
+                style={{ '--storm-spark-index': index }}
+              />
+            ))}
+          </div>
+          <span className="storm-capture-explosion" />
+        </>
+      ) : null}
+    </div>
   )
 }
 
@@ -465,7 +540,9 @@ export function StormCommanderEncounterPage({
   const [opponentCommsSelection, setOpponentCommsSelection] = useState(null)
   const [dismissedMissionEncounterId, setDismissedMissionEncounterId] = useState(null)
   const [selectionFlash, setSelectionFlash] = useState(null)
+  const [pendingMoveAnimation, setPendingMoveAnimation] = useState(null)
   const selectionFlashIdRef = useRef(0)
+  const isMoveAnimating = Boolean(pendingMoveAnimation)
   const selectedPiece =
     selection?.encounterId === encounter.id
       ? encounter.pieces.find((piece) => piece.id === selection.pieceId) || null
@@ -500,7 +577,9 @@ export function StormCommanderEncounterPage({
     [encounter, selectedPiece],
   )
   const isEnemyThinking =
-    encounter.status === 'active' && encounter.currentFaction !== encounter.playerFaction
+    encounter.status === 'active' &&
+    encounter.currentFaction !== encounter.playerFaction &&
+    !isMoveAnimating
   const isMissionResultOpen = encounter.status !== 'active'
   const isMissionBriefingOpen =
     encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
@@ -516,6 +595,22 @@ export function StormCommanderEncounterPage({
 
     return () => window.clearTimeout(timerId)
   }, [selectionFlash])
+
+  useEffect(() => {
+    if (!pendingMoveAnimation) {
+      return undefined
+    }
+
+    const timerId = window.setTimeout(() => {
+      setEncounter((currentEncounter) =>
+        applyEncounterMove(currentEncounter, pendingMoveAnimation.move),
+      )
+      setSelection(null)
+      setPendingMoveAnimation(null)
+    }, MOVE_ANIMATION_DURATION_MS)
+
+    return () => window.clearTimeout(timerId)
+  }, [pendingMoveAnimation, setEncounter])
 
   useEffect(() => {
     if (encounter.status !== 'active') {
@@ -578,15 +673,32 @@ export function StormCommanderEncounterPage({
   }
 
   function handleSquareClick(square) {
-    if (encounter.status !== 'active' || encounter.currentFaction !== encounter.playerFaction) {
+    if (
+      isMoveAnimating ||
+      encounter.status !== 'active' ||
+      encounter.currentFaction !== encounter.playerFaction
+    ) {
       return
     }
 
     const selectedMove = legalMoves.find((move) => sameSquare(move.to, square))
 
     if (selectedMove) {
-      setEncounter((currentEncounter) => applyEncounterMove(currentEncounter, selectedMove))
-      setSelection(null)
+      const movingPiece = encounter.pieces.find((piece) => piece.id === selectedMove.pieceId)
+      const capturedPiece = selectedMove.capturedPieceId
+        ? encounter.pieces.find((piece) => piece.id === selectedMove.capturedPieceId)
+        : null
+
+      if (movingPiece) {
+        setPendingMoveAnimation({
+          capturedPiece: capturedPiece ? { ...capturedPiece } : null,
+          move: selectedMove,
+          movingPiece: { ...movingPiece },
+        })
+      } else {
+        setEncounter((currentEncounter) => applyEncounterMove(currentEncounter, selectedMove))
+        setSelection(null)
+      }
       return
     }
 
@@ -672,6 +784,12 @@ export function StormCommanderEncounterPage({
               const isLastMoveTo = Boolean(
                 encounter.lastMove && sameSquare(encounter.lastMove.to, square),
               )
+              const isMoveAnimationFrom = Boolean(
+                pendingMoveAnimation && sameSquare(pendingMoveAnimation.move.from, square),
+              )
+              const isMoveAnimationTo = Boolean(
+                pendingMoveAnimation && sameSquare(pendingMoveAnimation.move.to, square),
+              )
               const className = [
                 'storm-encounter-square',
                 (square.x + square.y) % 2 === 0 ? 'is-light' : 'is-dark',
@@ -685,6 +803,8 @@ export function StormCommanderEncounterPage({
                 isLastMoveFrom || isLastMoveTo ? 'is-last-move' : '',
                 isLastMoveFrom ? 'is-last-move-from' : '',
                 isLastMoveTo ? 'is-last-move-to' : '',
+                isMoveAnimationFrom ? 'is-move-animation-from' : '',
+                isMoveAnimationTo ? 'is-move-animation-to' : '',
               ]
                 .filter(Boolean)
                 .join(' ')
@@ -701,6 +821,7 @@ export function StormCommanderEncounterPage({
                   className={className}
                   data-testid="storm-encounter-square"
                   data-faction={piece?.faction}
+                  disabled={isMoveAnimating}
                   aria-label={`${getSquareLabel(square, encounter.board)} ${getEncounterPieceLabel(piece)} ${actionLabel}`}
                   onClick={() => handleSquareClick(square)}
                 >
@@ -709,6 +830,7 @@ export function StormCommanderEncounterPage({
                 </button>
               )
             })}
+            <MoveAnimationLayer animation={pendingMoveAnimation} encounter={encounter} />
           </div>
         </section>
 

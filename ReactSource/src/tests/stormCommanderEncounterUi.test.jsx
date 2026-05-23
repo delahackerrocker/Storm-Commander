@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { render, screen, waitForElementToBeRemoved, within } from '@testing-library/react'
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitForElementToBeRemoved,
+  within,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
@@ -308,7 +315,7 @@ describe('Storm Commander random encounter UI', () => {
   })
 
   it('keeps the last selected player ship in comms after the move selection clears', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const encounter = {
       id: 'test_player_comms_persist',
       title: 'Random Pirate Raid',
@@ -348,16 +355,177 @@ describe('Storm Commander random encounter UI', () => {
       )
     }
 
-    render(<Harness />)
+    try {
+      render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
-    await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
-    await user.click(screen.getByRole('button', { name: /A4 empty legal destination/i }))
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+      fireEvent.click(screen.getByRole('button', { name: /A4 empty legal destination/i }))
 
-    const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+      await act(async () => {
+        vi.advanceTimersByTime(1200)
+      })
 
-    expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook : A4$/ }))
-      .toBeInTheDocument()
+      const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+
+      expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook : A4$/ }))
+        .toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('plays a cosmetic move animation and locks board input before applying a capture', async () => {
+    vi.useFakeTimers()
+    const encounter = {
+      id: 'test_capture_animation',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 0, y: 4 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          onReturnToChess={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    try {
+      const { container } = render(<Harness />)
+
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+      fireEvent.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
+
+      expect(container.querySelector('.storm-capture-animation-layer')).toBeInTheDocument()
+      expect(container.querySelector('.storm-capture-attacker')).toHaveAttribute(
+        'data-faction',
+        'pirate',
+      )
+      expect(container.querySelectorAll('.storm-capture-laser')).toHaveLength(5)
+      expect(container.querySelectorAll('.storm-capture-hit-spark')).toHaveLength(4)
+      expect(container.querySelector('.storm-capture-explosion')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /B4 Pirate rook square/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /D4 Imperial queen capture destination/i }))
+        .toBeDisabled()
+      expect(screen.getByRole('button', { name: /D4 Imperial queen capture destination/i }))
+        .toBeInTheDocument()
+
+      await act(async () => {
+        vi.advanceTimersByTime(1199)
+      })
+
+      expect(container.querySelector('.storm-capture-animation-layer')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /D4 Imperial queen capture destination/i }))
+        .toBeInTheDocument()
+
+      await act(async () => {
+        vi.advanceTimersByTime(1)
+      })
+
+      expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /D4 Pirate rook square/i })).not.toBeDisabled()
+      expect(screen.queryByRole('button', { name: /Imperial queen/i })).not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('animates quiet moves without laser or explosion effects', async () => {
+    vi.useFakeTimers()
+    const encounter = {
+      id: 'test_quiet_move_animation',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 4 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          onReturnToChess={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    try {
+      const { container } = render(<Harness />)
+
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+      fireEvent.click(screen.getByRole('button', { name: /C4 empty legal destination/i }))
+
+      expect(container.querySelector('.storm-capture-animation-layer')).toBeInTheDocument()
+      expect(container.querySelector('.storm-capture-attacker')).toHaveAttribute(
+        'data-faction',
+        'pirate',
+      )
+      expect(container.querySelectorAll('.storm-capture-laser')).toHaveLength(0)
+      expect(container.querySelectorAll('.storm-capture-hit-spark')).toHaveLength(0)
+      expect(container.querySelector('.storm-capture-explosion')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /B4 Pirate rook square/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /C4 empty legal destination/i })).toBeDisabled()
+
+      await act(async () => {
+        vi.advanceTimersByTime(1200)
+      })
+
+      expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /C4 Pirate rook square/i })).not.toBeDisabled()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('updates opponent comms when the player inspects an opponent ship', async () => {
@@ -543,7 +711,7 @@ describe('Storm Commander random encounter UI', () => {
   })
 
   it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const encounter = {
       id: 'test_destroy_target',
       title: 'Random Pirate Raid',
@@ -582,19 +750,27 @@ describe('Storm Commander random encounter UI', () => {
       )
     }
 
-    render(<Harness />)
+    try {
+      render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
-    await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
-    await user.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+      fireEvent.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
 
-    const resultDialog = screen.getByRole('dialog', { name: /^Objective Succeeded$/ })
+      await act(async () => {
+        vi.advanceTimersByTime(1200)
+      })
 
-    expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
+      const resultDialog = screen.getByRole('dialog', { name: /^Objective Succeeded$/ })
+
+      expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('shows an objective result popup with a next mission action when the encounter is won', async () => {
-    const user = userEvent.setup()
+    vi.useFakeTimers()
     const onNewEncounter = vi.fn()
     const encounter = {
       id: 'test_destroy_target_result',
@@ -634,19 +810,27 @@ describe('Storm Commander random encounter UI', () => {
       )
     }
 
-    render(<Harness />)
+    try {
+      render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
-    await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
-    await user.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+      fireEvent.click(screen.getByRole('button', { name: /Imperial queen capture destination/i }))
 
-    const resultDialog = screen.getByRole('dialog', { name: /^Objective Succeeded$/ })
+      await act(async () => {
+        vi.advanceTimersByTime(1200)
+      })
 
-    expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
+      const resultDialog = screen.getByRole('dialog', { name: /^Objective Succeeded$/ })
 
-    await user.click(within(resultDialog).getByRole('button', { name: /^Next Mission$/ }))
+      expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
 
-    expect(onNewEncounter).toHaveBeenCalledTimes(1)
+      fireEvent.click(within(resultDialog).getByRole('button', { name: /^Next Mission$/ }))
+
+      expect(onNewEncounter).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('opens the objective result popup when an active encounter already satisfies the objective', async () => {

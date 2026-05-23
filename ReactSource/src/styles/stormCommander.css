@@ -1016,20 +1016,8 @@
       transparent calc(50% + 2.5px)
   );
   box-shadow: none;
-  animation:
-    storm-target-reticle-pulse 2.8s ease-in-out infinite,
-    storm-target-reticle-rotate 2.666s linear infinite;
-}
-
-@keyframes storm-target-reticle-pulse {
-  0%,
-  100% {
-    opacity: 0.42;
-  }
-
-  50% {
-    opacity: 1;
-  }
+  opacity: 0.42;
+  animation: storm-target-reticle-rotate 2.666s linear infinite;
 }
 
 @keyframes storm-target-reticle-rotate {
@@ -1100,6 +1088,167 @@
   left: 50%;
   z-index: 3;
   translate: -50% -50%;
+}
+
+.storm-commander-root .storm-encounter-square.is-move-animation-from .storm-ship-piece,
+.storm-commander-root .storm-encounter-square.is-move-animation-to .storm-ship-piece {
+  opacity: 0;
+}
+
+.storm-commander-root .storm-capture-animation-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  color: var(--storm-attack-color, var(--storm-turn-hint));
+}
+
+.storm-commander-root .storm-capture-attacker {
+  position: absolute;
+  top: var(--storm-move-from-top);
+  left: var(--storm-move-from-left);
+  width: var(--storm-move-cell-width);
+  height: var(--storm-move-cell-width);
+  translate: -50% -50%;
+  transform-origin: 50% 50%;
+  animation: storm-capture-attacker-flight 1.2s ease-in-out forwards;
+}
+
+.storm-commander-root .storm-capture-attacker .storm-ship-piece {
+  width: 100%;
+  height: 100%;
+  transform: none;
+  transition: none;
+}
+
+.storm-commander-root .storm-capture-attacker[data-faction='pirate'] {
+  --storm-comms-faction-color: rgba(232, 108, 36, 0.9);
+}
+
+.storm-commander-root .storm-capture-attacker[data-faction='imperial'] {
+  --storm-comms-faction-color: rgba(213, 166, 14, 0.9);
+}
+
+.storm-commander-root .storm-capture-attacker[data-faction='robocorp'] {
+  --storm-comms-faction-color: rgba(85, 170, 242, 0.9);
+}
+
+.storm-commander-root .storm-capture-attacker[data-faction='rebel'] {
+  --storm-comms-faction-color: rgba(154, 112, 212, 0.9);
+}
+
+.storm-commander-root .storm-capture-laser {
+  position: absolute;
+  top: var(--storm-move-from-top);
+  left: var(--storm-move-from-left);
+  width: 12%;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+  opacity: 0;
+  transform-origin: 0 50%;
+  animation: storm-capture-laser-fire 180ms ease-out forwards;
+  animation-delay: calc(0.22s + var(--storm-laser-index) * 0.12s);
+}
+
+.storm-commander-root .storm-capture-hit-spark,
+.storm-commander-root .storm-capture-explosion {
+  position: absolute;
+  top: var(--storm-move-to-top);
+  left: var(--storm-move-to-left);
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.storm-commander-root .storm-capture-hit-spark {
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #fff 0 18%, currentColor 19% 58%, transparent 62%);
+  opacity: 0;
+  animation: storm-capture-hit-spark 220ms ease-out forwards;
+  animation-delay: calc(0.3s + var(--storm-spark-index) * 0.14s);
+}
+
+.storm-commander-root .storm-capture-explosion {
+  width: var(--storm-move-explosion-width);
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle, #fff4bc 0 10%, #ff8f2b 11% 34%, rgba(232, 108, 36, 0.5) 35% 58%, transparent 62%);
+  opacity: 0;
+  filter: drop-shadow(0 0 18px rgba(255, 142, 48, 0.8));
+  animation: storm-capture-explosion 300ms ease-out forwards;
+  animation-delay: 0.9s;
+}
+
+@keyframes storm-capture-attacker-flight {
+  0% {
+    top: var(--storm-move-from-top);
+    left: var(--storm-move-from-left);
+    transform: rotate(var(--storm-piece-rotation, 0deg));
+  }
+
+  16.667% {
+    top: var(--storm-move-from-top);
+    left: var(--storm-move-from-left);
+    transform: rotate(var(--storm-move-angle));
+  }
+
+  100% {
+    top: var(--storm-move-to-top);
+    left: var(--storm-move-to-left);
+    transform: rotate(var(--storm-move-angle));
+  }
+}
+
+@keyframes storm-capture-laser-fire {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--storm-move-angle)) scaleX(0.2);
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(var(--storm-move-angle)) scaleX(2.6);
+  }
+}
+
+@keyframes storm-capture-hit-spark {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+  }
+
+  45% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.8;
+  }
+}
+
+@keyframes storm-capture-explosion {
+  0% {
+    opacity: 0;
+    scale: 0.4;
+  }
+
+  45% {
+    opacity: 1;
+    scale: 1.3;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 2.2;
+  }
 }
 
 .storm-commander-root .storm-encounter-panel {
