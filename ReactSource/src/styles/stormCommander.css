@@ -1091,7 +1091,9 @@
 }
 
 .storm-commander-root .storm-encounter-square.is-move-animation-from .storm-ship-piece,
-.storm-commander-root .storm-encounter-square.is-move-animation-to .storm-ship-piece {
+.storm-commander-root
+  .storm-encounter-square.is-move-animation-to:not(.is-move-animation-capture-to)
+  .storm-ship-piece {
   opacity: 0;
 }
 

@@ -822,6 +822,9 @@ export function StormCommanderEncounterPage({
               const isMoveAnimationTo = Boolean(
                 pendingMoveAnimation && sameSquare(pendingMoveAnimation.move.to, square),
               )
+              const isMoveAnimationCaptureTo = Boolean(
+                isMoveAnimationTo && pendingMoveAnimation?.move.capturedPieceId,
+              )
               const className = [
                 'storm-encounter-square',
                 (square.x + square.y) % 2 === 0 ? 'is-light' : 'is-dark',
@@ -837,6 +840,7 @@ export function StormCommanderEncounterPage({
                 isLastMoveTo ? 'is-last-move-to' : '',
                 isMoveAnimationFrom ? 'is-move-animation-from' : '',
                 isMoveAnimationTo ? 'is-move-animation-to' : '',
+                isMoveAnimationCaptureTo ? 'is-move-animation-capture-to' : '',
               ]
                 .filter(Boolean)
                 .join(' ')
