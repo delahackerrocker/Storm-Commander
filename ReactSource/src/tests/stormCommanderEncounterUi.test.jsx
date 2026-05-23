@@ -441,8 +441,13 @@ describe('Storm Commander random encounter UI', () => {
       expect(screen.getByRole('button', { name: /B4 Pirate rook square/i })).toBeDisabled()
       expect(screen.getByRole('button', { name: /D4 Imperial queen capture destination/i }))
         .toBeDisabled()
-      expect(screen.getByRole('button', { name: /D4 Imperial queen capture destination/i }))
-        .toBeInTheDocument()
+      const targetSquare = screen.getByRole('button', {
+        name: /D4 Imperial queen capture destination/i,
+      })
+
+      expect(targetSquare).toBeInTheDocument()
+      expect(targetSquare.querySelector('.storm-ship-piece')).toBeInTheDocument()
+      expect(targetSquare).toHaveClass('is-move-animation-capture-to')
 
       await act(async () => {
         vi.advanceTimersByTime(1199)
@@ -587,6 +592,85 @@ describe('Storm Commander random encounter UI', () => {
 
       expect(animationLayer).toHaveStyle('--storm-move-start-angle: 350deg')
       expect(animationLayer).toHaveStyle('--storm-move-angle: 360deg')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('plays the same cosmetic animation before applying an enemy move', async () => {
+    vi.useFakeTimers()
+    const encounter = {
+      id: 'test_enemy_move_animation',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'imperial',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_queen', faction: 'pirate', type: 'q', square: { x: 3, y: 1 } },
+        { id: 'imperial_rook', faction: 'imperial', type: 'r', square: { x: 1, y: 1 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          onReturnToChess={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    try {
+      const { container } = render(<Harness />)
+
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+
+      await act(async () => {
+        vi.advanceTimersByTime(319)
+      })
+
+      expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /D4 Pirate queen square/i })).toBeInTheDocument()
+
+      await act(async () => {
+        vi.advanceTimersByTime(1)
+      })
+
+      expect(container.querySelector('.storm-capture-animation-layer')).toBeInTheDocument()
+      expect(container.querySelector('.storm-capture-attacker')).toHaveAttribute(
+        'data-faction',
+        'imperial',
+      )
+      expect(container.querySelectorAll('.storm-capture-laser')).toHaveLength(5)
+      expect(screen.getByRole('button', { name: /B4 Imperial rook square/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /D4 Pirate queen square/i })).toBeDisabled()
+      expect(screen.getByRole('button', { name: /D4 Pirate queen square/i })).toBeInTheDocument()
+
+      await act(async () => {
+        vi.advanceTimersByTime(1200)
+      })
+
+      expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /D4 Imperial rook square/i })).not.toBeDisabled()
+      expect(screen.queryByRole('button', { name: /Pirate queen/i })).not.toBeInTheDocument()
     } finally {
       vi.useRealTimers()
     }

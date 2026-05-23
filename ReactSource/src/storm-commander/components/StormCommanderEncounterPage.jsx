@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   STORM_COMMANDER_FACTION_PIECE_ASSETS,
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
@@ -6,6 +6,7 @@ import {
 import { StormCommanderShipPiece } from '../../components/StormCommanderShipPiece'
 import {
   advanceSloppyAggressiveTurn,
+  selectSloppyAggressiveMove,
 } from '../encounter/sloppyAggressiveAi'
 import {
   getObjectiveProgressText,
@@ -605,6 +606,24 @@ export function StormCommanderEncounterPage({
   const isMissionBriefingOpen =
     encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
 
+  const startMoveAnimation = useCallback((move) => {
+    const movingPiece = encounter.pieces.find((piece) => piece.id === move.pieceId)
+    const capturedPiece = move.capturedPieceId
+      ? encounter.pieces.find((piece) => piece.id === move.capturedPieceId)
+      : null
+
+    if (movingPiece) {
+      setPendingMoveAnimation({
+        capturedPiece: capturedPiece ? { ...capturedPiece } : null,
+        move,
+        movingPiece: { ...movingPiece },
+      })
+    } else {
+      setEncounter((currentEncounter) => applyEncounterMove(currentEncounter, move))
+      setSelection(null)
+    }
+  }, [encounter.pieces, setEncounter])
+
   useEffect(() => {
     if (!selectionFlash) {
       return undefined
@@ -651,11 +670,17 @@ export function StormCommanderEncounterPage({
     }
 
     const timerId = window.setTimeout(() => {
-      setEncounter((currentEncounter) => advanceSloppyAggressiveTurn(currentEncounter))
+      const selectedMove = selectSloppyAggressiveMove(encounter, encounter.currentFaction)
+
+      if (selectedMove) {
+        startMoveAnimation(selectedMove)
+      } else {
+        setEncounter((currentEncounter) => advanceSloppyAggressiveTurn(currentEncounter))
+      }
     }, ENEMY_MOVE_DELAY_MS)
 
     return () => window.clearTimeout(timerId)
-  }, [isEnemyThinking, setEncounter])
+  }, [encounter, isEnemyThinking, setEncounter, startMoveAnimation])
 
   useEffect(() => {
     if (!isMissionBriefingOpen) {
@@ -705,21 +730,7 @@ export function StormCommanderEncounterPage({
     const selectedMove = legalMoves.find((move) => sameSquare(move.to, square))
 
     if (selectedMove) {
-      const movingPiece = encounter.pieces.find((piece) => piece.id === selectedMove.pieceId)
-      const capturedPiece = selectedMove.capturedPieceId
-        ? encounter.pieces.find((piece) => piece.id === selectedMove.capturedPieceId)
-        : null
-
-      if (movingPiece) {
-        setPendingMoveAnimation({
-          capturedPiece: capturedPiece ? { ...capturedPiece } : null,
-          move: selectedMove,
-          movingPiece: { ...movingPiece },
-        })
-      } else {
-        setEncounter((currentEncounter) => applyEncounterMove(currentEncounter, selectedMove))
-        setSelection(null)
-      }
+      startMoveAnimation(selectedMove)
       return
     }
 
