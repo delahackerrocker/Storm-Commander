@@ -196,12 +196,27 @@ function getMoveAngle(from, to) {
   return `${Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90}deg`
 }
 
-function getMoveAnimationStyle(animation, encounter) {
+function getDegreeValue(rotation) {
+  const parsed = Number.parseFloat(rotation)
+
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function getShortestAngleTarget(fromAngle, toAngle) {
+  const shortestDelta = ((toAngle - fromAngle + 540) % 360) - 180
+
+  return fromAngle + shortestDelta
+}
+
+function getMoveAnimationStyle(animation, encounter, pieceRotation) {
   const theme = STORM_COMMANDER_FACTION_VISUAL_THEMES[animation.movingPiece.faction]
   const fromLeft = `${((animation.move.from.x + 0.5) / encounter.board.width) * 100}%`
   const fromTop = `${((animation.move.from.y + 0.5) / encounter.board.height) * 100}%`
   const toLeft = `${((animation.move.to.x + 0.5) / encounter.board.width) * 100}%`
   const toTop = `${((animation.move.to.y + 0.5) / encounter.board.height) * 100}%`
+  const startAngle = getDegreeValue(pieceRotation)
+  const targetAngle = getDegreeValue(getMoveAngle(animation.move.from, animation.move.to))
+  const shortestTargetAngle = getShortestAngleTarget(startAngle, targetAngle)
 
   return {
     '--storm-move-cell-width': `${100 / encounter.board.width}%`,
@@ -210,12 +225,13 @@ function getMoveAnimationStyle(animation, encounter) {
     '--storm-move-from-top': fromTop,
     '--storm-move-to-left': toLeft,
     '--storm-move-to-top': toTop,
-    '--storm-move-angle': getMoveAngle(animation.move.from, animation.move.to),
+    '--storm-move-angle': `${shortestTargetAngle}deg`,
+    '--storm-move-start-angle': `${startAngle}deg`,
     '--storm-attack-color': theme?.hint || 'rgba(232, 108, 36, 0.9)',
   }
 }
 
-function MoveAnimationLayer({ animation, encounter }) {
+function MoveAnimationLayer({ animation, encounter, pieceRotation }) {
   if (!animation) {
     return null
   }
@@ -226,23 +242,28 @@ function MoveAnimationLayer({ animation, encounter }) {
     <div
       className={`storm-capture-animation-layer ${isCapture ? 'is-capture' : 'is-quiet'}`}
       data-faction={animation.movingPiece.faction}
-      style={getMoveAnimationStyle(animation, encounter)}
+      style={getMoveAnimationStyle(animation, encounter, pieceRotation)}
       aria-hidden="true"
     >
       <div className="storm-capture-attacker" data-faction={animation.movingPiece.faction}>
         <StormCommanderEncounterPiece piece={animation.movingPiece} />
-      </div>
-      {isCapture ? (
-        <>
+        {isCapture ? (
           <div className="storm-capture-lasers">
             {Array.from({ length: 5 }, (_, index) => (
               <span
                 key={index}
                 className="storm-capture-laser"
-                style={{ '--storm-laser-index': index }}
+                style={{
+                  '--storm-laser-index': index,
+                  '--storm-laser-turn-delay': '0.2s',
+                }}
               />
             ))}
           </div>
+        ) : null}
+      </div>
+      {isCapture ? (
+        <>
           <div className="storm-capture-hit-sparks">
             {Array.from({ length: 4 }, (_, index) => (
               <span
@@ -830,7 +851,11 @@ export function StormCommanderEncounterPage({
                 </button>
               )
             })}
-            <MoveAnimationLayer animation={pendingMoveAnimation} encounter={encounter} />
+            <MoveAnimationLayer
+              animation={pendingMoveAnimation}
+              encounter={encounter}
+              pieceRotation={pieceRotation}
+            />
           </div>
         </section>
 

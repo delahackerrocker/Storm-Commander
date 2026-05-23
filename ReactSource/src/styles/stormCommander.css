@@ -1186,7 +1186,7 @@
   0% {
     top: var(--storm-move-from-top);
     left: var(--storm-move-from-left);
-    transform: rotate(var(--storm-piece-rotation, 0deg));
+    transform: rotate(var(--storm-move-start-angle, 0deg));
   }
 
   16.667% {

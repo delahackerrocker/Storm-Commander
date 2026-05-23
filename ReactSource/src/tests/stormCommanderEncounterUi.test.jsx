@@ -429,7 +429,13 @@ describe('Storm Commander random encounter UI', () => {
         'data-faction',
         'pirate',
       )
+      expect(container.querySelector('.storm-capture-lasers')?.parentElement).toHaveClass(
+        'storm-capture-attacker',
+      )
       expect(container.querySelectorAll('.storm-capture-laser')).toHaveLength(5)
+      container.querySelectorAll('.storm-capture-laser').forEach((laser) => {
+        expect(laser).toHaveStyle('--storm-laser-turn-delay: 0.2s')
+      })
       expect(container.querySelectorAll('.storm-capture-hit-spark')).toHaveLength(4)
       expect(container.querySelector('.storm-capture-explosion')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /B4 Pirate rook square/i })).toBeDisabled()
@@ -523,6 +529,64 @@ describe('Storm Commander random encounter UI', () => {
 
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
       expect(screen.getByRole('button', { name: /C4 Pirate rook square/i })).not.toBeDisabled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('chooses the shortest rotation path when turning toward a move target', async () => {
+    vi.useFakeTimers()
+    const encounter = {
+      id: 'test_shortest_move_rotation',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 4 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          onReturnToChess={() => {}}
+          pieceRotation="350deg"
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    try {
+      const { container } = render(<Harness />)
+
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /Pirate rook square/i }))
+      fireEvent.click(screen.getByRole('button', { name: /B5 empty legal destination/i }))
+
+      const animationLayer = container.querySelector('.storm-capture-animation-layer')
+
+      expect(animationLayer).toHaveStyle('--storm-move-start-angle: 350deg')
+      expect(animationLayer).toHaveStyle('--storm-move-angle: 360deg')
     } finally {
       vi.useRealTimers()
     }
