@@ -987,11 +987,16 @@
 
 .storm-commander-root .storm-encounter-square.is-legal-move::after {
   z-index: 2;
-  width: 20%;
-  height: 20%;
-  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  width: 10%;
+  height: 10%;
+  opacity: 0.5;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
   background: var(--storm-turn-hint);
-  box-shadow: 0 0 16px var(--storm-turn-hint-soft);
+  transform: translate(-50%, -50%) rotate(var(--storm-legal-move-angle, 0deg));
+  transform-origin: center;
+  box-shadow: 0 0 8px var(--storm-turn-hint-soft);
 }
 
 .storm-commander-root .storm-encounter-square.is-capture::after {

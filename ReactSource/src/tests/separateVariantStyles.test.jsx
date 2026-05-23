@@ -360,8 +360,14 @@ describe('separate variant style sources', () => {
     expect(activeSelectionRule).toContain('border-radius: 50%;')
     expect(lastMoveFromRule).toContain('opacity: 0.3;')
     expect(legalMoveRule).toContain('z-index: 2;')
-    expect(legalMoveRule).toContain('width: 20%;')
-    expect(legalMoveRule).toContain('height: 20%;')
+    expect(legalMoveRule).toContain('width: 10%;')
+    expect(legalMoveRule).toContain('height: 10%;')
+    expect(legalMoveRule).toContain('clip-path: polygon(50% 0, 100% 100%, 0 100%);')
+    expect(legalMoveRule).toContain('opacity: 0.5;')
+    expect(legalMoveRule).toContain(
+      'transform: translate(-50%, -50%) rotate(var(--storm-legal-move-angle, 0deg));',
+    )
+    expect(legalMoveRule).not.toContain('border-radius: 50%;')
     expect(captureRule).toContain('border: 5px solid var(--storm-turn-hint);')
     expect(captureRule).toContain('border-radius: 50%;')
     expect(captureRule).toContain('linear-gradient(')

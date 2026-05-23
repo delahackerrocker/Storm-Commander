@@ -197,6 +197,19 @@ function getMoveAngle(from, to) {
   return `${Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90}deg`
 }
 
+function getLegalMoveHintStyle(selectedPiece, legalMove) {
+  if (!selectedPiece || !legalMove || legalMove.capturedPieceId) {
+    return undefined
+  }
+
+  const moveAngle = getDegreeValue(getMoveAngle(selectedPiece.square, legalMove.to))
+  const shortestMoveAngle = getShortestAngleTarget(0, moveAngle)
+
+  return {
+    '--storm-legal-move-angle': `${shortestMoveAngle}deg`,
+  }
+}
+
 function getDegreeValue(rotation) {
   const parsed = Number.parseFloat(rotation)
 
@@ -849,6 +862,7 @@ export function StormCommanderEncounterPage({
                 : legalMove
                   ? 'legal destination'
                   : 'square'
+              const legalMoveHintStyle = getLegalMoveHintStyle(selectedPiece, legalMove)
 
               return (
                 <button
@@ -857,6 +871,7 @@ export function StormCommanderEncounterPage({
                   className={className}
                   data-testid="storm-encounter-square"
                   data-faction={piece?.faction}
+                  style={legalMoveHintStyle}
                   disabled={isMoveAnimating}
                   aria-label={`${getSquareLabel(square, encounter.board)} ${getEncounterPieceLabel(piece)} ${actionLabel}`}
                   onClick={() => handleSquareClick(square)}

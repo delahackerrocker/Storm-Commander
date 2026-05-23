@@ -597,6 +597,53 @@ describe('Storm Commander random encounter UI', () => {
     }
   })
 
+  it('orients smaller legal movement triangles away from the selected ship', () => {
+    const encounter = {
+      id: 'test_legal_move_triangles',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 2, y: 2 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 4 } },
+      ],
+    }
+
+    render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+    fireEvent.click(screen.getByRole('button', { name: /C3 Pirate rook square/i }))
+
+    expect(screen.getByRole('button', { name: /D3 empty legal destination/i }))
+      .toHaveStyle('--storm-legal-move-angle: 90deg')
+    expect(screen.getByRole('button', { name: /C4 empty legal destination/i }))
+      .toHaveStyle('--storm-legal-move-angle: 0deg')
+    expect(screen.getByRole('button', { name: /B3 empty legal destination/i }))
+      .toHaveStyle('--storm-legal-move-angle: -90deg')
+  })
+
   it('plays the same cosmetic animation before applying an enemy move', async () => {
     vi.useFakeTimers()
     const encounter = {
