@@ -38,6 +38,8 @@ const STORM_STARFIELD_LAYERS = [
   ['asteroid-near', 'asteroidNear'],
 ]
 
+const STORM_COMMANDER_PAWN_CAPTURE_HINT_SQUARES = new Set(['1,1', '3,1', '1,3', '3,3'])
+
 function sameSquare(left, right) {
   return left?.x === right?.x && left?.y === right?.y
 }
@@ -184,7 +186,7 @@ function StormCommanderEncounterPiece({ piece, pieceRotation }) {
 
 function getMovementPatternSquares(pieceType) {
   if (pieceType === 'p') {
-    return new Set(['2,1', '1,1', '3,1', '2,3', '1,3', '3,3'])
+    return new Set(['2,1', '1,2', '3,2', '2,3', '1,1', '3,1', '1,3', '3,3'])
   }
 
   if (pieceType === 'b') {
@@ -229,8 +231,11 @@ function MovementPatternIcon({ faction, pieceType }) {
 
   for (let y = 0; y < 5; y += 1) {
     for (let x = 0; x < 5; x += 1) {
+      const squareKey = `${x},${y}`
       const isOrigin = x === 2 && y === 2
-      const isMovementSquare = movementSquares.has(`${x},${y}`)
+      const isMovementSquare = movementSquares.has(squareKey)
+      const isPawnCaptureHint =
+        pieceType === 'p' && STORM_COMMANDER_PAWN_CAPTURE_HINT_SQUARES.has(squareKey)
       if (!isOrigin && !isMovementSquare) {
         continue
       }
@@ -239,6 +244,7 @@ function MovementPatternIcon({ faction, pieceType }) {
         'storm-movement-pattern-cell',
         isOrigin ? 'is-origin' : '',
         isMovementSquare ? 'is-move' : '',
+        isPawnCaptureHint ? 'is-capture-hint' : '',
       ]
         .filter(Boolean)
         .join(' ')
@@ -660,6 +666,12 @@ export function StormCommanderEncounterPage({
               const isTarget =
                 Boolean(encounter.objective.targetPieceId) &&
                 piece?.id === encounter.objective.targetPieceId
+              const isLastMoveFrom = Boolean(
+                encounter.lastMove && sameSquare(encounter.lastMove.from, square),
+              )
+              const isLastMoveTo = Boolean(
+                encounter.lastMove && sameSquare(encounter.lastMove.to, square),
+              )
               const className = [
                 'storm-encounter-square',
                 (square.x + square.y) % 2 === 0 ? 'is-light' : 'is-dark',
@@ -670,10 +682,9 @@ export function StormCommanderEncounterPage({
                 legalMove?.capturedPieceId ? 'is-capture' : '',
                 isExtraction ? 'is-extraction' : '',
                 isTarget ? 'is-target' : '',
-                encounter.lastMove &&
-                (sameSquare(encounter.lastMove.from, square) || sameSquare(encounter.lastMove.to, square))
-                  ? 'is-last-move'
-                  : '',
+                isLastMoveFrom || isLastMoveTo ? 'is-last-move' : '',
+                isLastMoveFrom ? 'is-last-move-from' : '',
+                isLastMoveTo ? 'is-last-move-to' : '',
               ]
                 .filter(Boolean)
                 .join(' ')

@@ -87,6 +87,9 @@ describe('separate variant style sources', () => {
     const movementRule = stormStyles.match(
       /\.storm-commander-root \.storm-movement-pattern\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const portraitRule = stormStyles.match(
+      /\.storm-commander-root \.storm-comms-portrait\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const portraitShipRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-portrait \.storm-ship-piece\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -140,6 +143,9 @@ describe('separate variant style sources', () => {
     const activeSelectionRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-selected \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const lastMoveFromRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-last-move-from::before\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const legalMoveRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-legal-move::after\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -152,8 +158,14 @@ describe('separate variant style sources', () => {
     const encounterPieceRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-piece\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const boardShipRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square \.storm-ship-piece\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const movementMoveCellRule = stormStyles.match(
       /\.storm-commander-root \.storm-movement-pattern-cell\.is-move\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const movementCaptureHintRule = stormStyles.match(
+      /\.storm-commander-root \.storm-movement-pattern-cell\.is-capture-hint\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
     const verticalBreakpointIndex = stormStyles.indexOf('@media (max-width: 900px)')
     const phoneBreakpointIndex = stormStyles.indexOf('@media (max-width: 560px)')
@@ -164,8 +176,15 @@ describe('separate variant style sources', () => {
     expect(stormStyles).not.toContain('storm-encounter-topbar')
     expect(stormStyles).not.toContain('storm-encounter-brand')
     expect(stormStyles).not.toContain('storm-encounter-actions')
-    expect(encounterRootRule).toContain('var(--storm-opponent-faction-bg)')
-    expect(encounterRootRule).toContain('var(--storm-player-faction-bg)')
+    expect(encounterRootRule).toContain(
+      'radial-gradient(circle at 0% 0%, var(--storm-opponent-faction-bg), transparent 42%)',
+    )
+    expect(encounterRootRule).toContain(
+      'radial-gradient(circle at 100% 100%, var(--storm-player-faction-bg), transparent 44%)',
+    )
+    expect(encounterRootRule).toContain(
+      'radial-gradient(circle at 86% 8%, rgba(89, 30, 58, 0.42), transparent 32%)',
+    )
     expect(shellRule).toContain(
       'grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);',
     )
@@ -303,8 +322,13 @@ describe('separate variant style sources', () => {
     expect(movementRule).not.toContain('linear-gradient')
     expect(movementRule).not.toContain('background-size')
     expect(stormStyles).not.toContain('background-size: 7px 7px;')
-    expect(portraitShipRule).toContain('width: 93.6%;')
-    expect(portraitShipRule).toContain('height: 93.6%;')
+    expect(portraitRule).toContain('position: relative;')
+    expect(portraitShipRule).toContain('width: 112.32%;')
+    expect(portraitShipRule).toContain('height: 112.32%;')
+    expect(portraitShipRule).toContain('position: absolute;')
+    expect(portraitShipRule).toContain('top: 50%;')
+    expect(portraitShipRule).toContain('left: 50%;')
+    expect(portraitShipRule).toContain('translate: -50% -50%;')
     expect(barkRule).toContain('min-height: 85px;')
     expect(selectionRingRule).not.toContain('border-radius: 50%;')
     expect(selectionRingRule).toContain('z-index: 2;')
@@ -331,6 +355,7 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain('--storm-opponent-soft-ring: rgba(154, 112, 212, 0.3024);')
     expect(activeSelectionRule).toContain('border: 5px solid var(--selected);')
     expect(activeSelectionRule).toContain('border-radius: 50%;')
+    expect(lastMoveFromRule).toContain('opacity: 0.3;')
     expect(legalMoveRule).toContain('z-index: 2;')
     expect(legalMoveRule).toContain('width: 20%;')
     expect(legalMoveRule).toContain('height: 20%;')
@@ -340,11 +365,28 @@ describe('separate variant style sources', () => {
     expect(captureRule).toContain('45deg')
     expect(captureRule).toContain('-45deg')
     expect(captureRule).toContain('box-shadow: none;')
+    expect(captureRule).toContain('animation:')
+    expect(captureRule).toContain('storm-target-reticle-pulse 2.8s ease-in-out infinite')
+    expect(captureRule).toContain('storm-target-reticle-rotate 2.666s linear infinite')
+    expect(stormStyles).toContain('@keyframes storm-target-reticle-pulse')
+    expect(stormStyles).toContain('opacity: 0.42;')
+    expect(stormStyles).toContain('opacity: 1;')
+    expect(stormStyles).toContain('@keyframes storm-target-reticle-rotate')
+    expect(stormStyles).toContain('transform: rotate(45deg);')
+    expect(stormStyles).toContain('transform: rotate(0deg);')
     expect(extractionSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
     expect(extractionSquareRule).toContain('animation: storm-extraction-pulse 3.2s ease-in-out infinite;')
     expect(stormStyles).toContain('@keyframes storm-extraction-pulse')
     expect(encounterPieceRule).toContain('z-index: 3;')
+    expect(encounterPieceRule).toContain('width: 100%;')
+    expect(encounterPieceRule).toContain('height: 100%;')
+    expect(boardShipRule).toContain('position: absolute;')
+    expect(boardShipRule).toContain('top: 50%;')
+    expect(boardShipRule).toContain('left: 50%;')
+    expect(boardShipRule).toContain('translate: -50% -50%;')
     expect(movementMoveCellRule).toContain('background: var(--storm-comms-faction-color')
     expect(movementMoveCellRule).toContain('box-shadow: 0 0 8px var(--storm-comms-faction-glow')
+    expect(movementCaptureHintRule).toContain('background: rgba(177, 181, 174, 0.5);')
+    expect(movementCaptureHintRule).toContain('box-shadow: none;')
   })
 })

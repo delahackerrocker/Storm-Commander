@@ -727,9 +727,9 @@
 
   color: var(--text);
   background:
-    radial-gradient(circle at 100% 0%, var(--storm-opponent-faction-bg), transparent 42%),
+    radial-gradient(circle at 0% 0%, var(--storm-opponent-faction-bg), transparent 42%),
     radial-gradient(circle at 100% 100%, var(--storm-player-faction-bg), transparent 44%),
-    radial-gradient(circle at 14% 8%, rgba(89, 30, 58, 0.42), transparent 32%),
+    radial-gradient(circle at 86% 8%, rgba(89, 30, 58, 0.42), transparent 32%),
     var(--storm-space-black);
 }
 
@@ -981,6 +981,10 @@
   box-shadow: 0 0 16px var(--storm-last-move-ring-soft);
 }
 
+.storm-commander-root .storm-encounter-square.is-last-move-from::before {
+  opacity: 0.3;
+}
+
 .storm-commander-root .storm-encounter-square.is-legal-move::after {
   z-index: 2;
   width: 20%;
@@ -1010,8 +1014,38 @@
       var(--storm-turn-hint) calc(50% - 2.5px),
       var(--storm-turn-hint) calc(50% + 2.5px),
       transparent calc(50% + 2.5px)
-    );
+  );
   box-shadow: none;
+  animation:
+    storm-target-reticle-pulse 2.8s ease-in-out infinite,
+    storm-target-reticle-rotate 2.666s linear infinite;
+}
+
+@keyframes storm-target-reticle-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes storm-target-reticle-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  12.5%,
+  50% {
+    transform: rotate(45deg);
+  }
+
+  62.5%,
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .storm-commander-root .storm-encounter-square.is-extraction::before {
@@ -1061,7 +1095,11 @@
 }
 
 .storm-commander-root .storm-encounter-square .storm-ship-piece {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   z-index: 3;
+  translate: -50% -50%;
 }
 
 .storm-commander-root .storm-encounter-panel {
@@ -1167,6 +1205,7 @@
 
 .storm-commander-root .storm-comms-portrait {
   aspect-ratio: 1;
+  position: relative;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -1200,8 +1239,12 @@
 }
 
 .storm-commander-root .storm-comms-portrait .storm-ship-piece {
-  width: 93.6%;
-  height: 93.6%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 112.32%;
+  height: 112.32%;
+  translate: -50% -50%;
 }
 
 .storm-commander-root .storm-comms-details {
@@ -1263,6 +1306,11 @@
 .storm-commander-root .storm-movement-pattern-cell.is-move {
   background: var(--storm-comms-faction-color, var(--storm-pirate-orange));
   box-shadow: 0 0 8px var(--storm-comms-faction-glow, rgba(216, 98, 32, 0.45));
+}
+
+.storm-commander-root .storm-movement-pattern-cell.is-capture-hint {
+  background: rgba(177, 181, 174, 0.5);
+  box-shadow: none;
 }
 
 .storm-commander-root .storm-movement-pattern-cell.is-origin {

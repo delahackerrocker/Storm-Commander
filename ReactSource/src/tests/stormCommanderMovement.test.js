@@ -16,17 +16,24 @@ function destinations(moves) {
 }
 
 describe('Storm Commander encounter movement', () => {
-  it('lets pawns move forward or backward but not sideways', () => {
+  it('lets pawns move one square vertically or horizontally without capturing', () => {
     const encounter = createEncounter([
       { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 2, y: 2 } },
     ])
 
-    expect(destinations(getLegalEncounterMoves(encounter, 'pirate_pawn'))).toEqual(['2,1', '2,3'])
+    expect(destinations(getLegalEncounterMoves(encounter, 'pirate_pawn'))).toEqual([
+      '1,2',
+      '2,1',
+      '2,3',
+      '3,2',
+    ])
   })
 
-  it('lets pawns capture diagonally forward or backward', () => {
+  it('lets pawns capture diagonally forward or backward but not horizontally', () => {
     const encounter = createEncounter([
       { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 2, y: 2 } },
+      { id: 'imperial_left', faction: 'imperial', type: 'n', square: { x: 1, y: 2 } },
+      { id: 'imperial_right', faction: 'imperial', type: 'n', square: { x: 3, y: 2 } },
       { id: 'imperial_a', faction: 'imperial', type: 'q', square: { x: 1, y: 1 } },
       { id: 'imperial_b', faction: 'imperial', type: 'r', square: { x: 3, y: 3 } },
       { id: 'pirate_blocker', faction: 'pirate', type: 'b', square: { x: 1, y: 3 } },

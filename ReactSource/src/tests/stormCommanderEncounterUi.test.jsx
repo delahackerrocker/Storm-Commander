@@ -782,6 +782,116 @@ describe('Storm Commander random encounter UI', () => {
     expect(container.querySelectorAll('.storm-encounter-square.is-extraction')).toHaveLength(1)
   })
 
+  it('mutes pawn diagonal capture pips in the movement icon', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_pawn_movement_icon',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsToSurvive: 4,
+        turnsSurvived: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 2, y: 2 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 2 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
+
+    const pawnMovementIcon = screen.getByRole('img', {
+      name: /^Moves one square vertically or horizontally\. Captures diagonally\.$/,
+    })
+    const captureHints = pawnMovementIcon.querySelectorAll(
+      '.storm-movement-pattern-cell.is-capture-hint',
+    )
+
+    expect(within(screen.getByRole('complementary', { name: /^Player comms$/ }))
+      .getByRole('heading', { name: /^Pirate Pawn : C3$/ })).toBeInTheDocument()
+    expect(captureHints).toHaveLength(4)
+    expect(pawnMovementIcon.querySelectorAll('.storm-movement-pattern-cell.is-move'))
+      .toHaveLength(8)
+    captureHints.forEach((captureHint) => {
+      expect(captureHint).toHaveClass('is-move')
+    })
+    expect(container.querySelectorAll('.storm-movement-pattern-cell:not(.is-move):not(.is-origin)'))
+      .toHaveLength(0)
+  })
+
+  it('separates last move origin and destination markers', () => {
+    const encounter = {
+      id: 'test_last_move_marker_sides',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsToSurvive: 4,
+        turnsSurvived: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      lastMove: {
+        faction: 'rebel',
+        from: { x: 3, y: 1 },
+        pieceId: 'rebel_bishop',
+        to: { x: 4, y: 2 },
+      },
+      pieces: [
+        { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 1, y: 3 } },
+        { id: 'rebel_bishop', faction: 'rebel', type: 'b', square: { x: 4, y: 2 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    const lastMoveFrom = container.querySelector('.storm-encounter-square.is-last-move-from')
+    const lastMoveTo = container.querySelector('.storm-encounter-square.is-last-move-to')
+
+    expect(lastMoveFrom).toHaveAccessibleName(/^D4 empty square$/)
+    expect(lastMoveFrom).toHaveClass('is-last-move')
+    expect(lastMoveTo).toHaveAccessibleName(/^E3 Rebel bishop square$/)
+    expect(lastMoveTo).toHaveClass('is-last-move')
+    expect(lastMoveTo).not.toHaveClass('is-last-move-from')
+  })
+
   it('renders runtime faction rocket exhaust on encounter ships', () => {
     const encounter = {
       id: 'test_runtime_exhaust',

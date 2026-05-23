@@ -23,7 +23,7 @@ export const STORM_COMMANDER_PIECE_NAMES = {
 }
 
 export const STORM_COMMANDER_MOVEMENT_HINTS = {
-  p: 'Moves one square forward or backward. Captures diagonally forward or backward.',
+  p: 'Moves one square vertically or horizontally. Captures diagonally.',
   b: 'Moves diagonally until blocked.',
   n: 'Jumps in an L-shape.',
   r: 'Moves in straight lines until blocked.',

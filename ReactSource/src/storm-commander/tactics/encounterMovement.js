@@ -106,6 +106,8 @@ function addSlidingMoves(encounter, piece, moves, directions) {
 function addPawnMoves(encounter, piece, moves) {
   addStepMove(encounter, piece, moves, { x: piece.square.x, y: piece.square.y - 1 }, false, true)
   addStepMove(encounter, piece, moves, { x: piece.square.x, y: piece.square.y + 1 }, false, true)
+  addStepMove(encounter, piece, moves, { x: piece.square.x - 1, y: piece.square.y }, false, true)
+  addStepMove(encounter, piece, moves, { x: piece.square.x + 1, y: piece.square.y }, false, true)
 
   for (const yDirection of [-1, 1]) {
     for (const xDirection of [-1, 1]) {
