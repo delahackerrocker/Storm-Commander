@@ -223,7 +223,7 @@ function getMovementPatternSquares(pieceType) {
   return new Set(['1,1', '2,1', '3,1', '1,2', '3,2', '1,3', '2,3', '3,3'])
 }
 
-function MovementPatternIcon({ pieceType }) {
+function MovementPatternIcon({ faction, pieceType }) {
   const movementSquares = getMovementPatternSquares(pieceType)
   const cells = []
 
@@ -231,6 +231,10 @@ function MovementPatternIcon({ pieceType }) {
     for (let x = 0; x < 5; x += 1) {
       const isOrigin = x === 2 && y === 2
       const isMovementSquare = movementSquares.has(`${x},${y}`)
+      if (!isOrigin && !isMovementSquare) {
+        continue
+      }
+
       const className = [
         'storm-movement-pattern-cell',
         isOrigin ? 'is-origin' : '',
@@ -239,7 +243,13 @@ function MovementPatternIcon({ pieceType }) {
         .filter(Boolean)
         .join(' ')
 
-      cells.push(<span key={`${x},${y}`} className={className} />)
+      cells.push(
+        <span
+          key={`${x},${y}`}
+          className={className}
+          style={{ gridColumn: x + 1, gridRow: y + 1 }}
+        />,
+      )
     }
   }
 
@@ -248,13 +258,22 @@ function MovementPatternIcon({ pieceType }) {
       className="storm-movement-pattern"
       role="img"
       aria-label={STORM_COMMANDER_MOVEMENT_HINTS[pieceType]}
+      data-faction={faction}
     >
       {cells}
     </div>
   )
 }
 
-function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, variant }) {
+function ShipCommsWindow({
+  ariaLabel,
+  board,
+  emptyText,
+  piece,
+  pieceRotation,
+  selectionFlash,
+  variant,
+}) {
   if (!piece) {
     return (
       <aside
@@ -272,9 +291,15 @@ function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, va
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
   const pilotTitle = `${factionName} ${displayPieceName}`
   const squareLabel = getSquareLabel(piece.square, board)
+  const activeSelectionFlash =
+    selectionFlash?.faction === piece.faction ? selectionFlash : null
 
   return (
-    <aside className={`storm-comms-window storm-comms-window-${variant}`} aria-label={ariaLabel}>
+    <aside
+      className={`storm-comms-window storm-comms-window-${variant}`}
+      aria-label={ariaLabel}
+      data-faction={piece.faction}
+    >
       <div
         className="storm-comms-portrait"
         role="img"
@@ -285,83 +310,70 @@ function ShipCommsWindow({ ariaLabel, board, emptyText, piece, pieceRotation, va
       </div>
       <h2>{pilotTitle} : {squareLabel}</h2>
       <div className="storm-comms-transmission">
-        <MovementPatternIcon pieceType={piece.type} />
+        <MovementPatternIcon faction={piece.faction} pieceType={piece.type} />
         <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
       </div>
+      {activeSelectionFlash ? (
+        <div
+          key={activeSelectionFlash.id}
+          className="storm-selection-flash"
+          data-faction={activeSelectionFlash.faction}
+          style={{ '--storm-selection-flash-color': activeSelectionFlash.color }}
+          aria-hidden="true"
+        />
+      ) : null}
     </aside>
   )
 }
 
 function MissionStatList({ encounter }) {
+  const opponentFaction =
+    encounter.factions.find((faction) => faction !== encounter.playerFaction) ?? encounter.factions[0]
+
   return (
     <dl className="storm-encounter-stats">
       <div>
         <dt>Factions</dt>
-        <dd>{encounter.factions.map(getFactionDisplayName).join(' / ')}</dd>
+        <dd>
+          {encounter.factions.map((faction, index) => (
+            <span key={faction}>
+              {index > 0 ? ' / ' : null}
+              <span className="storm-mission-faction-name" data-faction={faction}>
+                {getFactionDisplayName(faction)}
+              </span>
+            </span>
+          ))}
+        </dd>
       </div>
       <div>
         <dt>AI</dt>
-        <dd>Sloppy Aggressive</dd>
+        <dd>
+          <span className="storm-mission-ai-type" data-faction={opponentFaction}>
+            Sloppy Aggressive
+          </span>
+        </dd>
       </div>
     </dl>
   )
 }
 
-function NewEncounterButton({ className = '', onNewEncounter }) {
+function MissionStatusButton({ encounter, isMissionBriefingOpen, onOpenMission }) {
+  const objectiveLabel = getObjectiveTypeLabel(encounter.objective.type)
+  const progressText = getObjectiveProgressText(encounter)
+
   return (
     <button
       type="button"
-      className={`storm-primary-button storm-icon-button ${className}`.trim()}
-      aria-label="New Random Encounter"
-      title="New Random Encounter"
-      onClick={onNewEncounter}
+      className="storm-mission-status-button"
+      aria-label={`Mission status. Objective: ${objectiveLabel}. Progress: ${progressText}. Open mission briefing.`}
+      aria-haspopup="dialog"
+      aria-expanded={isMissionBriefingOpen}
+      aria-controls="storm-mission-briefing"
+      title={`Objective: ${objectiveLabel}. Progress: ${progressText}.`}
+      onClick={onOpenMission}
     >
-      <span className="storm-dice-icon" aria-hidden="true">
-        <span className="storm-dice-pip storm-dice-pip-one" />
-        <span className="storm-dice-pip storm-dice-pip-two" />
-        <span className="storm-dice-pip storm-dice-pip-three" />
-        <span className="storm-dice-pip storm-dice-pip-four" />
-        <span className="storm-dice-pip storm-dice-pip-five" />
-      </span>
+      ?
     </button>
-  )
-}
-
-function MissionSummaryPanel({
-  encounter,
-  isMissionBriefingOpen,
-  onNewEncounter,
-  onOpenMission,
-}) {
-  return (
-    <section className="storm-mission-summary" aria-label="Mission quick status">
-      <div className="storm-mission-summary-row">
-        <button
-          type="button"
-          className="storm-mission-button storm-mission-summary-button"
-          aria-haspopup="dialog"
-          aria-expanded={isMissionBriefingOpen}
-          aria-controls="storm-mission-briefing"
-          onClick={onOpenMission}
-        >
-          Mission
-        </button>
-        <dl className="storm-mission-summary-grid">
-          <div>
-            <dt>Objective</dt>
-            <dd>{getObjectiveTypeLabel(encounter.objective.type)}</dd>
-          </div>
-          <div>
-            <dt>Progress</dt>
-            <dd>{getObjectiveProgressText(encounter)}</dd>
-          </div>
-        </dl>
-        <NewEncounterButton
-          className="storm-mission-summary-new-encounter"
-          onNewEncounter={onNewEncounter}
-        />
-      </div>
-    </section>
   )
 }
 
@@ -605,6 +617,7 @@ export function StormCommanderEncounterPage({
           emptyText="Select a Pirate ship to open player comms."
           piece={playerCommsPiece}
           pieceRotation={pieceRotation}
+          selectionFlash={selectionFlash}
           variant="player"
         />
 
@@ -676,6 +689,7 @@ export function StormCommanderEncounterPage({
                   type="button"
                   className={className}
                   data-testid="storm-encounter-square"
+                  data-faction={piece?.faction}
                   aria-label={`${getSquareLabel(square, encounter.board)} ${getEncounterPieceLabel(piece)} ${actionLabel}`}
                   onClick={() => handleSquareClick(square)}
                 >
@@ -693,28 +707,18 @@ export function StormCommanderEncounterPage({
           emptyText="Touch an opponent ship to scan their comms."
           piece={opponentCommsPiece}
           pieceRotation={pieceRotation}
+          selectionFlash={selectionFlash}
           variant="opponent"
         />
 
-        <aside className="storm-encounter-panel" aria-label="Encounter status">
-          <MissionSummaryPanel
+        <div className="storm-encounter-panel">
+          <MissionStatusButton
             encounter={encounter}
             isMissionBriefingOpen={isMissionBriefingOpen}
-            onNewEncounter={handleNewEncounter}
             onOpenMission={() => setDismissedMissionEncounterId(null)}
           />
-        </aside>
+        </div>
       </main>
-
-      {selectionFlash ? (
-        <div
-          key={selectionFlash.id}
-          className="storm-selection-flash"
-          data-faction={selectionFlash.faction}
-          style={{ '--storm-selection-flash-color': selectionFlash.color }}
-          aria-hidden="true"
-        />
-      ) : null}
 
       {isMissionBriefingOpen ? (
         <MissionBriefingDialog

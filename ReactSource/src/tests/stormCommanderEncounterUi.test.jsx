@@ -15,7 +15,7 @@ describe('Storm Commander random encounter UI', () => {
 
       const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
       const encounterStatusButton = screen.getByRole('button', {
-        name: /Mission status\. Objective: Escape To Square\. Progress: Extraction at 1,1\./,
+        name: /Mission status\. Objective: .+\. Progress: .+\. Open mission briefing\./,
       })
 
       expect(missionDialog).toBeInTheDocument()
@@ -36,7 +36,22 @@ describe('Storm Commander random encounter UI', () => {
       expect(within(missionDialog).queryByText(/^Status$/)).not.toBeInTheDocument()
       expect(within(missionDialog).queryByText(/^Board$/)).not.toBeInTheDocument()
       expect(within(missionDialog).getByText(/^Factions$/)).toBeInTheDocument()
+      const briefingFactionNames = [
+        ...missionDialog.querySelectorAll('.storm-mission-faction-name'),
+      ]
+      expect(briefingFactionNames).toHaveLength(2)
+      expect(briefingFactionNames.map((factionName) => factionName.textContent)).toEqual([
+        'Pirate',
+        'Imperial',
+      ])
+      expect(briefingFactionNames.map((factionName) => factionName.dataset.faction)).toEqual([
+        'pirate',
+        'imperial',
+      ])
       expect(within(missionDialog).getByText(/^AI$/)).toBeInTheDocument()
+      const briefingAiType = missionDialog.querySelector('.storm-mission-ai-type')
+      expect(briefingAiType).toHaveTextContent(/^Sloppy Aggressive$/)
+      expect(briefingAiType).toHaveAttribute('data-faction', 'imperial')
       expect(encounterStatusButton).toHaveTextContent('?')
       expect(screen.queryByRole('complementary', { name: /^Encounter status$/ }))
         .not.toBeInTheDocument()
@@ -75,7 +90,7 @@ describe('Storm Commander random encounter UI', () => {
       await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
       const encounterStatusButton = screen.getByRole('button', {
-        name: /Mission status\. Objective: Escape To Square\. Progress: Extraction at 1,1\./,
+        name: /Mission status\. Objective: .+\. Progress: .+\. Open mission briefing\./,
       })
 
       expect(encounterStatusButton).toHaveTextContent('?')
@@ -89,7 +104,6 @@ describe('Storm Commander random encounter UI', () => {
         .not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /^New Random Encounter$/ }))
         .not.toBeInTheDocument()
-      expect(screen.getByText(/Objective/)).toBeInTheDocument()
       expect(container.querySelector('.storm-mission-summary-line')).not.toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBe(25)
 
@@ -104,6 +118,8 @@ describe('Storm Commander random encounter UI', () => {
         .toHaveAttribute('data-faction', 'pirate')
       expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
         .toHaveAttribute('data-faction', 'imperial')
+      expect(playerComms).toHaveAttribute('data-faction', 'pirate')
+      expect(opponentComms).toHaveAttribute('data-faction', 'imperial')
       expect(container.querySelector('.storm-encounter-root')).toHaveStyle(
         '--storm-player-faction-bg: rgba(232, 108, 36, 0.24)',
       )
@@ -121,6 +137,20 @@ describe('Storm Commander random encounter UI', () => {
       expect(container.querySelector('.storm-comms-movement')).not.toBeInTheDocument()
       expect(playerComms.querySelector('.storm-comms-transmission .storm-movement-pattern'))
         .toBeInTheDocument()
+      expect(playerComms.querySelector('.storm-comms-transmission .storm-movement-pattern'))
+        .toHaveAttribute('data-faction', 'pirate')
+      expect(opponentComms.querySelector('.storm-comms-transmission .storm-movement-pattern'))
+        .toHaveAttribute('data-faction', 'imperial')
+      expect(
+        playerComms.querySelectorAll(
+          '.storm-movement-pattern-cell:not(.is-move):not(.is-origin)',
+        ),
+      ).toHaveLength(0)
+      expect(
+        opponentComms.querySelectorAll(
+          '.storm-movement-pattern-cell:not(.is-move):not(.is-origin)',
+        ),
+      ).toHaveLength(0)
 
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
 
@@ -128,6 +158,10 @@ describe('Storm Commander random encounter UI', () => {
         .toBeInTheDocument()
       expect(within(playerComms).getByRole('img', { name: /Moves/i })).toHaveClass(
         'storm-movement-pattern',
+      )
+      expect(within(playerComms).getByRole('img', { name: /Moves/i })).toHaveAttribute(
+        'data-faction',
+        'pirate',
       )
       expect(within(playerComms).queryByText(/^Movement$/)).not.toBeInTheDocument()
       expect(within(playerComms).getByRole('heading', { name: /Pirate .* : [A-Z][1-9]/i }))
@@ -377,7 +411,7 @@ describe('Storm Commander random encounter UI', () => {
       .toBeInTheDocument()
   })
 
-  it('flashes a full screen faction color overlay when the selected ship changes', async () => {
+  it('flashes the selected ship faction color inside its comms bar only', async () => {
     const user = userEvent.setup()
     const encounter = {
       id: 'test_selection_flash',
@@ -415,13 +449,18 @@ describe('Storm Commander random encounter UI', () => {
     )
 
     await user.click(screen.getByRole('button', { name: /^Battle$/ }))
+    const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+    const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
     await user.click(screen.getByRole('button', { name: /Pirate rook square/i }))
 
-    const pirateFlash = container.querySelector('.storm-selection-flash')
+    const pirateFlash = playerComms.querySelector('.storm-selection-flash')
 
     expect(pirateFlash).toBeInTheDocument()
     expect(pirateFlash).toHaveAttribute('data-faction', 'pirate')
     expect(pirateFlash).toHaveStyle('--storm-selection-flash-color: rgba(232, 108, 36, 0.9)')
+    expect(opponentComms.querySelector('.storm-selection-flash')).not.toBeInTheDocument()
+    expect(container.querySelector('.storm-encounter-play-area .storm-selection-flash'))
+      .not.toBeInTheDocument()
 
     await waitForElementToBeRemoved(() => container.querySelector('.storm-selection-flash'), {
       timeout: 500,
@@ -430,11 +469,14 @@ describe('Storm Commander random encounter UI', () => {
     await user.click(screen.getByRole('button', { name: /C5 empty square/i }))
     await user.click(screen.getByRole('button', { name: /Imperial queen square/i }))
 
-    const imperialFlash = container.querySelector('.storm-selection-flash')
+    const imperialFlash = opponentComms.querySelector('.storm-selection-flash')
 
     expect(imperialFlash).toBeInTheDocument()
     expect(imperialFlash).toHaveAttribute('data-faction', 'imperial')
     expect(imperialFlash).toHaveStyle('--storm-selection-flash-color: rgba(213, 166, 14, 0.92)')
+    expect(playerComms.querySelector('.storm-selection-flash')).not.toBeInTheDocument()
+    expect(container.querySelector('.storm-encounter-play-area .storm-selection-flash'))
+      .not.toBeInTheDocument()
   })
 
   it('keeps soft rings on each comms ship and upgrades the player ship to active selection', async () => {
@@ -484,6 +526,7 @@ describe('Storm Commander random encounter UI', () => {
     expect(playerSquare.querySelector('.storm-selection-ring')).toBeInTheDocument()
     expect(playerSquare).toHaveClass('is-player-soft-selected')
     expect(firstOpponentSquare).toHaveClass('is-opponent-soft-selected')
+    expect(firstOpponentSquare).toHaveAttribute('data-faction', 'imperial')
 
     await user.click(playerSquare)
 
@@ -496,6 +539,7 @@ describe('Storm Commander random encounter UI', () => {
     expect(playerSquare).toHaveClass('is-player-soft-selected')
     expect(firstOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
     expect(secondOpponentSquare).toHaveClass('is-opponent-soft-selected')
+    expect(secondOpponentSquare).toHaveAttribute('data-faction', 'imperial')
   })
 
   it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {
