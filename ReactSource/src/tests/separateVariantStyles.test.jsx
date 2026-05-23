@@ -152,6 +152,9 @@ describe('separate variant style sources', () => {
     const captureRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-capture::after\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const captureLaserRule = stormStyles.match(
+      /\.storm-commander-root \.storm-capture-laser\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const extractionSquareRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-extraction::before\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -371,6 +374,13 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain('@keyframes storm-target-reticle-rotate')
     expect(stormStyles).toContain('transform: rotate(45deg);')
     expect(stormStyles).toContain('transform: rotate(0deg);')
+    expect(captureLaserRule).toContain('top: 50%;')
+    expect(captureLaserRule).toContain('left: 50%;')
+    expect(captureLaserRule).toContain('transform-origin: 0 50%;')
+    expect(captureLaserRule).toContain(
+      'animation-delay: calc(var(--storm-laser-turn-delay) + var(--storm-laser-index) * 0.12s);',
+    )
+    expect(stormStyles).toContain('transform: translateY(-50%) rotate(-90deg) scaleX(2.3);')
     expect(extractionSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
     expect(extractionSquareRule).toContain('animation: storm-extraction-pulse 3.2s ease-in-out infinite;')
     expect(stormStyles).toContain('@keyframes storm-extraction-pulse')

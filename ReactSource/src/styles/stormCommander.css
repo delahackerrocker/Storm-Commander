@@ -1139,9 +1139,9 @@
 
 .storm-commander-root .storm-capture-laser {
   position: absolute;
-  top: var(--storm-move-from-top);
-  left: var(--storm-move-from-left);
-  width: 12%;
+  top: 50%;
+  left: 50%;
+  width: 74%;
   height: 3px;
   border-radius: 999px;
   background: currentColor;
@@ -1149,7 +1149,7 @@
   opacity: 0;
   transform-origin: 0 50%;
   animation: storm-capture-laser-fire 180ms ease-out forwards;
-  animation-delay: calc(0.22s + var(--storm-laser-index) * 0.12s);
+  animation-delay: calc(var(--storm-laser-turn-delay) + var(--storm-laser-index) * 0.12s);
 }
 
 .storm-commander-root .storm-capture-hit-spark,
@@ -1205,7 +1205,7 @@
 @keyframes storm-capture-laser-fire {
   0% {
     opacity: 0;
-    transform: rotate(var(--storm-move-angle)) scaleX(0.2);
+    transform: translateY(-50%) rotate(-90deg) scaleX(0.2);
   }
 
   50% {
@@ -1214,7 +1214,7 @@
 
   100% {
     opacity: 0;
-    transform: rotate(var(--storm-move-angle)) scaleX(2.6);
+    transform: translateY(-50%) rotate(-90deg) scaleX(2.3);
   }
 }
 
