@@ -874,7 +874,7 @@
 }
 
 .storm-commander-root .storm-encounter-square.is-light {
-  background: rgba(255, 255, 255, 0.016875);
+  background: rgba(255, 255, 255, 0.01265625);
 }
 
 .storm-commander-root .storm-encounter-square.is-dark {
@@ -910,47 +910,87 @@
 }
 
 .storm-commander-root .storm-encounter-square.is-player-soft-selected .storm-selection-ring {
-  inset: 23%;
-  border: 3px solid rgba(216, 98, 32, 0.3192);
-  border-radius: var(--radius);
+  inset: 0;
   opacity: 1;
-  box-shadow:
-    inset 0 0 24px rgba(216, 98, 32, 0.112),
-    0 0 30px rgba(216, 98, 32, 0.238);
+  background:
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color));
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom right,
+    bottom right,
+    bottom left,
+    bottom left;
+  background-repeat: no-repeat;
+  background-size:
+    22% 4px,
+    4px 22%,
+    22% 4px,
+    4px 22%,
+    22% 4px,
+    4px 22%,
+    22% 4px,
+    4px 22%;
+  box-shadow: none;
 }
 
 .storm-commander-root .storm-encounter-square.is-opponent-soft-selected .storm-selection-ring {
-  inset: 23%;
-  border: 3px solid var(--storm-opponent-soft-ring, rgba(85, 214, 232, 0.3024));
-  border-radius: var(--radius);
+  inset: 0;
   opacity: 1;
-  box-shadow:
-    inset 0 0 24px var(--storm-opponent-soft-ring-inner, rgba(85, 214, 232, 0.105)),
-    0 0 30px var(--storm-opponent-soft-ring-outer, rgba(85, 214, 232, 0.224));
+  background:
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color)),
+    linear-gradient(var(--storm-soft-selection-color), var(--storm-soft-selection-color));
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom right,
+    bottom right,
+    bottom left,
+    bottom left;
+  background-repeat: no-repeat;
+  background-size:
+    22% 4px,
+    4px 22%,
+    22% 4px,
+    4px 22%,
+    22% 4px,
+    4px 22%,
+    22% 4px,
+    4px 22%;
+  box-shadow: none;
 }
 
 .storm-commander-root .storm-encounter-square[data-faction='pirate'] {
-  --storm-opponent-soft-ring: rgba(232, 108, 36, 0.3192);
-  --storm-opponent-soft-ring-inner: rgba(216, 98, 32, 0.112);
-  --storm-opponent-soft-ring-outer: rgba(216, 98, 32, 0.238);
+  --storm-soft-selection-color: rgba(232, 108, 36, 1);
 }
 
 .storm-commander-root .storm-encounter-square[data-faction='imperial'] {
-  --storm-opponent-soft-ring: rgba(213, 166, 14, 0.3024);
-  --storm-opponent-soft-ring-inner: rgba(213, 166, 14, 0.105);
-  --storm-opponent-soft-ring-outer: rgba(213, 166, 14, 0.224);
+  --storm-soft-selection-color: rgba(213, 166, 14, 1);
 }
 
 .storm-commander-root .storm-encounter-square[data-faction='robocorp'] {
-  --storm-opponent-soft-ring: rgba(85, 170, 242, 0.3024);
-  --storm-opponent-soft-ring-inner: rgba(85, 170, 242, 0.105);
-  --storm-opponent-soft-ring-outer: rgba(85, 170, 242, 0.224);
+  --storm-soft-selection-color: rgba(85, 170, 242, 1);
 }
 
 .storm-commander-root .storm-encounter-square[data-faction='rebel'] {
-  --storm-opponent-soft-ring: rgba(154, 112, 212, 0.3024);
-  --storm-opponent-soft-ring-inner: rgba(154, 112, 212, 0.105);
-  --storm-opponent-soft-ring-outer: rgba(154, 112, 212, 0.224);
+  --storm-soft-selection-color: rgba(154, 112, 212, 1);
 }
 
 .storm-commander-root .storm-encounter-square.is-selected .storm-selection-ring {
@@ -991,7 +1031,7 @@
   left: 50%;
   width: 10%;
   height: 10%;
-  opacity: 0.5;
+  opacity: 1;
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
   background: var(--storm-turn-hint);
   transform: translate(-50%, -50%) rotate(var(--storm-legal-move-angle, 0deg));
@@ -1005,6 +1045,7 @@
   inset: 13%;
   border: 5px solid var(--storm-turn-hint);
   border-radius: 50%;
+  clip-path: none;
   background:
     linear-gradient(
       45deg,
