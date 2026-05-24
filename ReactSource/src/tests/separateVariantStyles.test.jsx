@@ -5,7 +5,10 @@ import { describe, expect, it } from 'vitest'
 import App from '../App'
 
 async function openDebugPage(user, pageName) {
-  await user.click(screen.getByRole('button', { name: /^Debug$/ }))
+  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
+  for (let press = 0; press < 6; press += 1) {
+    await user.click(debugButton)
+  }
   await user.click(screen.getByRole('button', { name: pageName }))
 }
 
@@ -51,6 +54,9 @@ describe('separate variant style sources', () => {
     const encounterRootRule = stormStyles.match(
       /\.storm-commander-root\.storm-encounter-root\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const encounterBoardRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-board\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const panelRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-panel\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -74,6 +80,9 @@ describe('separate variant style sources', () => {
     )?.groups.body
     const missionStatusButtonRule = stormStyles.match(
       /\.storm-commander-root \.storm-mission-status-button\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const missionStatusButtonFocusRule = stormStyles.match(
+      /\.storm-commander-root \.storm-mission-status-button:hover,\s*\n\.storm-commander-root \.storm-mission-status-button:focus-visible\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
     const stackedMediaRule = stormStyles.match(
       /@media \(max-width: 1180px\)\s*\{(?<body>[\s\S]+?)\n\}/,
@@ -122,6 +131,9 @@ describe('separate variant style sources', () => {
     const objectiveTargetIconRule = stormStyles.match(
       /\.storm-commander-root \.storm-objective-target-icon\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const objectiveTargetShipIconRule = stormStyles.match(
+      /\.storm-commander-root \.storm-objective-target-icon\.is-target\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const resultOverlayRule = stormStyles.match(
       /\.storm-commander-root \.storm-result-overlay\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -161,6 +173,10 @@ describe('separate variant style sources', () => {
     const extractionSquareRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-square\.is-extraction::before\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const targetSquareRule = [...stormStyles.matchAll(
+      /\.storm-commander-root \.storm-encounter-square\.is-target::before\s*\{(?<body>[^}]+)\}/g,
+    )].map((match) => match.groups.body)
+      .find((body) => body.includes('z-index: 2;'))
     const encounterPieceRule = stormStyles.match(
       /\.storm-commander-root \.storm-encounter-piece\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -198,6 +214,7 @@ describe('separate variant style sources', () => {
     expect(shellRule).not.toContain('encounter-status')
     expect(shellRule).toContain('width: min(1320px, calc(100vw - 32px));')
     expect(shellRule).toContain('justify-content: center;')
+    expect(encounterBoardRule).toContain('border: 4px solid var(--storm-turn-hint);')
     expect(panelRule).toContain('position: fixed;')
     expect(panelRule).toContain('left: 16px;')
     expect(panelRule).toContain('bottom: 16px;')
@@ -205,6 +222,9 @@ describe('separate variant style sources', () => {
     expect(missionStatusButtonRule).toContain('width: 48px;')
     expect(missionStatusButtonRule).toContain('height: 48px;')
     expect(missionStatusButtonRule).toContain('border-radius: var(--radius);')
+    expect(missionStatusButtonRule).toContain('background: rgba(115, 221, 126, 0.9);')
+    expect(missionStatusButtonRule).toContain('box-shadow: 0 8px 22px rgba(115, 221, 126, 0.18);')
+    expect(missionStatusButtonFocusRule).toContain('outline: 3px solid rgba(115, 221, 126, 0.5);')
     expect(commsWindowRule).toContain('box-sizing: border-box;')
     expect(commsWindowRule).toContain('position: relative;')
     expect(commsWindowRule).toContain('justify-self: stretch;')
@@ -313,6 +333,8 @@ describe('separate variant style sources', () => {
     expect(objectiveTargetIconRule).toContain('width: 86px;')
     expect(stormStyles).toContain('.storm-commander-root .storm-objective-target-icon.is-extraction')
     expect(stormStyles).toContain('.storm-commander-root .storm-objective-target-icon.is-target')
+    expect(objectiveTargetShipIconRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
+    expect(objectiveTargetShipIconRule).toContain('box-shadow: 0 0 16px rgba(115, 221, 126, 0.18);')
     expect(resultOverlayRule).toContain('z-index: 70;')
     expect(resultOverlayRule).toContain('place-items: center;')
     expect(resultDialogRule).toContain('width: min(520px, calc(100vw - 32px));')
@@ -405,6 +427,9 @@ describe('separate variant style sources', () => {
     expect(extractionSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
     expect(extractionSquareRule).toContain('animation: storm-extraction-pulse 3.2s ease-in-out infinite;')
     expect(stormStyles).toContain('@keyframes storm-extraction-pulse')
+    expect(targetSquareRule).toContain('inset: 8%;')
+    expect(targetSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
+    expect(targetSquareRule).toContain('box-shadow: 0 0 16px rgba(115, 221, 126, 0.18);')
     expect(encounterPieceRule).toContain('z-index: 3;')
     expect(encounterPieceRule).toContain('width: 100%;')
     expect(encounterPieceRule).toContain('height: 100%;')

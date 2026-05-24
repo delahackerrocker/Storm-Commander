@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StandardChessPage } from './pages/StandardChessPage'
 import { StormCommanderPage } from './pages/StormCommanderPage'
 
@@ -8,6 +8,12 @@ const PAGES = {
   basicChess: 'basic-chess',
 }
 
+const DEBUG_FADED_OPACITY = 0.1
+const DEBUG_PRESS_OPACITY_STEP = 0.2
+const DEBUG_FADE_DELAY_MS = 2000
+const DEBUG_IDLE_RESET_MS = 5000
+const DEBUG_OPEN_PRESS_COUNT = 6
+
 function DebugDock({
   currentPage,
   isOpen,
@@ -16,6 +22,48 @@ function DebugDock({
   onOpenStormChessDrill,
   onToggle,
 }) {
+  const [debugPressCount, setDebugPressCount] = useState(0)
+  const [debugOpacity, setDebugOpacity] = useState(1)
+  const [debugInteractionCount, setDebugInteractionCount] = useState(0)
+
+  useEffect(() => {
+    const fadeTimerId = window.setTimeout(() => {
+      setDebugOpacity(DEBUG_FADED_OPACITY)
+    }, DEBUG_FADE_DELAY_MS)
+
+    return () => window.clearTimeout(fadeTimerId)
+  }, [])
+
+  useEffect(() => {
+    if (debugInteractionCount === 0) {
+      return undefined
+    }
+
+    const resetTimerId = window.setTimeout(() => {
+      setDebugPressCount(0)
+      setDebugOpacity(DEBUG_FADED_OPACITY)
+    }, DEBUG_IDLE_RESET_MS)
+
+    return () => window.clearTimeout(resetTimerId)
+  }, [debugInteractionCount])
+
+  function handleDebugTogglePress() {
+    const nextPressCount = debugPressCount + 1
+
+    setDebugInteractionCount((currentValue) => currentValue + 1)
+    setDebugOpacity(
+      Math.min(1, DEBUG_FADED_OPACITY + nextPressCount * DEBUG_PRESS_OPACITY_STEP),
+    )
+
+    if (nextPressCount >= DEBUG_OPEN_PRESS_COUNT) {
+      setDebugPressCount(0)
+      onToggle()
+      return
+    }
+
+    setDebugPressCount(nextPressCount)
+  }
+
   return (
     <div className="debug-dock">
       {isOpen ? (
@@ -52,7 +100,8 @@ function DebugDock({
         className="debug-toggle"
         aria-expanded={isOpen}
         aria-controls="storm-debug-panel"
-        onClick={onToggle}
+        style={{ opacity: debugOpacity }}
+        onClick={handleDebugTogglePress}
       >
         Debug
       </button>

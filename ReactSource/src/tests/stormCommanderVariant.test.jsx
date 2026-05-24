@@ -21,7 +21,10 @@ import App from '../App'
 const FACTION_ASSET_PREFIX = '/assets/chess/storm-commander/factions/'
 
 async function openDebugPage(user, pageName) {
-  await user.click(screen.getByRole('button', { name: /^Debug$/ }))
+  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
+  for (let press = 0; press < 6; press += 1) {
+    await user.click(debugButton)
+  }
   await user.click(screen.getByRole('button', { name: pageName }))
 }
 

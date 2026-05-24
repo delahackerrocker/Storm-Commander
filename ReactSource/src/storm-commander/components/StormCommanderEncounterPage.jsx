@@ -25,7 +25,8 @@ import {
   getPieceDisplayName,
 } from '../tactics/encounterConstants'
 
-const ENEMY_MOVE_DELAY_MS = 320
+const ENEMY_MOVE_DELAY_MS = 1500
+const ENEMY_THINKING_SELECTION_INTERVAL_MS = 500
 const SELECTION_FLASH_DURATION_MS = 300
 const MOVE_ANIMATION_DURATION_MS = 1200
 
@@ -72,6 +73,21 @@ function getInitialCommsPiece(pieces, encounterId) {
     .reduce((total, character) => total + character.charCodeAt(0), 0)
 
   return pieces[seed % pieces.length]
+}
+
+function getRandomThinkingPieceId(pieces, currentPieceId) {
+  if (pieces.length === 0) {
+    return null
+  }
+
+  if (pieces.length === 1) {
+    return pieces[0].id
+  }
+
+  const selectablePieces = pieces.filter((piece) => piece.id !== currentPieceId)
+  const selectedIndex = Math.floor(Math.random() * selectablePieces.length)
+
+  return selectablePieces[selectedIndex].id
 }
 
 function getBoardStyle(encounter) {
@@ -576,19 +592,34 @@ export function StormCommanderEncounterPage({
   const [dismissedMissionEncounterId, setDismissedMissionEncounterId] = useState(null)
   const [selectionFlash, setSelectionFlash] = useState(null)
   const [pendingMoveAnimation, setPendingMoveAnimation] = useState(null)
+  const [enemyThinkingPieceSelection, setEnemyThinkingPieceSelection] = useState(null)
   const selectionFlashIdRef = useRef(0)
   const isMoveAnimating = Boolean(pendingMoveAnimation)
+  const isEnemyThinking =
+    encounter.status === 'active' &&
+    encounter.currentFaction !== encounter.playerFaction &&
+    !isMoveAnimating
   const selectedPiece =
     selection?.encounterId === encounter.id
       ? encounter.pieces.find((piece) => piece.id === selection.pieceId) || null
       : null
-  const playerPieces = encounter.pieces.filter((piece) => piece.faction === encounter.playerFaction)
+  const playerPieces = useMemo(
+    () => encounter.pieces.filter((piece) => piece.faction === encounter.playerFaction),
+    [encounter.pieces, encounter.playerFaction],
+  )
   const playerCommsPiece =
     playerCommsSelection?.encounterId === encounter.id
       ? playerPieces.find((piece) => piece.id === playerCommsSelection.pieceId) ||
         getInitialCommsPiece(playerPieces, encounter.id)
       : getInitialCommsPiece(playerPieces, encounter.id)
-  const opponentPieces = encounter.pieces.filter((piece) => piece.faction !== encounter.playerFaction)
+  const opponentPieces = useMemo(
+    () => encounter.pieces.filter((piece) => piece.faction !== encounter.playerFaction),
+    [encounter.pieces, encounter.playerFaction],
+  )
+  const enemyThinkingPiece =
+    isEnemyThinking && enemyThinkingPieceSelection?.encounterId === encounter.id
+      ? opponentPieces.find((piece) => piece.id === enemyThinkingPieceSelection.pieceId) || null
+      : null
   const latestOpponentMovePiece =
     encounter.lastMove?.faction && encounter.lastMove.faction !== encounter.playerFaction
       ? encounter.pieces.find((piece) => piece.id === encounter.lastMove.pieceId) || null
@@ -600,6 +631,8 @@ export function StormCommanderEncounterPage({
       ? opponentPieces.find((piece) => piece.id === opponentCommsSelection.pieceId) || null
       : null
   const opponentCommsPiece =
+    (isEnemyThinking && opponentPieces.length === 1 ? opponentPieces[0] : null) ||
+    enemyThinkingPiece ||
     manuallySelectedOpponentPiece ||
     latestOpponentMovePiece ||
     opponentPieces[0] ||
@@ -611,10 +644,6 @@ export function StormCommanderEncounterPage({
         : [],
     [encounter, selectedPiece],
   )
-  const isEnemyThinking =
-    encounter.status === 'active' &&
-    encounter.currentFaction !== encounter.playerFaction &&
-    !isMoveAnimating
   const isMissionResultOpen = encounter.status !== 'active'
   const isMissionBriefingOpen =
     encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
@@ -676,6 +705,28 @@ export function StormCommanderEncounterPage({
       setEncounter(evaluatedEncounter)
     }
   }, [encounter, setEncounter])
+
+  useEffect(() => {
+    if (!isEnemyThinking || opponentPieces.length <= 1) {
+      return undefined
+    }
+
+    const timerId = window.setInterval(() => {
+      setEnemyThinkingPieceSelection((currentSelection) => {
+        const currentPieceId =
+          currentSelection?.encounterId === encounter.id
+            ? currentSelection.pieceId
+            : opponentPieces[0].id
+
+        return {
+          encounterId: encounter.id,
+          pieceId: getRandomThinkingPieceId(opponentPieces, currentPieceId),
+        }
+      })
+    }, ENEMY_THINKING_SELECTION_INTERVAL_MS)
+
+    return () => window.clearInterval(timerId)
+  }, [encounter.id, isEnemyThinking, opponentPieces])
 
   useEffect(() => {
     if (!isEnemyThinking) {

@@ -1,10 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
 
 async function openDebugPage(user, pageName) {
-  await user.click(screen.getByRole('button', { name: /^Debug$/ }))
+  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
+  for (let press = 0; press < 6; press += 1) {
+    await user.click(debugButton)
+  }
   await user.click(screen.getByRole('button', { name: pageName }))
 }
 
@@ -18,6 +21,44 @@ describe('Chess-ish prototype', () => {
     expect(screen.queryByRole('button', { name: /^basic chess$/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Storm Commander$/ })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Debug$/ })).toBeInTheDocument()
+  })
+
+  it('fades and unlocks the debug menu after six presses', () => {
+    vi.useFakeTimers()
+
+    try {
+      render(<App />)
+
+      const debugButton = screen.getByRole('button', { name: /^Debug$/ })
+
+      expect(debugButton).toHaveStyle({ opacity: '1' })
+
+      act(() => {
+        vi.advanceTimersByTime(2000)
+      })
+
+      expect(debugButton).toHaveStyle({ opacity: '0.1' })
+
+      for (let press = 0; press < 5; press += 1) {
+        fireEvent.click(debugButton)
+      }
+
+      expect(debugButton).toHaveStyle({ opacity: '1' })
+      expect(screen.queryByRole('button', { name: /^Basic Chess$/ })).not.toBeInTheDocument()
+
+      fireEvent.click(debugButton)
+
+      expect(screen.getByRole('button', { name: /^Basic Chess$/ })).toBeInTheDocument()
+      expect(debugButton).toHaveStyle({ opacity: '1' })
+
+      act(() => {
+        vi.advanceTimersByTime(5000)
+      })
+
+      expect(debugButton).toHaveStyle({ opacity: '0.1' })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('opens basic chess only through debug mode', async () => {
