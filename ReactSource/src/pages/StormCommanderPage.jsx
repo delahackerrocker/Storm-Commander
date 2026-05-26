@@ -35,9 +35,9 @@ function applyStarfieldStyle(element, starfieldMotion) {
   }
 }
 
-function useLowPowerStarfieldMotion(isPaused = false) {
-  const starfieldRootRef = useRef(null)
+function useLowPowerStarfieldMotion() {
   const [initialStarfieldMotion] = useState(() => createInitialStarfieldMotion())
+  const starfieldRootRef = useRef(null)
   const starfieldMotionRef = useRef(initialStarfieldMotion)
   const pieceRotationRef = useRef(initialStarfieldMotion.pieceRotation)
   const initialStarfieldStyle = useMemo(
@@ -84,7 +84,7 @@ function useLowPowerStarfieldMotion(isPaused = false) {
     function startStarfieldTimer() {
       clearStarfieldTimer()
 
-      if (isPaused || document.hidden) {
+      if (document.hidden) {
         return
       }
 
@@ -95,7 +95,7 @@ function useLowPowerStarfieldMotion(isPaused = false) {
     }
 
     function handleVisibilityChange() {
-      if (isPaused || document.hidden) {
+      if (document.hidden) {
         clearStarfieldTimer()
         return
       }
@@ -113,7 +113,7 @@ function useLowPowerStarfieldMotion(isPaused = false) {
       clearStarfieldTimer()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isPaused])
+  }, [])
 
   return {
     getCurrentPieceRotation,
@@ -124,7 +124,6 @@ function useLowPowerStarfieldMotion(isPaused = false) {
 
 export function StormCommanderPage({
   allowChessDrill = true,
-  chessTitle = 'Storm Commander',
   onBack,
   startInRandomEncounter = false,
 }) {
@@ -132,14 +131,9 @@ export function StormCommanderPage({
   const [encounter, setEncounter] = useState(() =>
     startInRandomEncounter ? generateRandomEncounter() : null,
   )
-  const [areBoardAnimationsPaused, setAreBoardAnimationsPaused] = useState(false)
   const { getCurrentPieceRotation, initialStarfieldStyle, starfieldRootRef } =
-    useLowPowerStarfieldMotion(areBoardAnimationsPaused)
+    useLowPowerStarfieldMotion()
   const sideVisualThemes = useMemo(() => createSideVisualThemes(sideFactions), [sideFactions])
-
-  const handleBoardAnimationsPausedChange = useCallback((isPaused) => {
-    setAreBoardAnimationsPaused(isPaused)
-  }, [])
 
   function randomizeSideFactions() {
     setSideFactions((currentSideFactions) =>
@@ -162,7 +156,6 @@ export function StormCommanderPage({
           encounter={encounter}
           getCurrentPieceRotation={getCurrentPieceRotation}
           onBack={onBack}
-          onBoardAnimationsPausedChange={handleBoardAnimationsPausedChange}
           onNewEncounter={startRandomEncounter}
           onReturnToChess={allowChessDrill ? () => setEncounter(null) : undefined}
           setEncounter={setEncounter}
@@ -170,22 +163,19 @@ export function StormCommanderPage({
         />
       ) : (
         <BasicChessPage
-          enableStormBoardEffects
-          extrasPlacement="below"
-          getCurrentPieceRotation={getCurrentPieceRotation}
           onBack={onBack}
           onNewGameVisuals={randomizeSideFactions}
           pieceSet="storm-commander-png"
-          rootClassName="storm-commander-root storm-encounter-root storm-debug-chess-root"
+          rootClassName="storm-commander-root"
           sidePieceFactions={sideFactions}
           sideVisualThemes={sideVisualThemes}
           showStarfieldLayers
-          title={chessTitle}
-          topControls={allowChessDrill ? (
+          title="Storm Commander"
+          topControls={
             <button type="button" className="storm-primary-button" onClick={startRandomEncounter}>
               New Random Encounter
             </button>
-          ) : null}
+          }
         />
       )}
     </div>
