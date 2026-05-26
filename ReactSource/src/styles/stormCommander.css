@@ -1331,6 +1331,10 @@
   position: relative;
   box-sizing: border-box;
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "portrait movement"
+    "title title";
   gap: 12px;
   align-content: start;
   justify-self: stretch;
@@ -1394,6 +1398,7 @@
 }
 
 .storm-commander-root .storm-comms-window h2 {
+  grid-area: title;
   color: var(--storm-comms-title-color, var(--storm-old-ivory));
   font-size: 1.04rem;
   line-height: 1.1;
@@ -1401,10 +1406,12 @@
 }
 
 .storm-commander-root .storm-comms-portrait {
+  grid-area: portrait;
   aspect-ratio: 1;
   position: relative;
   display: grid;
   place-items: center;
+  width: 100%;
   overflow: hidden;
   border: 1px solid rgba(216, 98, 32, 0.62);
   border-radius: var(--radius);
@@ -1475,16 +1482,18 @@
 }
 
 .storm-commander-root .storm-comms-transmission {
-  display: grid;
-  grid-template-columns: 85px minmax(0, 1fr);
-  gap: 10px;
-  align-items: stretch;
+  display: contents;
 }
 
 .storm-commander-root .storm-movement-pattern {
+  grid-area: movement;
   display: grid;
   justify-self: center;
   align-self: center;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1;
+  place-content: center;
   grid-template-columns: repeat(5, 11px);
   grid-template-rows: repeat(5, 11px);
   gap: 3px;
@@ -1524,7 +1533,7 @@
 }
 
 .storm-commander-root .storm-comms-bark {
-  display: grid;
+  display: none;
   align-items: center;
   min-height: 85px;
   overflow-wrap: anywhere;

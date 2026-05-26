@@ -8,7 +8,7 @@ const PAGES = {
   basicChess: 'basic-chess',
 }
 
-const DEBUG_FADED_OPACITY = 0.1
+const DEBUG_FADED_OPACITY = 0
 const DEBUG_PRESS_OPACITY_STEP = 0.2
 const DEBUG_FADE_DELAY_MS = 2000
 const DEBUG_IDLE_RESET_MS = 5000

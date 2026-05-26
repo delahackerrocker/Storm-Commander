@@ -37,7 +37,7 @@ describe('Chess-ish prototype', () => {
         vi.advanceTimersByTime(2000)
       })
 
-      expect(debugButton).toHaveStyle({ opacity: '0.1' })
+      expect(debugButton).toHaveStyle({ opacity: '0' })
 
       for (let press = 0; press < 5; press += 1) {
         fireEvent.click(debugButton)
@@ -55,7 +55,7 @@ describe('Chess-ish prototype', () => {
         vi.advanceTimersByTime(5000)
       })
 
-      expect(debugButton).toHaveStyle({ opacity: '0.1' })
+      expect(debugButton).toHaveStyle({ opacity: '0' })
     } finally {
       vi.useRealTimers()
     }

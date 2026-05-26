@@ -115,7 +115,7 @@ describe('separate variant style sources', () => {
     const stackedCommsTitleRule = [...stormStyles.matchAll(
       /\.storm-commander-root \.storm-comms-window h2\s*\{(?<body>[^}]+)\}/g,
     )].map((match) => match.groups.body)
-      .find((body) => body.includes('grid-area: title;'))
+      .find((body) => body.includes('font-size: 2rem;'))
     const missionOverlayRule = stormStyles.match(
       /\.storm-commander-root \.storm-mission-overlay\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -227,6 +227,10 @@ describe('separate variant style sources', () => {
     expect(missionStatusButtonFocusRule).toContain('outline: 3px solid rgba(115, 221, 126, 0.5);')
     expect(commsWindowRule).toContain('box-sizing: border-box;')
     expect(commsWindowRule).toContain('position: relative;')
+    expect(commsWindowRule).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
+    expect(commsWindowRule).toContain('grid-template-areas:')
+    expect(commsWindowRule).toContain('"portrait movement"')
+    expect(commsWindowRule).toContain('"title title";')
     expect(commsWindowRule).toContain('justify-self: stretch;')
     expect(commsWindowRule).toContain('width: 100%;')
     expect(commsWindowRule).toContain('border: 2px solid var(--storm-comms-faction-color')
@@ -265,7 +269,13 @@ describe('separate variant style sources', () => {
     expect(dicePipRule).toContain('width: 2px;')
     expect(dicePipRule).toContain('height: 2px;')
     expect(stormStyles).not.toContain('.storm-commander-root .storm-comms-movement')
-    expect(transmissionRule).toContain('grid-template-columns: 85px minmax(0, 1fr);')
+    expect(transmissionRule).toContain('display: contents;')
+    expect(portraitRule).toContain('grid-area: portrait;')
+    expect(portraitRule).toContain('width: 100%;')
+    expect(movementRule).toContain('grid-area: movement;')
+    expect(movementRule).toContain('width: 100%;')
+    expect(movementRule).toContain('aspect-ratio: 1;')
+    expect(barkRule).toContain('display: none;')
     expect(stormStyles).toContain('grid-template-columns: 85px 85px minmax(130px, 1fr);')
     expect(stormStyles).toContain('grid-template-areas: "portrait movement title";')
     expect(stormStyles).toContain('grid-area: portrait;')
