@@ -1,6 +1,7 @@
+import { readFileSync } from 'node:fs'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
 
 async function openDebugPage(user, pageName) {
@@ -62,13 +63,29 @@ describe('iPhone device preview', () => {
   })
 
   it('renders the random encounter without debug chrome in iframe mode', () => {
-    window.history.replaceState({}, '', '/?storm-view=ios-frame')
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
 
-    render(<App />)
+    try {
+      window.history.replaceState({}, '', '/?storm-view=ios-frame')
 
-    expect(screen.getByRole('heading', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
-    expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
-    expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: /^iPhone Preview$/ })).not.toBeInTheDocument()
+      render(<App />)
+
+      expect(screen.getByRole('heading', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
+      expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
+      expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: /^iPhone Preview$/ })).not.toBeInTheDocument()
+    } finally {
+      randomSpy.mockRestore()
+    }
+  })
+
+  it('centers the fixed screen preview for portrait and landscape widths', () => {
+    const globalStyles = readFileSync('src/styles.css', 'utf8')
+    const frameShellRule = globalStyles.match(
+      /\.ios-preview-frame-shell\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+
+    expect(frameShellRule).toContain('margin-left: auto;')
+    expect(frameShellRule).toContain('margin-right: auto;')
   })
 })
