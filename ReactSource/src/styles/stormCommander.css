@@ -733,6 +733,9 @@
   --storm-player-faction-bg: rgba(232, 108, 36, 0.24);
   --storm-opponent-faction-bg: rgba(85, 214, 232, 0.16);
 
+  height: 100dvh;
+  padding-top: 0;
+  overflow: hidden;
   color: var(--text);
   background:
     radial-gradient(circle at 0% 0%, var(--storm-opponent-faction-bg), transparent 42%),
@@ -1863,7 +1866,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  overflow: auto;
+  overflow: hidden;
   background: rgba(0, 0, 0, 0.5);
 }
 
@@ -1875,7 +1878,8 @@
   display: grid;
   align-content: center;
   gap: 16px;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 32px;
   border: 1px solid rgba(107, 110, 58, 0.9);
   border-radius: var(--radius);
@@ -1906,7 +1910,7 @@
 }
 
 .storm-commander-root .storm-mission-dismiss {
-  justify-self: start;
+  justify-self: end;
   min-height: 40px;
   border: 2px solid #050505;
   border-radius: 7px;
@@ -2192,5 +2196,107 @@
 
   .storm-commander-root .storm-mission-dialog h1 {
     max-width: none;
+  }
+}
+
+@media (max-width: 560px) and (orientation: portrait) {
+  .storm-commander-root .storm-encounter-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "opponent-comms"
+      "board"
+      "player-comms";
+    width: min(720px, calc(100vw - 24px));
+    gap: 22px;
+    padding: 18px 0 28px;
+  }
+
+  .storm-commander-root .storm-comms-window {
+    grid-template-columns: 43px 43px minmax(0, 1fr);
+    grid-template-areas: "portrait movement title";
+  }
+
+  .storm-commander-root .storm-comms-window-player {
+    grid-template-columns: minmax(0, 1fr) 43px 43px;
+    grid-template-areas: "title movement portrait";
+  }
+
+  .storm-commander-root .storm-comms-portrait {
+    width: 43px;
+    height: 43px;
+  }
+
+  .storm-commander-root .storm-movement-pattern {
+    grid-template-columns: repeat(5, 5.5px);
+    grid-template-rows: repeat(5, 5.5px);
+    gap: 1.5px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .storm-commander-root .storm-movement-pattern-cell {
+    width: 5.5px;
+    height: 5.5px;
+    border-radius: 1px;
+  }
+}
+
+@media (max-width: 956px) and (orientation: landscape) {
+  .storm-commander-root .storm-encounter-shell {
+    grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);
+    grid-template-areas: "opponent-comms board player-comms";
+    gap: 12px;
+    width: min(1320px, calc(100vw - 12px));
+    margin: 0 auto;
+    padding: 8px 0;
+    align-items: start;
+    justify-content: center;
+  }
+
+  .storm-commander-root .storm-comms-window {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "portrait movement"
+      "title title";
+    align-items: start;
+    align-content: start;
+    overflow-x: visible;
+    padding: 10px;
+  }
+
+  .storm-commander-root .storm-comms-window-player {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "portrait movement"
+      "title title";
+  }
+
+  .storm-commander-root .storm-comms-window-player h2 {
+    text-align: left;
+  }
+
+  .storm-commander-root .storm-comms-window h2 {
+    font-size: 1.04rem;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  .storm-commander-root .storm-comms-portrait {
+    width: 100%;
+    height: auto;
+  }
+
+  .storm-commander-root .storm-movement-pattern {
+    grid-template-columns: repeat(5, 11px);
+    grid-template-rows: repeat(5, 11px);
+    gap: 3px;
+    padding: 8px;
+    border-radius: 7px;
+  }
+
+  .storm-commander-root .storm-movement-pattern-cell {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
   }
 }
