@@ -144,3 +144,163 @@ button {
     gap: 18px;
   }
 }
+
+.ios-preview-page {
+  min-height: 100vh;
+  overflow: auto;
+  padding: 20px;
+  color: #efeadd;
+  background:
+    linear-gradient(135deg, rgba(54, 80, 88, 0.24), transparent 44%),
+    linear-gradient(180deg, #161914 0%, #0d1114 100%);
+}
+
+.ios-preview-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  margin: 0 auto;
+  padding: 14px;
+  border: 1px solid rgba(198, 173, 108, 0.34);
+  border-radius: 8px;
+  background: rgba(18, 22, 24, 0.94);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
+}
+
+.ios-preview-title-group {
+  min-width: 180px;
+  margin-right: auto;
+}
+
+.ios-preview-title-group h1,
+.ios-preview-title-group p,
+.ios-preview-size {
+  margin: 0;
+}
+
+.ios-preview-title-group h1 {
+  color: #f4efe0;
+  font-size: 1.28rem;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.ios-preview-eyebrow,
+.ios-preview-field span {
+  color: #c6ad6c;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ios-preview-field {
+  display: grid;
+  gap: 6px;
+}
+
+.ios-preview-field select {
+  width: 230px;
+  min-height: 40px;
+  border: 1px solid rgba(198, 173, 108, 0.45);
+  border-radius: 7px;
+  padding: 8px 10px;
+  color: #f4efe0;
+  background: #222821;
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 750;
+}
+
+.ios-preview-segmented-control {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  border: 1px solid rgba(198, 173, 108, 0.45);
+  border-radius: 7px;
+  background: #222821;
+}
+
+.ios-preview-segmented-control button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 0;
+  padding: 8px 12px;
+  color: #d8d0bf;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.ios-preview-segmented-control button[aria-pressed='true'] {
+  color: #101411;
+  background: #f6c85f;
+}
+
+.ios-preview-size {
+  min-width: 104px;
+  padding: 9px 10px;
+  border: 1px solid rgba(122, 164, 153, 0.48);
+  border-radius: 7px;
+  color: #c9efe3;
+  background: rgba(47, 100, 88, 0.24);
+  font-size: 0.95rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.ios-preview-field select:focus-visible,
+.ios-preview-segmented-control button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid rgba(246, 200, 95, 0.56);
+  outline-offset: 2px;
+}
+
+.ios-preview-workbench {
+  min-width: max-content;
+  padding: 24px 0 40px;
+}
+
+.ios-preview-frame-shell {
+  box-sizing: content-box;
+  width: var(--ios-preview-width);
+  height: var(--ios-preview-height);
+  overflow: hidden;
+  border: 2px solid #050505;
+  border-radius: 8px;
+  background: #050505;
+  box-shadow:
+    0 0 0 1px rgba(246, 200, 95, 0.28),
+    0 22px 70px rgba(0, 0, 0, 0.48);
+}
+
+.ios-preview-frame {
+  display: block;
+  border: 0;
+  background: #050505;
+}
+
+@media (max-width: 720px) {
+  .ios-preview-page {
+    padding: 12px;
+  }
+
+  .ios-preview-toolbar {
+    align-items: stretch;
+  }
+
+  .ios-preview-title-group,
+  .ios-preview-field,
+  .ios-preview-field select,
+  .ios-preview-segmented-control,
+  .ios-preview-size {
+    width: 100%;
+  }
+}
