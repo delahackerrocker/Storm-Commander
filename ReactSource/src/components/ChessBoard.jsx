@@ -23,6 +23,7 @@ export function ChessBoard({
   selectedSquare,
   sidePieceFactions,
   sideVisualThemes,
+  showStarfieldLayers = false,
   starfieldLayerStyles,
 }) {
   const legalMoveByDestination = new Map()
@@ -87,13 +88,14 @@ export function ChessBoard({
           role="grid"
           aria-label="Chess board"
         >
-          {pieceSet === 'storm-commander-png' && starfieldLayerStyles ? (
+          {pieceSet === 'storm-commander-png' &&
+          (showStarfieldLayers || starfieldLayerStyles) ? (
             <div className="storm-starfield-layers" aria-hidden="true">
               {STORM_STARFIELD_LAYERS.map(([layerId, styleId]) => (
                 <span
                   key={layerId}
                   className={`storm-starfield-layer storm-starfield-layer-${layerId}`}
-                  style={styleId ? starfieldLayerStyles[styleId] : undefined}
+                  style={styleId && starfieldLayerStyles ? starfieldLayerStyles[styleId] : undefined}
                 />
               ))}
             </div>

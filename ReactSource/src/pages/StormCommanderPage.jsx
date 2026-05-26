@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createRandomSideFactions } from '../chess/stormCommanderFactions'
 import {
   STORM_COMMANDER_STARFIELD_TICK_MS,
   advanceStarfieldMotion,
   createInitialStarfieldMotion,
-  toStarfieldLayerStyles,
   toStarfieldStyle,
 } from '../chess/stormCommanderStarfield'
 import {
@@ -22,35 +21,123 @@ function createSideVisualThemes(sideFactions) {
   }
 }
 
+const MAX_STARFIELD_ELAPSED_MS = STORM_COMMANDER_STARFIELD_TICK_MS * 3
+
+function getCurrentTimeMs() {
+  return window.performance?.now?.() ?? Date.now()
+}
+
+function applyStarfieldStyle(element, starfieldMotion) {
+  const nextStyle = toStarfieldStyle(starfieldMotion)
+
+  for (const [propertyName, value] of Object.entries(nextStyle)) {
+    element.style.setProperty(propertyName, value)
+  }
+}
+
+function useLowPowerStarfieldMotion() {
+  const starfieldRootRef = useRef(null)
+  const starfieldMotionRef = useRef(null)
+
+  if (!starfieldMotionRef.current) {
+    starfieldMotionRef.current = createInitialStarfieldMotion()
+  }
+
+  const pieceRotationRef = useRef(starfieldMotionRef.current.pieceRotation)
+  const initialStarfieldStyle = useMemo(
+    () => toStarfieldStyle(starfieldMotionRef.current),
+    [],
+  )
+  const getCurrentPieceRotation = useCallback(() => pieceRotationRef.current, [])
+
+  useEffect(() => {
+    const rootElement = starfieldRootRef.current
+
+    if (!rootElement) {
+      return undefined
+    }
+
+    let timerId = null
+    let lastTickTime = getCurrentTimeMs()
+
+    function clearStarfieldTimer() {
+      if (timerId !== null) {
+        window.clearInterval(timerId)
+        timerId = null
+      }
+    }
+
+    function advanceStarfield() {
+      const now = getCurrentTimeMs()
+      const elapsedMs = Math.min(
+        MAX_STARFIELD_ELAPSED_MS,
+        Math.max(STORM_COMMANDER_STARFIELD_TICK_MS, now - lastTickTime),
+      )
+      const nextMotion = advanceStarfieldMotion(
+        starfieldMotionRef.current,
+        Math.random,
+        elapsedMs,
+      )
+
+      lastTickTime = now
+      starfieldMotionRef.current = nextMotion
+      pieceRotationRef.current = nextMotion.pieceRotation
+      applyStarfieldStyle(rootElement, nextMotion)
+    }
+
+    function startStarfieldTimer() {
+      clearStarfieldTimer()
+
+      if (document.hidden) {
+        return
+      }
+
+      timerId = window.setInterval(
+        advanceStarfield,
+        STORM_COMMANDER_STARFIELD_TICK_MS,
+      )
+    }
+
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        clearStarfieldTimer()
+        return
+      }
+
+      lastTickTime = getCurrentTimeMs()
+      advanceStarfield()
+      startStarfieldTimer()
+    }
+
+    applyStarfieldStyle(rootElement, starfieldMotionRef.current)
+    startStarfieldTimer()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      clearStarfieldTimer()
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
+  return {
+    getCurrentPieceRotation,
+    initialStarfieldStyle,
+    starfieldRootRef,
+  }
+}
+
 export function StormCommanderPage({
   allowChessDrill = true,
   onBack,
   startInRandomEncounter = false,
 }) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
-  const [starfieldMotion, setStarfieldMotion] = useState(() => createInitialStarfieldMotion())
   const [encounter, setEncounter] = useState(() =>
     startInRandomEncounter ? generateRandomEncounter() : null,
   )
-  const starfieldLayerStyles = useMemo(
-    () => toStarfieldLayerStyles(starfieldMotion),
-    [starfieldMotion],
-  )
-  const starfieldStyle = useMemo(() => toStarfieldStyle(starfieldMotion), [starfieldMotion])
+  const { getCurrentPieceRotation, initialStarfieldStyle, starfieldRootRef } =
+    useLowPowerStarfieldMotion()
   const sideVisualThemes = useMemo(() => createSideVisualThemes(sideFactions), [sideFactions])
-
-  useEffect(() => {
-    const advanceStarfield = () => {
-      setStarfieldMotion((currentMotion) => advanceStarfieldMotion(currentMotion))
-    }
-    const starterId = window.setTimeout(advanceStarfield, 40)
-    const timerId = window.setInterval(advanceStarfield, STORM_COMMANDER_STARFIELD_TICK_MS)
-
-    return () => {
-      window.clearTimeout(starterId)
-      window.clearInterval(timerId)
-    }
-  }, [])
 
   function randomizeSideFactions() {
     setSideFactions((currentSideFactions) =>
@@ -63,16 +150,20 @@ export function StormCommanderPage({
   }
 
   return (
-    <div className="storm-commander-effects" style={starfieldStyle}>
+    <div
+      ref={starfieldRootRef}
+      className="storm-commander-effects"
+      style={initialStarfieldStyle}
+    >
       {encounter ? (
         <StormCommanderEncounterPage
           encounter={encounter}
+          getCurrentPieceRotation={getCurrentPieceRotation}
           onBack={onBack}
           onNewEncounter={startRandomEncounter}
           onReturnToChess={allowChessDrill ? () => setEncounter(null) : undefined}
-          pieceRotation={starfieldMotion.pieceRotation}
           setEncounter={setEncounter}
-          starfieldLayerStyles={starfieldLayerStyles}
+          showStarfieldLayers
         />
       ) : (
         <BasicChessPage
@@ -82,8 +173,7 @@ export function StormCommanderPage({
           rootClassName="storm-commander-root"
           sidePieceFactions={sideFactions}
           sideVisualThemes={sideVisualThemes}
-          pieceRotation={starfieldMotion.pieceRotation}
-          starfieldLayerStyles={starfieldLayerStyles}
+          showStarfieldLayers
           title="Storm Commander"
           topControls={
             <button type="button" className="storm-primary-button" onClick={startRandomEncounter}>

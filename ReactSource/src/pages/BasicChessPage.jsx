@@ -64,6 +64,7 @@ export function BasicChessPage({
   rootClassName = '',
   sidePieceFactions,
   sideVisualThemes,
+  showStarfieldLayers = false,
   starfieldLayerStyles,
   title = 'Chess-ish',
   topControls,
@@ -254,6 +255,7 @@ export function BasicChessPage({
             pieceSet={pieceSet}
             sidePieceFactions={sidePieceFactions}
             sideVisualThemes={sideVisualThemes}
+            showStarfieldLayers={showStarfieldLayers}
             starfieldLayerStyles={starfieldLayerStyles}
           />
         </section>
