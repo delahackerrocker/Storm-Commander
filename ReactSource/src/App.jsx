@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
+import { IosDevicePreviewPage } from './pages/IosDevicePreviewPage'
 import { StandardChessPage } from './pages/StandardChessPage'
 import { StormCommanderPage } from './pages/StormCommanderPage'
 
 const PAGES = {
   randomEncounter: 'random-encounter',
+  iosPreview: 'ios-preview',
   stormChessDrill: 'storm-chess-drill',
   basicChess: 'basic-chess',
 }
+
+const STORM_VIEW_QUERY_PARAM = 'storm-view'
+const STORM_VIEW_IOS_PREVIEW = 'ios-preview'
+const STORM_VIEW_IOS_FRAME = 'ios-frame'
 
 const DEBUG_FADED_OPACITY = 0
 const DEBUG_PRESS_OPACITY_STEP = 0.2
@@ -18,6 +24,7 @@ function DebugDock({
   currentPage,
   isOpen,
   onOpenBasicChess,
+  onOpenIosPreview,
   onOpenRandomEncounter,
   onOpenStormChessDrill,
   onToggle,
@@ -80,6 +87,14 @@ function DebugDock({
           <button
             type="button"
             className="debug-option"
+            aria-pressed={currentPage === PAGES.iosPreview}
+            onClick={onOpenIosPreview}
+          >
+            iPhone Preview
+          </button>
+          <button
+            type="button"
+            className="debug-option"
             aria-pressed={currentPage === PAGES.stormChessDrill}
             onClick={onOpenStormChessDrill}
           >
@@ -109,13 +124,30 @@ function DebugDock({
   )
 }
 
+function getStormViewMode() {
+  return new URLSearchParams(window.location.search).get(STORM_VIEW_QUERY_PARAM)
+}
+
 function App() {
-  const [currentPage, setCurrentPage] = useState(PAGES.randomEncounter)
+  const stormViewMode = getStormViewMode()
+  const [currentPage, setCurrentPage] = useState(() =>
+    stormViewMode === STORM_VIEW_IOS_PREVIEW ? PAGES.iosPreview : PAGES.randomEncounter,
+  )
   const [isDebugOpen, setIsDebugOpen] = useState(false)
 
   function openDebugPage(page) {
     setCurrentPage(page)
     setIsDebugOpen(false)
+  }
+
+  if (stormViewMode === STORM_VIEW_IOS_FRAME) {
+    return (
+      <StormCommanderPage
+        key="storm-ios-frame-random-encounter"
+        allowChessDrill={false}
+        startInRandomEncounter
+      />
+    )
   }
 
   let page = (
@@ -125,6 +157,15 @@ function App() {
       startInRandomEncounter
     />
   )
+
+  if (currentPage === PAGES.iosPreview) {
+    page = (
+      <IosDevicePreviewPage
+        key="ios-device-preview"
+        onBack={() => openDebugPage(PAGES.randomEncounter)}
+      />
+    )
+  }
 
   if (currentPage === PAGES.basicChess) {
     page = (
@@ -152,6 +193,7 @@ function App() {
         currentPage={currentPage}
         isOpen={isDebugOpen}
         onOpenBasicChess={() => openDebugPage(PAGES.basicChess)}
+        onOpenIosPreview={() => openDebugPage(PAGES.iosPreview)}
         onOpenRandomEncounter={() => openDebugPage(PAGES.randomEncounter)}
         onOpenStormChessDrill={() => openDebugPage(PAGES.stormChessDrill)}
         onToggle={() => setIsDebugOpen((currentValue) => !currentValue)}
