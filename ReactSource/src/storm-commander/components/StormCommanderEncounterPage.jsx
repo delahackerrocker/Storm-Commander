@@ -238,13 +238,13 @@ function getShortestAngleTarget(fromAngle, toAngle) {
   return fromAngle + shortestDelta
 }
 
-function getMoveAnimationStyle(animation, encounter, pieceRotation) {
+function getMoveAnimationStyle(animation, encounter) {
   const theme = STORM_COMMANDER_FACTION_VISUAL_THEMES[animation.movingPiece.faction]
   const fromLeft = `${((animation.move.from.x + 0.5) / encounter.board.width) * 100}%`
   const fromTop = `${((animation.move.from.y + 0.5) / encounter.board.height) * 100}%`
   const toLeft = `${((animation.move.to.x + 0.5) / encounter.board.width) * 100}%`
   const toTop = `${((animation.move.to.y + 0.5) / encounter.board.height) * 100}%`
-  const startAngle = getDegreeValue(pieceRotation)
+  const startAngle = getDegreeValue(animation.pieceRotation)
   const targetAngle = getDegreeValue(getMoveAngle(animation.move.from, animation.move.to))
   const shortestTargetAngle = getShortestAngleTarget(startAngle, targetAngle)
 
@@ -261,7 +261,7 @@ function getMoveAnimationStyle(animation, encounter, pieceRotation) {
   }
 }
 
-function MoveAnimationLayer({ animation, encounter, pieceRotation }) {
+function MoveAnimationLayer({ animation, encounter }) {
   if (!animation) {
     return null
   }
@@ -272,7 +272,7 @@ function MoveAnimationLayer({ animation, encounter, pieceRotation }) {
     <div
       className={`storm-capture-animation-layer ${isCapture ? 'is-capture' : 'is-quiet'}`}
       data-faction={animation.movingPiece.faction}
-      style={getMoveAnimationStyle(animation, encounter, pieceRotation)}
+      style={getMoveAnimationStyle(animation, encounter)}
       aria-hidden="true"
     >
       <div className="storm-capture-attacker" data-faction={animation.movingPiece.faction}>
@@ -581,9 +581,11 @@ function MissionResultDialog({ encounter, onNextMission }) {
 
 export function StormCommanderEncounterPage({
   encounter,
+  getCurrentPieceRotation,
   onNewEncounter,
   pieceRotation,
   setEncounter,
+  showStarfieldLayers = false,
   starfieldLayerStyles,
 }) {
   const [selection, setSelection] = useState(null)
@@ -659,12 +661,13 @@ export function StormCommanderEncounterPage({
         capturedPiece: capturedPiece ? { ...capturedPiece } : null,
         move,
         movingPiece: { ...movingPiece },
+        pieceRotation: getCurrentPieceRotation?.() || pieceRotation || '0deg',
       })
     } else {
       setEncounter((currentEncounter) => applyEncounterMove(currentEncounter, move))
       setSelection(null)
     }
-  }, [encounter.pieces, setEncounter])
+  }, [encounter.pieces, getCurrentPieceRotation, pieceRotation, setEncounter])
 
   useEffect(() => {
     if (!selectionFlash) {
@@ -843,13 +846,13 @@ export function StormCommanderEncounterPage({
             role="grid"
             aria-label={`${encounter.board.width} by ${encounter.board.height} Storm Commander encounter board`}
           >
-            {starfieldLayerStyles ? (
+            {showStarfieldLayers || starfieldLayerStyles ? (
               <div className="storm-starfield-layers" aria-hidden="true">
                 {STORM_STARFIELD_LAYERS.map(([layerId, styleId]) => (
                   <span
                     key={layerId}
                     className={`storm-starfield-layer storm-starfield-layer-${layerId}`}
-                    style={styleId ? starfieldLayerStyles[styleId] : undefined}
+                    style={styleId && starfieldLayerStyles ? starfieldLayerStyles[styleId] : undefined}
                   />
                 ))}
               </div>
@@ -935,7 +938,6 @@ export function StormCommanderEncounterPage({
             <MoveAnimationLayer
               animation={pendingMoveAnimation}
               encounter={encounter}
-              pieceRotation={pieceRotation}
             />
           </div>
         </section>
