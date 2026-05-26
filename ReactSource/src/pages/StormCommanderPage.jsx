@@ -36,17 +36,13 @@ function applyStarfieldStyle(element, starfieldMotion) {
 }
 
 function useLowPowerStarfieldMotion() {
+  const [initialStarfieldMotion] = useState(() => createInitialStarfieldMotion())
   const starfieldRootRef = useRef(null)
-  const starfieldMotionRef = useRef(null)
-
-  if (!starfieldMotionRef.current) {
-    starfieldMotionRef.current = createInitialStarfieldMotion()
-  }
-
-  const pieceRotationRef = useRef(starfieldMotionRef.current.pieceRotation)
+  const starfieldMotionRef = useRef(initialStarfieldMotion)
+  const pieceRotationRef = useRef(initialStarfieldMotion.pieceRotation)
   const initialStarfieldStyle = useMemo(
-    () => toStarfieldStyle(starfieldMotionRef.current),
-    [],
+    () => toStarfieldStyle(initialStarfieldMotion),
+    [initialStarfieldMotion],
   )
   const getCurrentPieceRotation = useCallback(() => pieceRotationRef.current, [])
 
