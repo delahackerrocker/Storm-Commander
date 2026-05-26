@@ -334,7 +334,7 @@ describe('separate variant style sources', () => {
     expect(stormStyles).not.toContain('padding: 76px 18px 22px;')
     expect(stormStyles).not.toContain('storm-mission-return-note')
     expect(missionDismissRule).not.toContain('position: absolute;')
-    expect(missionDismissRule).toContain('justify-self: start;')
+    expect(missionDismissRule).toContain('justify-self: end;')
     expect(objectivePanelRule).toBeDefined()
     expect(objectivePanelRule).toContain('grid-template-columns: minmax(0, 1fr) auto;')
     expect(objectivePanelRule).toContain('align-items: center;')
