@@ -35,7 +35,7 @@ function applyStarfieldStyle(element, starfieldMotion) {
   }
 }
 
-function useLowPowerStarfieldMotion() {
+function useLowPowerStarfieldMotion(isPaused = false) {
   const starfieldRootRef = useRef(null)
   const [initialStarfieldMotion] = useState(() => createInitialStarfieldMotion())
   const starfieldMotionRef = useRef(initialStarfieldMotion)
@@ -84,7 +84,7 @@ function useLowPowerStarfieldMotion() {
     function startStarfieldTimer() {
       clearStarfieldTimer()
 
-      if (document.hidden) {
+      if (isPaused || document.hidden) {
         return
       }
 
@@ -95,7 +95,7 @@ function useLowPowerStarfieldMotion() {
     }
 
     function handleVisibilityChange() {
-      if (document.hidden) {
+      if (isPaused || document.hidden) {
         clearStarfieldTimer()
         return
       }
@@ -113,7 +113,7 @@ function useLowPowerStarfieldMotion() {
       clearStarfieldTimer()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [isPaused])
 
   return {
     getCurrentPieceRotation,
@@ -132,9 +132,14 @@ export function StormCommanderPage({
   const [encounter, setEncounter] = useState(() =>
     startInRandomEncounter ? generateRandomEncounter() : null,
   )
+  const [areBoardAnimationsPaused, setAreBoardAnimationsPaused] = useState(false)
   const { getCurrentPieceRotation, initialStarfieldStyle, starfieldRootRef } =
-    useLowPowerStarfieldMotion()
+    useLowPowerStarfieldMotion(areBoardAnimationsPaused)
   const sideVisualThemes = useMemo(() => createSideVisualThemes(sideFactions), [sideFactions])
+
+  const handleBoardAnimationsPausedChange = useCallback((isPaused) => {
+    setAreBoardAnimationsPaused(isPaused)
+  }, [])
 
   function randomizeSideFactions() {
     setSideFactions((currentSideFactions) =>
@@ -157,6 +162,7 @@ export function StormCommanderPage({
           encounter={encounter}
           getCurrentPieceRotation={getCurrentPieceRotation}
           onBack={onBack}
+          onBoardAnimationsPausedChange={handleBoardAnimationsPausedChange}
           onNewEncounter={startRandomEncounter}
           onReturnToChess={allowChessDrill ? () => setEncounter(null) : undefined}
           setEncounter={setEncounter}

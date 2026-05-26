@@ -1,7 +1,8 @@
 .storm-commander-effects {
+  --storm-board-animation-play-state: running;
   --storm-piece-rotation: 0deg;
+  --storm-star-step-count: 36;
   --storm-star-tween-ms: 700ms;
-  --storm-star-ease: linear;
   --storm-star-near-x: 0px;
   --storm-star-near-y: 0px;
   --storm-star-mid-x: 0px;
@@ -165,7 +166,7 @@
 
 .storm-commander-root .storm-starfield-layer {
   background-repeat: repeat;
-  transition: background-position var(--storm-star-tween-ms) var(--storm-star-ease);
+  transition: background-position var(--storm-star-tween-ms) steps(var(--storm-star-step-count), end);
 }
 
 .storm-commander-root .storm-starfield-layer-nebula {
@@ -332,7 +333,7 @@
   user-select: none;
   transform: rotate(var(--storm-piece-rotation));
   transform-origin: 50% 50%;
-  transition: transform var(--storm-star-tween-ms) var(--storm-star-ease);
+  transition: transform var(--storm-star-tween-ms) steps(var(--storm-star-step-count), end);
 }
 
 .storm-commander-root .storm-ship-piece[data-faction='pirate'] {
@@ -408,12 +409,9 @@
   opacity: 0.67;
   transform: translateX(var(--storm-exhaust-x)) scale(var(--storm-exhaust-scale)) scaleY(1);
   transform-origin: 50% 0;
-  animation: none;
-}
-
-.storm-commander-root .storm-capture-attacker .storm-rocket-exhaust {
-  animation: storm-rocket-exhaust-flicker 240ms infinite alternate ease-in-out;
+  animation: storm-rocket-exhaust-flicker 240ms steps(7, end) infinite alternate;
   animation-delay: var(--storm-exhaust-delay);
+  animation-play-state: var(--storm-board-animation-play-state, running);
 }
 
 .storm-commander-root .storm-rocket-exhaust-left {
@@ -458,11 +456,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .storm-commander-root .storm-rocket-exhaust {
-    animation: none;
-    opacity: 0.63;
-  }
-
   .storm-commander-root .storm-starfield-layer,
   .storm-commander-root .storm-ship-piece {
     transition: none;
@@ -748,6 +741,11 @@
     var(--storm-space-black);
 }
 
+.storm-commander-root.is-mission-briefing-open {
+  --storm-board-animation-play-state: paused;
+  --storm-star-tween-ms: 0ms;
+}
+
 .storm-commander-root.storm-encounter-root .storm-primary-button,
 .storm-commander-root.storm-encounter-root .storm-mode-button,
 .storm-commander-root.storm-encounter-root .storm-mission-button,
@@ -911,7 +909,7 @@
   z-index: 90;
   pointer-events: none;
   background: var(--storm-selection-flash-color);
-  animation: storm-selection-flash 0.3s ease-out forwards;
+  animation: storm-selection-flash 0.3s steps(9, end) forwards;
 }
 
 @keyframes storm-selection-flash {
@@ -1078,7 +1076,7 @@
   );
   box-shadow: none;
   opacity: 0.42;
-  animation: storm-target-reticle-rotate 2.666s linear infinite;
+  animation: storm-target-reticle-rotate 2667ms steps(80, end) infinite;
 }
 
 @keyframes storm-target-reticle-rotate {
@@ -1102,7 +1100,7 @@
   inset: 8%;
   border: 2px dashed rgba(115, 221, 126, 0.9);
   box-shadow: 0 0 16px rgba(115, 221, 126, 0.18);
-  animation: storm-extraction-pulse 3.2s ease-in-out infinite;
+  animation: storm-extraction-pulse 3.2s steps(96, end) infinite;
 }
 
 @keyframes storm-extraction-pulse {
@@ -1174,7 +1172,7 @@
   height: var(--storm-move-cell-width);
   translate: -50% -50%;
   transform-origin: 50% 50%;
-  animation: storm-capture-attacker-flight 1.2s ease-in-out forwards;
+  animation: storm-capture-attacker-flight 1.2s steps(36, end) forwards;
 }
 
 .storm-commander-root .storm-capture-attacker .storm-ship-piece {
@@ -1211,7 +1209,7 @@
   box-shadow: 0 0 10px currentColor;
   opacity: 0;
   transform-origin: 0 50%;
-  animation: storm-capture-laser-fire 180ms ease-out forwards;
+  animation: storm-capture-laser-fire 180ms steps(5, end) forwards;
   animation-delay: calc(var(--storm-laser-turn-delay) + var(--storm-laser-index) * 0.12s);
 }
 
@@ -1230,7 +1228,7 @@
   height: 12px;
   background: radial-gradient(circle, #fff 0 18%, currentColor 19% 58%, transparent 62%);
   opacity: 0;
-  animation: storm-capture-hit-spark 220ms ease-out forwards;
+  animation: storm-capture-hit-spark 220ms steps(6, end) forwards;
   animation-delay: calc(0.3s + var(--storm-spark-index) * 0.14s);
 }
 
@@ -1241,8 +1239,13 @@
     radial-gradient(circle, #fff4bc 0 10%, #ff8f2b 11% 34%, rgba(232, 108, 36, 0.5) 35% 58%, transparent 62%);
   opacity: 0;
   filter: drop-shadow(0 0 18px rgba(255, 142, 48, 0.8));
-  animation: storm-capture-explosion 300ms ease-out forwards;
+  animation: storm-capture-explosion 300ms steps(9, end) forwards;
   animation-delay: 0.9s;
+}
+
+.storm-commander-root.storm-encounter-root .storm-encounter-shell *,
+.storm-commander-root.storm-encounter-root .storm-encounter-panel * {
+  animation-play-state: var(--storm-board-animation-play-state, running);
 }
 
 @keyframes storm-capture-attacker-flight {
@@ -1450,7 +1453,7 @@
     );
   box-shadow: none;
   opacity: 0.42;
-  animation: storm-target-reticle-rotate 2.666s linear infinite;
+  animation: storm-target-reticle-rotate 2667ms steps(80, end) infinite;
 }
 
 .storm-commander-root.storm-debug-chess-root .chess-square.is-move-animation-from .storm-ship-piece,

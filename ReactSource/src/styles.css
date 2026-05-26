@@ -19,6 +19,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #07020c;
 }
 
 button {
@@ -30,33 +31,85 @@ button {
 }
 
 .start-page {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
   display: grid;
-  align-items: start;
-  justify-items: center;
-  padding: 56px 16px;
+  align-items: center;
+  justify-items: start;
+  overflow: hidden;
+  padding: clamp(28px, 6vw, 72px);
+  color: #f3f0df;
+  background:
+    linear-gradient(90deg, rgba(7, 2, 12, 0.94) 0%, rgba(7, 2, 12, 0.72) 48%, rgba(7, 2, 12, 0.24) 100%),
+    var(--start-hero-image) center / cover no-repeat,
+    #07020c;
+}
+
+.start-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(216, 98, 32, 0.24), transparent 28%),
+    radial-gradient(circle at 80% 72%, rgba(85, 214, 232, 0.22), transparent 36%);
+  pointer-events: none;
+}
+
+.start-menu {
+  display: grid;
+  gap: 24px;
+  width: min(430px, 100%);
+}
+
+.start-menu-kicker,
+.start-menu h1 {
+  margin: 0;
+}
+
+.start-menu-kicker {
+  color: #ff8c2a;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.start-menu h1 {
+  max-width: 8ch;
+  color: #f3f0df;
+  font-size: clamp(3rem, 12vw, 6.8rem);
+  line-height: 0.88;
+  letter-spacing: 0;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.42);
 }
 
 .menu-stack {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   width: min(360px, 100%);
 }
 
 .menu-button,
 .back-button {
-  border: 0;
+  border: 1px solid rgba(177, 152, 129, 0.52);
   border-radius: 8px;
-  color: #fff;
-  background: #2f6458;
-  font-weight: 800;
+  color: #f3f0df;
+  background: rgba(17, 19, 3, 0.84);
+  font-weight: 850;
   cursor: pointer;
 }
 
 .menu-button {
   min-height: 56px;
-  padding: 14px 18px;
-  font-size: 1.15rem;
+  padding: 13px 16px;
+  font-size: 1rem;
+  text-align: left;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
 }
 
 .back-button {
@@ -67,83 +120,27 @@ button {
 
 .menu-button:hover,
 .back-button:hover {
-  background: #275449;
+  border-color: rgba(255, 140, 42, 0.82);
+  background: rgba(88, 42, 24, 0.9);
 }
 
 .menu-button:focus-visible,
 .back-button:focus-visible {
-  outline: 3px solid #f6c85f;
+  outline: 3px solid #55d6e8;
   outline-offset: 3px;
 }
 
-.debug-dock {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 30;
-  display: grid;
-  justify-items: end;
-  gap: 8px;
-  pointer-events: none;
-}
+@media (max-width: 640px) {
+  .start-page {
+    align-items: end;
+    padding: 24px;
+    background:
+      linear-gradient(0deg, rgba(7, 2, 12, 0.94) 0%, rgba(7, 2, 12, 0.68) 58%, rgba(7, 2, 12, 0.22) 100%),
+      var(--start-hero-image) center / cover no-repeat,
+      #07020c;
+  }
 
-.debug-panel {
-  width: min(260px, calc(100vw - 32px));
-  display: grid;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid rgba(246, 200, 95, 0.46);
-  border-radius: 8px;
-  background: rgba(18, 22, 31, 0.94);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-  pointer-events: auto;
-}
-
-.debug-panel-title {
-  margin: 0 0 2px;
-  color: #f6c85f;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.debug-toggle,
-.debug-option {
-  border: 0;
-  border-radius: 8px;
-  font-weight: 850;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.debug-toggle {
-  min-width: 78px;
-  padding: 9px 12px;
-  color: #101820;
-  background: #f6c85f;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
-  transition: opacity 0.3s ease;
-}
-
-.debug-option {
-  width: 100%;
-  min-height: 38px;
-  padding: 8px 10px;
-  color: #f5f6f0;
-  background: rgba(255, 255, 255, 0.1);
-  text-align: left;
-}
-
-.debug-option[aria-pressed='true'] {
-  color: #101820;
-  background: #f6c85f;
-}
-
-.debug-toggle:hover,
-.debug-toggle:focus-visible,
-.debug-option:hover,
-.debug-option:focus-visible {
-  outline: 3px solid rgba(246, 200, 95, 0.5);
-  outline-offset: 2px;
+  .start-menu {
+    gap: 18px;
+  }
 }

@@ -4,6 +4,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   waitForElementToBeRemoved,
   within,
 } from '@testing-library/react'
@@ -12,13 +13,74 @@ import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
 import { StormCommanderEncounterPage } from '../storm-commander/components/StormCommanderEncounterPage'
 
+async function renderRandomEncounterApp(user) {
+  const renderResult = render(<App />)
+
+  await user.click(screen.getByRole('button', { name: /^Random Encounter$/ }))
+
+  return renderResult
+}
+
 describe('Storm Commander random encounter UI', () => {
+  it('marks board and ship animations paused while the mission briefing is open', async () => {
+    const user = userEvent.setup()
+    const onBoardAnimationsPausedChange = vi.fn()
+    const encounter = {
+      id: 'test_animation_pause_briefing',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onBoardAnimationsPausedChange={onBoardAnimationsPausedChange}
+        onNewEncounter={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    const root = container.querySelector('.storm-encounter-root')
+
+    expect(root).toHaveClass('is-mission-briefing-open')
+    await waitFor(() => {
+      expect(onBoardAnimationsPausedChange).toHaveBeenLastCalledWith(true)
+    })
+
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
+
+    expect(root).not.toHaveClass('is-mission-briefing-open')
+    await waitFor(() => {
+      expect(onBoardAnimationsPausedChange).toHaveBeenLastCalledWith(false)
+    })
+  })
+
   it('opens mission details as a dismissible briefing that can be restored', async () => {
     const user = userEvent.setup()
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
 
     try {
-      const { container } = render(<App />)
+      const { container } = await renderRandomEncounterApp(user)
 
       const missionDialog = screen.getByRole('dialog', { name: /^Random Pirate Raid$/ })
       const encounterStatusButton = screen.getByRole('button', {
@@ -92,7 +154,7 @@ describe('Storm Commander random encounter UI', () => {
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
 
     try {
-      const { container } = render(<App />)
+      const { container } = await renderRandomEncounterApp(user)
 
       await user.click(screen.getByRole('button', { name: /^Battle$/ }))
 
@@ -927,7 +989,7 @@ describe('Storm Commander random encounter UI', () => {
       .not.toBeInTheDocument()
   })
 
-  it('keeps soft rings on each comms ship and upgrades the player ship to active selection', async () => {
+  it('keeps soft rings off during the player turn and upgrades the player ship to active selection', async () => {
     const user = userEvent.setup()
     const encounter = {
       id: 'test_soft_selection_rings',
@@ -972,8 +1034,8 @@ describe('Storm Commander random encounter UI', () => {
     const secondOpponentSquare = screen.getByRole('button', { name: /E1 Imperial queen square/i })
 
     expect(playerSquare.querySelector('.storm-selection-ring')).toBeInTheDocument()
-    expect(playerSquare).toHaveClass('is-player-soft-selected')
-    expect(firstOpponentSquare).toHaveClass('is-opponent-soft-selected')
+    expect(playerSquare).not.toHaveClass('is-player-soft-selected')
+    expect(firstOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
     expect(firstOpponentSquare).toHaveAttribute('data-faction', 'imperial')
 
     await user.click(playerSquare)
@@ -984,10 +1046,83 @@ describe('Storm Commander random encounter UI', () => {
     await user.click(secondOpponentSquare)
 
     expect(playerSquare).not.toHaveClass('is-selected')
-    expect(playerSquare).toHaveClass('is-player-soft-selected')
+    expect(playerSquare).not.toHaveClass('is-player-soft-selected')
     expect(firstOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
-    expect(secondOpponentSquare).toHaveClass('is-opponent-soft-selected')
+    expect(secondOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
     expect(secondOpponentSquare).toHaveAttribute('data-faction', 'imperial')
+  })
+
+  it('waits until the enemy turn to replace active selection with soft rings', async () => {
+    vi.useFakeTimers()
+    const encounter = {
+      id: 'test_selection_ring_enemy_turn',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 4,
+        turnsElapsed: 0,
+        text: 'Survive 4 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 4, y: 4 } },
+      ],
+    }
+
+    function Harness() {
+      const [currentEncounter, setEncounter] = useState(encounter)
+
+      return (
+        <StormCommanderEncounterPage
+          encounter={currentEncounter}
+          onBack={() => {}}
+          onNewEncounter={() => {}}
+          setEncounter={setEncounter}
+        />
+      )
+    }
+
+    try {
+      render(<Harness />)
+
+      fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
+
+      const playerStartSquare = screen.getByRole('button', { name: /B4 Pirate rook square/i })
+      const opponentSquare = screen.getByRole('button', { name: /E1 Imperial queen square/i })
+
+      expect(playerStartSquare).not.toHaveClass('is-player-soft-selected')
+      expect(opponentSquare).not.toHaveClass('is-opponent-soft-selected')
+
+      fireEvent.click(playerStartSquare)
+
+      expect(playerStartSquare).toHaveClass('is-selected')
+      expect(playerStartSquare).not.toHaveClass('is-player-soft-selected')
+
+      fireEvent.click(screen.getByRole('button', { name: /C4 empty legal destination/i }))
+
+      await act(async () => {
+        vi.advanceTimersByTime(1200)
+      })
+
+      const playerMovedSquare = screen.getByRole('button', { name: /C4 Pirate rook square/i })
+
+      expect(screen.getByRole('grid')).toHaveAttribute('data-current-faction', 'imperial')
+      expect(playerMovedSquare).not.toHaveClass('is-selected')
+      expect(playerMovedSquare).toHaveClass('is-player-soft-selected')
+      expect(opponentSquare).toHaveClass('is-opponent-soft-selected')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('shows a clear victory state when a Destroy Target capture ends the encounter', async () => {

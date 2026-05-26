@@ -4,11 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from '../App'
 
-async function openDebugPage(user, pageName) {
-  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
-  for (let press = 0; press < 6; press += 1) {
-    await user.click(debugButton)
-  }
+async function openStartMenuPage(user, pageName) {
   await user.click(screen.getByRole('button', { name: pageName }))
 }
 
@@ -17,7 +13,7 @@ describe('separate variant style sources', () => {
     const user = userEvent.setup()
     const { container } = render(<App />)
 
-    await openDebugPage(user, /^Basic Chess$/)
+    await openStartMenuPage(user, /^Basic Chess$/)
 
     expect(container.querySelector('.storm-commander-root')).toBeInTheDocument()
     expect(container.querySelector('.storm-debug-chess-root')).toBeInTheDocument()
@@ -29,7 +25,7 @@ describe('separate variant style sources', () => {
     const user = userEvent.setup()
     const { container } = render(<App />)
 
-    await openDebugPage(user, /^Storm Chess Drill$/)
+    await openStartMenuPage(user, /^Storm Chess Drill$/)
 
     expect(container.querySelector('.storm-commander-root')).toBeInTheDocument()
     expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()
@@ -374,7 +370,7 @@ describe('separate variant style sources', () => {
     expect(selectionRingRule).toContain('z-index: 2;')
     expect(selectionFlashRule).toContain('position: absolute;')
     expect(selectionFlashRule).toContain('background: var(--storm-selection-flash-color);')
-    expect(selectionFlashRule).toContain('animation: storm-selection-flash 0.3s ease-out forwards;')
+    expect(selectionFlashRule).toContain('animation: storm-selection-flash 0.3s steps(9, end) forwards;')
     expect(selectionFlashRule).not.toContain('position: fixed;')
     expect(playerSoftSelectionRule).toContain('inset: 0;')
     expect(playerSoftSelectionRule).toContain('opacity: 1;')
@@ -424,7 +420,7 @@ describe('separate variant style sources', () => {
     expect(captureRule).toContain('-45deg')
     expect(captureRule).toContain('box-shadow: none;')
     expect(stormStyles).toContain('opacity: 0.42;')
-    expect(captureRule).toContain('animation: storm-target-reticle-rotate 2.666s linear infinite')
+    expect(captureRule).toContain('animation: storm-target-reticle-rotate 2667ms steps(80, end) infinite')
     expect(stormStyles).not.toContain('@keyframes storm-target-reticle-pulse')
     expect(stormStyles).toContain('@keyframes storm-target-reticle-rotate')
     expect(stormStyles).toContain('transform: rotate(45deg);')
@@ -437,7 +433,7 @@ describe('separate variant style sources', () => {
     )
     expect(stormStyles).toContain('transform: translateY(-50%) rotate(-90deg) scaleX(2.3);')
     expect(extractionSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
-    expect(extractionSquareRule).toContain('animation: storm-extraction-pulse 3.2s ease-in-out infinite;')
+    expect(extractionSquareRule).toContain('animation: storm-extraction-pulse 3.2s steps(96, end) infinite;')
     expect(stormStyles).toContain('@keyframes storm-extraction-pulse')
     expect(targetSquareRule).toContain('inset: 8%;')
     expect(targetSquareRule).toContain('border: 2px dashed rgba(115, 221, 126, 0.9);')
@@ -453,6 +449,84 @@ describe('separate variant style sources', () => {
     expect(movementMoveCellRule).toContain('box-shadow: 0 0 8px var(--storm-comms-faction-glow')
     expect(movementCaptureHintRule).toContain('background: rgba(177, 181, 174, 0.5);')
     expect(movementCaptureHintRule).toContain('box-shadow: none;')
+  })
+
+  it('keeps Storm Commander rocket exhaust animated on normal board pieces', () => {
+    const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
+    const exhaustRule = stormStyles.match(
+      /\.storm-commander-root \.storm-rocket-exhaust\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const reducedMotionRule = stormStyles.match(
+      /@media \(prefers-reduced-motion: reduce\)\s*\{(?<body>[\s\S]+?)\n\}/,
+    )?.groups.body
+
+    expect(exhaustRule).toContain(
+      'animation: storm-rocket-exhaust-flicker 240ms steps(7, end) infinite alternate;',
+    )
+    expect(exhaustRule).toContain('animation-delay: var(--storm-exhaust-delay);')
+    expect(exhaustRule).toContain(
+      'animation-play-state: var(--storm-board-animation-play-state, running);',
+    )
+    expect(exhaustRule).not.toContain('animation: none;')
+    expect(reducedMotionRule).not.toContain('.storm-commander-root .storm-rocket-exhaust')
+  })
+
+  it('caps Storm Commander board animation timing and pauses board motion under mission details', () => {
+    const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
+    const starfieldRule = [...stormStyles.matchAll(
+      /\.storm-commander-root \.storm-starfield-layer\s*\{(?<body>[^}]+)\}/g,
+    )].map((match) => match.groups.body)
+      .find((body) => body.includes('transition: background-position'))
+    const shipPieceRule = stormStyles.match(
+      /\.storm-commander-root \.storm-ship-piece\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const missionBriefingRootRule = stormStyles.match(
+      /\.storm-commander-root\.is-mission-briefing-open\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const boardPauseRule = stormStyles.match(
+      /\.storm-commander-root\.storm-encounter-root \.storm-encounter-shell \*,\s*\n\.storm-commander-root\.storm-encounter-root \.storm-encounter-panel \*\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const selectionFlashRule = stormStyles.match(
+      /\.storm-commander-root \.storm-selection-flash\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const reticleRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-capture::after\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const extractionRule = stormStyles.match(
+      /\.storm-commander-root \.storm-encounter-square\.is-extraction::before\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const attackerRule = stormStyles.match(
+      /\.storm-commander-root \.storm-capture-attacker\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const laserRule = stormStyles.match(
+      /\.storm-commander-root \.storm-capture-laser\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const sparkRule = stormStyles.match(
+      /\.storm-commander-root \.storm-capture-hit-spark\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const explosionRule = [...stormStyles.matchAll(
+      /\.storm-commander-root \.storm-capture-explosion\s*\{(?<body>[^}]+)\}/g,
+    )].map((match) => match.groups.body)
+      .find((body) => body.includes('animation: storm-capture-explosion'))
+
+    expect(starfieldRule).toContain(
+      'transition: background-position var(--storm-star-tween-ms) steps(var(--storm-star-step-count), end);',
+    )
+    expect(shipPieceRule).toContain(
+      'transition: transform var(--storm-star-tween-ms) steps(var(--storm-star-step-count), end);',
+    )
+    expect(missionBriefingRootRule).toContain('--storm-board-animation-play-state: paused;')
+    expect(missionBriefingRootRule).toContain('--storm-star-tween-ms: 0ms;')
+    expect(boardPauseRule).toContain(
+      'animation-play-state: var(--storm-board-animation-play-state, running);',
+    )
+    expect(selectionFlashRule).toContain('animation: storm-selection-flash 0.3s steps(9, end) forwards;')
+    expect(reticleRule).toContain('animation: storm-target-reticle-rotate 2667ms steps(80, end) infinite')
+    expect(extractionRule).toContain('animation: storm-extraction-pulse 3.2s steps(96, end) infinite;')
+    expect(attackerRule).toContain('animation: storm-capture-attacker-flight 1.2s steps(36, end) forwards;')
+    expect(laserRule).toContain('animation: storm-capture-laser-fire 180ms steps(5, end) forwards;')
+    expect(sparkRule).toContain('animation: storm-capture-hit-spark 220ms steps(6, end) forwards;')
+    expect(explosionRule).toContain('animation: storm-capture-explosion 300ms steps(9, end) forwards;')
   })
 
   it('styles Storm debug chess squares with the main encounter highlight language', () => {
@@ -481,7 +555,7 @@ describe('separate variant style sources', () => {
     )
     expect(captureRule).toContain('border: 5px solid var(--storm-turn-hint);')
     expect(captureRule).toContain('border-radius: 50%;')
-    expect(captureRule).toContain('animation: storm-target-reticle-rotate 2.666s linear infinite')
+    expect(captureRule).toContain('animation: storm-target-reticle-rotate 2667ms steps(80, end) infinite')
     expect(activeSelectionRule).toContain('border: 5px solid var(--selected);')
     expect(activeSelectionRule).toContain('border-radius: 50%;')
     expect(lastMoveFromRule).toContain('opacity: 0.3;')

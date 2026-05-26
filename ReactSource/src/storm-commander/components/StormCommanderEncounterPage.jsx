@@ -582,6 +582,8 @@ function MissionResultDialog({ encounter, onNextMission }) {
 export function StormCommanderEncounterPage({
   encounter,
   getCurrentPieceRotation,
+  onBack,
+  onBoardAnimationsPausedChange,
   onNewEncounter,
   pieceRotation,
   setEncounter,
@@ -597,12 +599,14 @@ export function StormCommanderEncounterPage({
   const [enemyThinkingPieceSelection, setEnemyThinkingPieceSelection] = useState(null)
   const selectionFlashIdRef = useRef(0)
   const isMoveAnimating = Boolean(pendingMoveAnimation)
+  const isPlayerTurn =
+    encounter.status === 'active' && encounter.currentFaction === encounter.playerFaction
   const isEnemyThinking =
     encounter.status === 'active' &&
     encounter.currentFaction !== encounter.playerFaction &&
     !isMoveAnimating
   const selectedPiece =
-    selection?.encounterId === encounter.id
+    isPlayerTurn && selection?.encounterId === encounter.id
       ? encounter.pieces.find((piece) => piece.id === selection.pieceId) || null
       : null
   const playerPieces = useMemo(
@@ -750,6 +754,14 @@ export function StormCommanderEncounterPage({
   }, [encounter, isEnemyThinking, setEncounter, startMoveAnimation])
 
   useEffect(() => {
+    onBoardAnimationsPausedChange?.(isMissionBriefingOpen)
+  }, [isMissionBriefingOpen, onBoardAnimationsPausedChange])
+
+  useEffect(() => () => {
+    onBoardAnimationsPausedChange?.(false)
+  }, [onBoardAnimationsPausedChange])
+
+  useEffect(() => {
     if (!isMissionBriefingOpen) {
       return undefined
     }
@@ -825,8 +837,23 @@ export function StormCommanderEncounterPage({
   const boardStyle = getBoardStyle(encounter)
   const rootStyle = getEncounterRootStyle(encounter)
 
+  const rootClassName = [
+    'game-page',
+    'storm-commander-root',
+    'storm-encounter-root',
+    isMissionBriefingOpen ? 'is-mission-briefing-open' : '',
+  ].filter(Boolean).join(' ')
+
   return (
-    <div className="game-page storm-commander-root storm-encounter-root" style={rootStyle}>
+    <div className={rootClassName} style={rootStyle}>
+      {onBack && !isMissionResultOpen ? (
+        <div className="page-topbar">
+          <button type="button" className="back-button" onClick={onBack}>
+            Back
+          </button>
+        </div>
+      ) : null}
+
       <main className="storm-encounter-shell">
         <ShipCommsWindow
           ariaLabel="Player comms"
@@ -865,11 +892,13 @@ export function StormCommanderEncounterPage({
                 selectedPiece && sameSquare(selectedPiece.square, square),
               )
               const isPlayerSoftSelection = Boolean(
+                isEnemyThinking &&
                 !isActiveSelection &&
                 piece?.id &&
                 playerCommsPiece?.id === piece.id,
               )
               const isOpponentSoftSelection = Boolean(
+                isEnemyThinking &&
                 piece?.id &&
                 opponentCommsPiece?.id === piece.id,
               )

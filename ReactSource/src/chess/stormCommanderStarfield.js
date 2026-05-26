@@ -1,5 +1,9 @@
 export const STORM_COMMANDER_STARFIELD_TICK_MS = 1200
-export const STORM_COMMANDER_STARFIELD_TWEEN_MS = 700
+export const STORM_COMMANDER_STARFIELD_TWEEN_MS = STORM_COMMANDER_STARFIELD_TICK_MS
+export const STORM_COMMANDER_BOARD_ANIMATION_FPS = 30
+export const STORM_COMMANDER_STARFIELD_STEP_COUNT = Math.floor(
+  (STORM_COMMANDER_STARFIELD_TWEEN_MS / 1000) * STORM_COMMANDER_BOARD_ANIMATION_FPS,
+)
 
 const LAYER_PIXELS_PER_SECOND = {
   near: 154,
@@ -153,6 +157,7 @@ export function advanceStarfieldMotion(
 export function toStarfieldStyle(starfieldMotion) {
   return {
     '--storm-star-tween-ms': `${STORM_COMMANDER_STARFIELD_TWEEN_MS}ms`,
+    '--storm-star-step-count': `${STORM_COMMANDER_STARFIELD_STEP_COUNT}`,
     '--storm-star-near-x': px(starfieldMotion.nearX),
     '--storm-star-near-y': px(starfieldMotion.nearY),
     '--storm-star-mid-x': px(starfieldMotion.midX),

@@ -14,10 +14,11 @@ npm.cmd run test
 
 ## Play
 
-- The app starts directly in a Storm Commander random encounter.
-- Use the bottom-right `Debug` button to open the Storm-styled `Basic Chess` and `Storm Chess Drill` debug views.
+- The app starts at a Storm Commander `Start Menu` with entries for `Random Encounter`, `Storm Chess Drill`, and `Basic Chess`.
+- `Basic Chess` and `Storm Chess Drill` are Storm-styled chess debug surfaces rather than Debug-menu entries.
 - Debug chess views use traditional chess movement through chess.js, including orthodox pawn movement, while the random encounter keeps its hybrid movement rules.
-- Debug views can use `Back` to return to the random encounter. Supporting controls, scenarios, and move history sit below the normal play area.
+- All play modes use `Back` to return to the Start Menu. Supporting controls, scenarios, and move history sit below the normal play area.
+- Completed random encounters use `Next Mission` to immediately generate another random encounter without returning to the Start Menu.
 - Use the Scenario Library panel to load random scenarios or puzzles.
 - Use the Theme Filter to choose tactical themes, including `promotion`.
 - Human plays White.
@@ -46,4 +47,4 @@ Standard Chess styling lives in `src/styles/standardChess.css` under `.standard-
 
 Storm Commander styling lives in `src/styles/stormCommander.css` under `.storm-commander-root`.
 
-`src/styles.css` is reserved for global shell styles such as the reset, root font, and debug dock.
+`src/styles.css` is reserved for global shell styles such as the reset, root font, and Start Menu.

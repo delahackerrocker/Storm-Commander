@@ -10,6 +10,9 @@ import {
 } from '../chess/stormCommanderPieceAssets'
 import { createRandomSideFactions } from '../chess/stormCommanderFactions'
 import {
+  STORM_COMMANDER_BOARD_ANIMATION_FPS,
+  STORM_COMMANDER_STARFIELD_TICK_MS,
+  STORM_COMMANDER_STARFIELD_STEP_COUNT,
   STORM_COMMANDER_STARFIELD_TWEEN_MS,
   advanceStarfieldMotion,
   createInitialStarfieldMotion,
@@ -20,19 +23,11 @@ import App from '../App'
 
 const FACTION_ASSET_PREFIX = '/assets/chess/storm-commander/factions/'
 
-async function openDebugPage(user, pageName) {
-  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
-  for (let press = 0; press < 6; press += 1) {
-    await user.click(debugButton)
-  }
+async function openStartMenuPage(user, pageName) {
   await user.click(screen.getByRole('button', { name: pageName }))
 }
 
-function openDebugPageWithFireEvent(pageName) {
-  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
-  for (let press = 0; press < 6; press += 1) {
-    fireEvent.click(debugButton)
-  }
+function openStartMenuPageWithFireEvent(pageName) {
   fireEvent.click(screen.getByRole('button', { name: pageName }))
 }
 
@@ -42,7 +37,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await openDebugPage(user, /^Storm Chess Drill$/)
+    await openStartMenuPage(user, /^Storm Chess Drill$/)
 
     const images = screen.getAllByRole('img')
     const board = document.querySelector('.storm-commander-root .chess-board')
@@ -67,7 +62,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await openDebugPage(user, /^Storm Chess Drill$/)
+    await openStartMenuPage(user, /^Storm Chess Drill$/)
 
     const board = document.querySelector('.storm-commander-root .chess-board')
 
@@ -94,7 +89,7 @@ describe('Storm Commander variant', () => {
     const user = userEvent.setup()
     const { container } = render(<App />)
 
-    await openDebugPage(user, /^Basic Chess$/)
+    await openStartMenuPage(user, /^Basic Chess$/)
 
     expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
     expect(container.querySelector('.storm-commander-effects')).toBeInTheDocument()
@@ -157,7 +152,7 @@ describe('Storm Commander variant', () => {
         .mockReturnValue(0.5)
         .mockReturnValueOnce(0.01)
 
-      await openDebugPage(user, /^Storm Chess Drill$/)
+      await openStartMenuPage(user, /^Storm Chess Drill$/)
 
       const board = document.querySelector('.storm-commander-root .chess-board')
 
@@ -181,7 +176,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await openDebugPage(user, /^Storm Chess Drill$/)
+    await openStartMenuPage(user, /^Storm Chess Drill$/)
 
     const effectsRoot = document.querySelector('.storm-commander-effects')
     const root = screen.getByText('Storm Commander').closest('.storm-commander-root')
@@ -199,6 +194,20 @@ describe('Storm Commander variant', () => {
     expect(document.querySelectorAll('.storm-starfield-layer')).toHaveLength(8)
     expect(document.querySelector('.storm-starfield-layer-streak')).not.toBeInTheDocument()
     expect(document.querySelector('.storm-starfield-layer-asteroid-near')).toBeInTheDocument()
+  })
+
+  it('keeps starfield transitions aligned to the update cadence', () => {
+    expect(STORM_COMMANDER_STARFIELD_TWEEN_MS).toBe(STORM_COMMANDER_STARFIELD_TICK_MS)
+  })
+
+  it('caps starfield and ship rotation tweens to the app animation frame rate', () => {
+    expect(STORM_COMMANDER_BOARD_ANIMATION_FPS).toBe(30)
+    expect(STORM_COMMANDER_STARFIELD_STEP_COUNT).toBe(
+      Math.floor((STORM_COMMANDER_STARFIELD_TWEEN_MS / 1000) * STORM_COMMANDER_BOARD_ANIMATION_FPS),
+    )
+    expect(STORM_COMMANDER_STARFIELD_STEP_COUNT).toBeLessThanOrEqual(
+      (STORM_COMMANDER_STARFIELD_TWEEN_MS / 1000) * STORM_COMMANDER_BOARD_ANIMATION_FPS,
+    )
   })
 
   it('advances layered starfield motion and rotates ships with the new heading', () => {
@@ -226,6 +235,7 @@ describe('Storm Commander variant', () => {
     expect(layerStyles.near.backgroundPosition).toMatch(/px .+px$/)
     expect(layerStyles.asteroidNear.backgroundPosition).toMatch(/px .+px$/)
     expect(nextStyle['--storm-star-tween-ms']).toBe(`${STORM_COMMANDER_STARFIELD_TWEEN_MS}ms`)
+    expect(nextStyle['--storm-star-step-count']).toBe(`${STORM_COMMANDER_STARFIELD_STEP_COUNT}`)
     expect(nextStyle['--storm-piece-rotation']).toMatch(/deg$/)
   })
 
@@ -273,7 +283,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await openDebugPage(user, /^Storm Chess Drill$/)
+    await openStartMenuPage(user, /^Storm Chess Drill$/)
 
     const board = document.querySelector('.storm-commander-root .chess-board')
     const whiteFaction = board.dataset.whiteFaction
@@ -316,7 +326,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await openDebugPage(user, /^Storm Chess Drill$/)
+    await openStartMenuPage(user, /^Storm Chess Drill$/)
     await user.click(screen.getByRole('button', { name: /b1 white knight square/i }))
 
     expect(screen.getByRole('button', { name: /a3 empty legal destination/i })).toBeInTheDocument()
@@ -328,7 +338,7 @@ describe('Storm Commander variant', () => {
 
     render(<App />)
 
-    await openDebugPage(user, /^Basic Chess$/)
+    await openStartMenuPage(user, /^Basic Chess$/)
     await user.click(screen.getByRole('button', { name: /e2 white pawn square/i }))
 
     expect(screen.getByRole('button', { name: /e3 empty legal destination/i })).toBeInTheDocument()
@@ -345,7 +355,7 @@ describe('Storm Commander variant', () => {
     try {
       render(<App />)
 
-      openDebugPageWithFireEvent(/^Storm Chess Drill$/)
+      openStartMenuPageWithFireEvent(/^Storm Chess Drill$/)
 
       fireEvent.click(screen.getByRole('button', { name: /b1 white knight square/i }))
       const destination = screen.getByRole('button', { name: /a3 empty legal destination/i })
@@ -374,7 +384,7 @@ describe('Storm Commander variant', () => {
     try {
       render(<App />)
 
-      openDebugPageWithFireEvent(/^Storm Chess Drill$/)
+      openStartMenuPageWithFireEvent(/^Storm Chess Drill$/)
       fireEvent.change(screen.getByLabelText(/Theme Filter/i), { target: { value: 'fork' } })
       fireEvent.click(screen.getByRole('button', { name: /^New Random Puzzle$/ }))
       fireEvent.click(screen.getByRole('button', { name: /d4 white knight square/i }))
