@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-favicon.ps1",
+    "prebuild": "node scripts/generateFavicon.mjs",
     "build": "vite build . --base=/storm_commander/",
     "lint": "eslint .",
     "preview": "vite preview --base=/storm_commander/",

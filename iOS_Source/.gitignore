@@ -1,0 +1,10 @@
+# Dependencies
+node_modules
+
+# Capacitor web output
+dist
+
+# Local build/editor files
+*.local
+.DS_Store
+

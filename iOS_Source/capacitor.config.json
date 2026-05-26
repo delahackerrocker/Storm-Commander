@@ -1,0 +1,9 @@
+{
+  "appId": "digital.practitioner.stormcommander",
+  "appName": "Storm Commander",
+  "webDir": "dist",
+  "ios": {
+    "path": "ios"
+  }
+}
+
