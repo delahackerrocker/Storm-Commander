@@ -1,4 +1,9 @@
 import { BOARD_SQUARES } from '../chess/squareUtils'
+import {
+  getStormChessMoveAnimationStyle,
+  getStormLegalMoveHintStyle,
+} from '../chess/stormCommanderBoardEffects'
+import { ChessPiece } from './ChessPiece'
 import { ChessSquare } from './ChessSquare'
 
 const STORM_STARFIELD_LAYERS = [
@@ -12,12 +17,67 @@ const STORM_STARFIELD_LAYERS = [
   ['asteroid-near', 'asteroidNear'],
 ]
 
+function ChessMoveAnimationLayer({ animation, pieceSet, sidePieceFactions }) {
+  if (!animation?.movingPiece) {
+    return null
+  }
+
+  const isCapture = Boolean(animation.move.captured)
+
+  return (
+    <div
+      className={`storm-capture-animation-layer ${isCapture ? 'is-capture' : 'is-quiet'}`}
+      data-faction={animation.faction}
+      style={getStormChessMoveAnimationStyle(animation)}
+      aria-hidden="true"
+    >
+      <div className="storm-capture-attacker" data-faction={animation.faction}>
+        <ChessPiece
+          piece={animation.movingPiece}
+          pieceSet={pieceSet}
+          sidePieceFactions={sidePieceFactions}
+        />
+        {isCapture ? (
+          <div className="storm-capture-lasers">
+            {Array.from({ length: 5 }, (_, index) => (
+              <span
+                key={index}
+                className="storm-capture-laser"
+                style={{
+                  '--storm-laser-index': index,
+                  '--storm-laser-turn-delay': '0.2s',
+                }}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+      {isCapture ? (
+        <>
+          <div className="storm-capture-hit-sparks">
+            {Array.from({ length: 4 }, (_, index) => (
+              <span
+                key={index}
+                className="storm-capture-hit-spark"
+                style={{ '--storm-spark-index': index }}
+              />
+            ))}
+          </div>
+          <span className="storm-capture-explosion" />
+        </>
+      ) : null}
+    </div>
+  )
+}
+
 export function ChessBoard({
+  enableStormBoardEffects = false,
   game,
   inputDisabled,
   lastMove,
   legalMoves,
   onSquareClick,
+  pendingMoveAnimation,
   pieceRotation,
   pieceSet = 'unicode',
   selectedSquare,
@@ -103,6 +163,20 @@ export function ChessBoard({
           {BOARD_SQUARES.map((square) => {
             const piece = game.get(square)
             const move = legalMoveByDestination.get(square)
+            const isLastMoveFrom = lastMove?.from === square
+            const isLastMoveTo = lastMove?.to === square
+            const isMoveAnimationFrom = pendingMoveAnimation?.move.from === square
+            const isMoveAnimationTo = pendingMoveAnimation?.move.to === square
+            const isMoveAnimationCaptureTo = Boolean(
+              isMoveAnimationTo && pendingMoveAnimation?.move.captured,
+            )
+            const classNameExtras = [
+              isLastMoveFrom ? 'is-last-move-from' : '',
+              isLastMoveTo ? 'is-last-move-to' : '',
+              isMoveAnimationFrom ? 'is-move-animation-from' : '',
+              isMoveAnimationTo ? 'is-move-animation-to' : '',
+              isMoveAnimationCaptureTo ? 'is-move-animation-capture-to' : '',
+            ]
 
             return (
               <ChessSquare
@@ -112,15 +186,30 @@ export function ChessBoard({
                 isSelected={selectedSquare === square}
                 isLegalMove={Boolean(move)}
                 isCapture={Boolean(move?.captured)}
-                isLastMove={lastMove?.from === square || lastMove?.to === square}
+                isLastMove={isLastMoveFrom || isLastMoveTo}
                 inputDisabled={inputDisabled}
+                classNameExtras={classNameExtras}
+                dataFaction={sidePieceFactions?.[piece?.color]}
+                legalMoveHintStyle={
+                  enableStormBoardEffects
+                    ? getStormLegalMoveHintStyle(selectedSquare, move)
+                    : undefined
+                }
                 onClick={onSquareClick}
                 pieceRotation={pieceRotation}
                 pieceSet={pieceSet}
+                showStormSelectionRing={enableStormBoardEffects}
                 sidePieceFactions={sidePieceFactions}
               />
             )
           })}
+          {enableStormBoardEffects ? (
+            <ChessMoveAnimationLayer
+              animation={pendingMoveAnimation}
+              pieceSet={pieceSet}
+              sidePieceFactions={sidePieceFactions}
+            />
+          ) : null}
         </div>
         <div className="board-ranks board-ranks-right" aria-hidden="true">
           <span>8</span>

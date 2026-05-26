@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import {
@@ -26,6 +26,14 @@ async function openDebugPage(user, pageName) {
     await user.click(debugButton)
   }
   await user.click(screen.getByRole('button', { name: pageName }))
+}
+
+function openDebugPageWithFireEvent(pageName) {
+  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
+  for (let press = 0; press < 6; press += 1) {
+    fireEvent.click(debugButton)
+  }
+  fireEvent.click(screen.getByRole('button', { name: pageName }))
 }
 
 describe('Storm Commander variant', () => {
@@ -82,17 +90,18 @@ describe('Storm Commander variant', () => {
     ).toBeInTheDocument()
   })
 
-  it('keeps main chess in classic piece rendering mode', async () => {
+  it('opens Basic Chess as a Storm Commander-styled debug chess view', async () => {
     const user = userEvent.setup()
-
-    render(<App />)
+    const { container } = render(<App />)
 
     await openDebugPage(user, /^Basic Chess$/)
 
     expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
-    expect(document.querySelector('.storm-commander-effects')).not.toBeInTheDocument()
-    expect(document.querySelector('.storm-commander-root')).not.toBeInTheDocument()
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    expect(container.querySelector('.storm-commander-effects')).toBeInTheDocument()
+    expect(container.querySelector('.storm-debug-chess-root')).toBeInTheDocument()
+    expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('img')).toHaveLength(32)
+    expect(screen.getByText('Basic Chess')).toBeInTheDocument()
   })
 
   it('centralizes Storm Commander piece paths under local PNG assets', () => {
@@ -312,5 +321,84 @@ describe('Storm Commander variant', () => {
 
     expect(screen.getByRole('button', { name: /a3 empty legal destination/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /c3 empty legal destination/i })).toBeInTheDocument()
+  })
+
+  it('keeps debug chess pawns on traditional chess movement', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await openDebugPage(user, /^Basic Chess$/)
+    await user.click(screen.getByRole('button', { name: /e2 white pawn square/i }))
+
+    expect(screen.getByRole('button', { name: /e3 empty legal destination/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /e4 empty legal destination/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /d3 empty legal destination/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /f3 empty legal destination/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /d2 .*legal destination/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /f2 .*legal destination/i })).not.toBeInTheDocument()
+  })
+
+  it('animates and locks a quiet move in Storm debug chess', () => {
+    vi.useFakeTimers()
+
+    try {
+      render(<App />)
+
+      openDebugPageWithFireEvent(/^Storm Chess Drill$/)
+
+      fireEvent.click(screen.getByRole('button', { name: /b1 white knight square/i }))
+      const destination = screen.getByRole('button', { name: /a3 empty legal destination/i })
+
+      fireEvent.click(destination)
+
+      expect(document.querySelector('.storm-capture-animation-layer.is-quiet')).toBeInTheDocument()
+      expect(destination).toBeDisabled()
+      expect(document.querySelector('[data-square="b1"]')).toHaveClass('is-move-animation-from')
+      expect(document.querySelector('[data-square="a3"]')).toHaveClass('is-move-animation-to')
+
+      act(() => {
+        vi.advanceTimersByTime(1200)
+      })
+
+      expect(document.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /a3 white knight square/i })).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('plays capture animation effects before finishing a debug chess capture', () => {
+    vi.useFakeTimers()
+
+    try {
+      render(<App />)
+
+      openDebugPageWithFireEvent(/^Storm Chess Drill$/)
+      fireEvent.change(screen.getByLabelText(/Theme Filter/i), { target: { value: 'fork' } })
+      fireEvent.click(screen.getByRole('button', { name: /^New Random Puzzle$/ }))
+      fireEvent.click(screen.getByRole('button', { name: /d4 white knight square/i }))
+
+      const captureDestination = screen.getByRole('button', {
+        name: /c6 black knight capture destination/i,
+      })
+
+      fireEvent.click(captureDestination)
+
+      expect(document.querySelector('.storm-capture-animation-layer.is-capture')).toBeInTheDocument()
+      expect(document.querySelector('.storm-capture-laser')).toBeInTheDocument()
+      expect(document.querySelector('.storm-capture-hit-spark')).toBeInTheDocument()
+      expect(document.querySelector('.storm-capture-explosion')).toBeInTheDocument()
+      expect(captureDestination).toHaveClass('is-move-animation-capture-to')
+
+      act(() => {
+        vi.advanceTimersByTime(1200)
+      })
+
+      expect(document.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /c6 white knight square/i })).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

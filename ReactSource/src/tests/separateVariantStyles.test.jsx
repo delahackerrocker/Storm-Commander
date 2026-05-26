@@ -13,15 +13,16 @@ async function openDebugPage(user, pageName) {
 }
 
 describe('separate variant style sources', () => {
-  it('renders Standard Chess inside the standard style root only', async () => {
+  it('renders Basic Chess inside the Storm debug chess style root', async () => {
     const user = userEvent.setup()
     const { container } = render(<App />)
 
     await openDebugPage(user, /^Basic Chess$/)
 
-    expect(container.querySelector('.standard-chess-root')).toBeInTheDocument()
-    expect(container.querySelector('.storm-commander-root')).not.toBeInTheDocument()
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    expect(container.querySelector('.storm-commander-root')).toBeInTheDocument()
+    expect(container.querySelector('.storm-debug-chess-root')).toBeInTheDocument()
+    expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('img')).toHaveLength(32)
   })
 
   it('renders Storm Commander inside the storm style root only', async () => {
@@ -87,6 +88,7 @@ describe('separate variant style sources', () => {
     const stackedMediaRule = stormStyles.match(
       /@media \(max-width: 1180px\)\s*\{(?<body>[\s\S]+?)\n\}/,
     )?.groups.body
+    const normalizedStackedMediaRule = stackedMediaRule?.replace(/\r\n/g, '\n')
     const verticalMediaRule = stormStyles.match(
       /@media \(max-width: 900px\)\s*\{(?<body>[\s\S]+?)\n\}/,
     )?.groups.body
@@ -241,7 +243,7 @@ describe('separate variant style sources', () => {
     expect(stormStyles).not.toContain('.storm-commander-root .storm-mission-summary-button')
     expect(stormStyles).not.toContain('storm-mission-summary-new-encounter')
     expect(stackedMediaRule).toContain('.storm-commander-root .storm-encounter-shell')
-    expect(stackedMediaRule).toContain(
+    expect(normalizedStackedMediaRule).toContain(
       [
         'grid-template-areas:',
         '      "opponent-comms"',
@@ -451,5 +453,38 @@ describe('separate variant style sources', () => {
     expect(movementMoveCellRule).toContain('box-shadow: 0 0 8px var(--storm-comms-faction-glow')
     expect(movementCaptureHintRule).toContain('background: rgba(177, 181, 174, 0.5);')
     expect(movementCaptureHintRule).toContain('box-shadow: none;')
+  })
+
+  it('styles Storm debug chess squares with the main encounter highlight language', () => {
+    const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
+    const legalMoveRule = stormStyles.match(
+      /\.storm-commander-root\.storm-debug-chess-root \.chess-square\.is-legal-move::after\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const captureRule = stormStyles.match(
+      /\.storm-commander-root\.storm-debug-chess-root \.chess-square\.is-capture::after\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const activeSelectionRule = stormStyles.match(
+      /\.storm-commander-root\.storm-debug-chess-root \.chess-square\.is-selected \.storm-selection-ring\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const lastMoveFromRule = stormStyles.match(
+      /\.storm-commander-root\.storm-debug-chess-root \.chess-square\.is-last-move-from::before\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const animationHideRule = stormStyles.match(
+      /\.storm-commander-root\.storm-debug-chess-root \.chess-square\.is-move-animation-from \.storm-ship-piece,\s*\n\.storm-commander-root\.storm-debug-chess-root\s+\.chess-square\.is-move-animation-to:not\(\.is-move-animation-capture-to\)\s+\.storm-ship-piece\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+
+    expect(legalMoveRule).toContain('width: 10%;')
+    expect(legalMoveRule).toContain('height: 10%;')
+    expect(legalMoveRule).toContain('clip-path: polygon(50% 0, 100% 100%, 0 100%);')
+    expect(legalMoveRule).toContain(
+      'transform: translate(-50%, -50%) rotate(var(--storm-legal-move-angle, 0deg));',
+    )
+    expect(captureRule).toContain('border: 5px solid var(--storm-turn-hint);')
+    expect(captureRule).toContain('border-radius: 50%;')
+    expect(captureRule).toContain('animation: storm-target-reticle-rotate 2.666s linear infinite')
+    expect(activeSelectionRule).toContain('border: 5px solid var(--selected);')
+    expect(activeSelectionRule).toContain('border-radius: 50%;')
+    expect(lastMoveFromRule).toContain('opacity: 0.3;')
+    expect(animationHideRule).toContain('opacity: 0;')
   })
 })

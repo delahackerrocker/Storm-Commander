@@ -63,8 +63,7 @@ describe('Chess-ish prototype', () => {
 
   it('opens basic chess only through debug mode', async () => {
     const user = userEvent.setup()
-
-    render(<App />)
+    const { container } = render(<App />)
 
     await openDebugPage(user, /^Basic Chess$/)
 
@@ -72,6 +71,8 @@ describe('Chess-ish prototype', () => {
     expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
     expect(screen.getByRole('button', { name: /new game/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^back$/i })).toBeInTheDocument()
+    expect(container.querySelector('.storm-debug-chess-root')).toBeInTheDocument()
+    expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()
   })
 
   it('opens the Storm Commander chess drill only through debug mode', async () => {

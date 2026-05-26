@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { StandardChessPage } from './pages/StandardChessPage'
 import { StormCommanderPage } from './pages/StormCommanderPage'
 
 const PAGES = {
@@ -128,8 +127,10 @@ function App() {
 
   if (currentPage === PAGES.basicChess) {
     page = (
-      <StandardChessPage
+      <StormCommanderPage
         key="basic-chess"
+        allowChessDrill={false}
+        chessTitle="Basic Chess"
         onBack={() => openDebugPage(PAGES.randomEncounter)}
       />
     )

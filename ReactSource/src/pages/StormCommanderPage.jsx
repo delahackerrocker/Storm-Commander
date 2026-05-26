@@ -37,16 +37,12 @@ function applyStarfieldStyle(element, starfieldMotion) {
 
 function useLowPowerStarfieldMotion() {
   const starfieldRootRef = useRef(null)
-  const starfieldMotionRef = useRef(null)
-
-  if (!starfieldMotionRef.current) {
-    starfieldMotionRef.current = createInitialStarfieldMotion()
-  }
-
-  const pieceRotationRef = useRef(starfieldMotionRef.current.pieceRotation)
+  const [initialStarfieldMotion] = useState(() => createInitialStarfieldMotion())
+  const starfieldMotionRef = useRef(initialStarfieldMotion)
+  const pieceRotationRef = useRef(initialStarfieldMotion.pieceRotation)
   const initialStarfieldStyle = useMemo(
-    () => toStarfieldStyle(starfieldMotionRef.current),
-    [],
+    () => toStarfieldStyle(initialStarfieldMotion),
+    [initialStarfieldMotion],
   )
   const getCurrentPieceRotation = useCallback(() => pieceRotationRef.current, [])
 
@@ -128,6 +124,7 @@ function useLowPowerStarfieldMotion() {
 
 export function StormCommanderPage({
   allowChessDrill = true,
+  chessTitle = 'Storm Commander',
   onBack,
   startInRandomEncounter = false,
 }) {
@@ -167,19 +164,22 @@ export function StormCommanderPage({
         />
       ) : (
         <BasicChessPage
+          enableStormBoardEffects
+          extrasPlacement="below"
+          getCurrentPieceRotation={getCurrentPieceRotation}
           onBack={onBack}
           onNewGameVisuals={randomizeSideFactions}
           pieceSet="storm-commander-png"
-          rootClassName="storm-commander-root"
+          rootClassName="storm-commander-root storm-encounter-root storm-debug-chess-root"
           sidePieceFactions={sideFactions}
           sideVisualThemes={sideVisualThemes}
           showStarfieldLayers
-          title="Storm Commander"
-          topControls={
+          title={chessTitle}
+          topControls={allowChessDrill ? (
             <button type="button" className="storm-primary-button" onClick={startRandomEncounter}>
               New Random Encounter
             </button>
-          }
+          ) : null}
         />
       )}
     </div>

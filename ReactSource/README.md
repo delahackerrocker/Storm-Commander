@@ -15,8 +15,9 @@ npm.cmd run test
 ## Play
 
 - The app starts directly in a Storm Commander random encounter.
-- Use the bottom-right `Debug` button to open the legacy `Basic Chess` and `Storm Chess Drill` views.
-- Debug views can use `Back` to return to the random encounter.
+- Use the bottom-right `Debug` button to open the Storm-styled `Basic Chess` and `Storm Chess Drill` debug views.
+- Debug chess views use traditional chess movement through chess.js, including orthodox pawn movement, while the random encounter keeps its hybrid movement rules.
+- Debug views can use `Back` to return to the random encounter. Supporting controls, scenarios, and move history sit below the normal play area.
 - Use the Scenario Library panel to load random scenarios or puzzles.
 - Use the Theme Filter to choose tactical themes, including `promotion`.
 - Human plays White.

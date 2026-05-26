@@ -1314,6 +1314,152 @@
   }
 }
 
+.storm-commander-root.storm-debug-chess-root .app-shell {
+  grid-template-columns: minmax(320px, 760px);
+  width: min(760px, calc(100vw - 32px));
+  justify-content: center;
+}
+
+.storm-commander-root.storm-debug-chess-root .play-area {
+  width: 100%;
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-board {
+  border: 4px solid var(--storm-turn-hint);
+  box-shadow:
+    0 18px 55px rgba(4, 8, 18, 0.32),
+    inset 0 0 0 1px rgba(177, 152, 129, 0.18);
+}
+
+.storm-commander-root.storm-debug-chess-root .side-panel {
+  background: rgba(17, 19, 3, 0.86);
+  border: 2px solid var(--line);
+  box-shadow:
+    0 0 18px rgba(232, 108, 36, 0.16),
+    0 18px 55px rgba(4, 8, 18, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.storm-commander-root.storm-debug-chess-root .storm-debug-extra-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.storm-commander-root.storm-debug-chess-root .status-list div,
+.storm-commander-root.storm-debug-chess-root .scenario-field select,
+.storm-commander-root.storm-debug-chess-root .scenario-button-grid button,
+.storm-commander-root.storm-debug-chess-root .metadata-list div,
+.storm-commander-root.storm-debug-chess-root .move-list li {
+  border-color: rgba(107, 110, 58, 0.78);
+  color: var(--text);
+  background: rgba(43, 45, 30, 0.74);
+}
+
+.storm-commander-root.storm-debug-chess-root .scenario-button-grid button,
+.storm-commander-root.storm-debug-chess-root .new-game-button {
+  border: 1px solid rgba(5, 5, 5, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(243, 240, 223, 0.08);
+}
+
+.storm-commander-root.storm-debug-chess-root .scenario-button-grid button:disabled {
+  color: rgba(243, 240, 223, 0.42);
+  background: rgba(43, 45, 30, 0.38);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square[data-faction='pirate'] {
+  --storm-soft-selection-color: rgba(232, 108, 36, 1);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square[data-faction='imperial'] {
+  --storm-soft-selection-color: rgba(213, 166, 14, 1);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square[data-faction='robocorp'] {
+  --storm-soft-selection-color: rgba(85, 170, 242, 1);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square[data-faction='rebel'] {
+  --storm-soft-selection-color: rgba(154, 112, 212, 1);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-selected {
+  box-shadow: inset 0 0 24px rgba(246, 200, 95, 0.14);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-selected .storm-selection-ring {
+  inset: 9%;
+  border: 5px solid var(--selected);
+  border-radius: 50%;
+  opacity: 1;
+  transform: none;
+  box-shadow:
+    inset 0 0 22px rgba(246, 200, 95, 0.14),
+    0 0 18px rgba(246, 200, 95, 0.34);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-last-move::before {
+  z-index: 3;
+  inset: 10%;
+  border: 4px solid var(--storm-last-move-ring);
+  border-radius: 50%;
+  box-shadow: 0 0 16px var(--storm-last-move-ring-soft);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-last-move-from::before {
+  opacity: 0.3;
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-legal-move::after {
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 10%;
+  height: 10%;
+  inset: auto;
+  border-radius: 0;
+  opacity: 1;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: var(--storm-turn-hint);
+  transform: translate(-50%, -50%) rotate(var(--storm-legal-move-angle, 0deg));
+  transform-origin: center;
+  box-shadow: 0 0 8px var(--storm-turn-hint-soft);
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-capture::after {
+  width: auto;
+  height: auto;
+  inset: 13%;
+  border: 5px solid var(--storm-turn-hint);
+  border-radius: 50%;
+  clip-path: none;
+  background:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% + 2.5px),
+      transparent calc(50% + 2.5px)
+    ),
+    linear-gradient(
+      -45deg,
+      transparent calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% - 2.5px),
+      var(--storm-turn-hint) calc(50% + 2.5px),
+      transparent calc(50% + 2.5px)
+    );
+  box-shadow: none;
+  opacity: 0.42;
+  animation: storm-target-reticle-rotate 2.666s linear infinite;
+}
+
+.storm-commander-root.storm-debug-chess-root .chess-square.is-move-animation-from .storm-ship-piece,
+.storm-commander-root.storm-debug-chess-root
+  .chess-square.is-move-animation-to:not(.is-move-animation-capture-to)
+  .storm-ship-piece {
+  opacity: 0;
+}
+
 .storm-commander-root .storm-encounter-panel {
   position: fixed;
   left: 16px;

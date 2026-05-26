@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Chess } from 'chess.js'
 import { filterScenarios, getRatingRangeLabel, selectRandomScenario } from '../chess/scenarios/scenarioFilters'
 import { getCuratedScenarios, loadScenarioIntoChess } from '../chess/scenarios/scenarioLoader'
 import { selectComputerMove } from '../chess/selectComputerMove'
+import { STORM_CHESS_MOVE_ANIMATION_DURATION_MS } from '../chess/stormCommanderBoardEffects'
 import { ChessBoard } from '../components/ChessBoard'
 import { GameStatus } from '../components/GameStatus'
 import { MoveHistory } from '../components/MoveHistory'
@@ -12,14 +13,15 @@ const COMPUTER_MOVE_DELAY_MS = 300
 const SCENARIOS = getCuratedScenarios()
 
 function cloneGame(game) {
-  const clone = new Chess()
   const pgn = game.pgn()
 
   if (pgn) {
+    const clone = new Chess()
     clone.loadPgn(pgn)
+    return clone
   }
 
-  return clone
+  return new Chess(game.fen())
 }
 
 function toMoveRequest(move) {
@@ -57,6 +59,9 @@ function getStatusText(game, isBlackThinking) {
 }
 
 export function BasicChessPage({
+  enableStormBoardEffects = false,
+  extrasPlacement = 'side',
+  getCurrentPieceRotation,
   onBack,
   onNewGameVisuals,
   pieceRotation,
@@ -78,6 +83,7 @@ export function BasicChessPage({
   const [themeFilter, setThemeFilter] = useState('any')
   const [scenarioNotice, setScenarioNotice] = useState('')
   const [copyStatus, setCopyStatus] = useState('')
+  const [pendingMoveAnimation, setPendingMoveAnimation] = useState(null)
 
   const statusText = useMemo(
     () => getStatusText(game, isBlackThinking),
@@ -96,8 +102,44 @@ export function BasicChessPage({
     [filteredScenarios],
   )
 
+  const createPendingMoveAnimation = useCallback((move, kind) => {
+    const movingPiece = game.get(move.from)
+
+    return {
+      faction: sidePieceFactions?.[movingPiece?.color],
+      kind,
+      move,
+      movingPiece: movingPiece ? { ...movingPiece } : null,
+      pieceRotation: getCurrentPieceRotation?.() || pieceRotation || '0deg',
+    }
+  }, [game, getCurrentPieceRotation, pieceRotation, sidePieceFactions])
+
+  function applyMoveToCurrentGame(move) {
+    const nextGame = cloneGame(game)
+    const madeMove = nextGame.move(toMoveRequest(move))
+
+    setGame(nextGame)
+    setLastMove(madeMove)
+    setSelectedSquare(null)
+    setLegalMoves([])
+
+    return nextGame
+  }
+
   useEffect(() => {
-    if (!isBlackThinking || game.turn() !== 'b' || game.isGameOver()) {
+    if (!pendingMoveAnimation) {
+      return undefined
+    }
+
+    const timerId = window.setTimeout(() => {
+      setPendingMoveAnimation(null)
+    }, STORM_CHESS_MOVE_ANIMATION_DURATION_MS)
+
+    return () => window.clearTimeout(timerId)
+  }, [pendingMoveAnimation])
+
+  useEffect(() => {
+    if (!isBlackThinking || pendingMoveAnimation || game.turn() !== 'b' || game.isGameOver()) {
       return undefined
     }
 
@@ -106,6 +148,15 @@ export function BasicChessPage({
       const computerMove = selectComputerMove(nextGame)
 
       if (computerMove) {
+        if (enableStormBoardEffects) {
+          setPendingMoveAnimation(createPendingMoveAnimation(computerMove, 'computer'))
+          const madeMove = nextGame.move(toMoveRequest(computerMove))
+          setLastMove(madeMove)
+          setGame(nextGame)
+          setIsBlackThinking(false)
+          return
+        }
+
         const madeMove = nextGame.move(toMoveRequest(computerMove))
         setLastMove(madeMove)
         setGame(nextGame)
@@ -115,7 +166,13 @@ export function BasicChessPage({
     }, COMPUTER_MOVE_DELAY_MS)
 
     return () => window.clearTimeout(timerId)
-  }, [game, isBlackThinking])
+  }, [
+    createPendingMoveAnimation,
+    enableStormBoardEffects,
+    game,
+    isBlackThinking,
+    pendingMoveAnimation,
+  ])
 
   function clearSelection() {
     setSelectedSquare(null)
@@ -142,6 +199,7 @@ export function BasicChessPage({
     setGame(nextGame)
     setLastMove(null)
     clearSelection()
+    setPendingMoveAnimation(null)
     setIsBlackThinking(!nextGame.isGameOver() && nextGame.turn() === 'b')
   }
 
@@ -167,12 +225,11 @@ export function BasicChessPage({
   }
 
   function makeHumanMove(move) {
-    const nextGame = cloneGame(game)
-    const madeMove = nextGame.move(toMoveRequest(move))
+    if (enableStormBoardEffects) {
+      setPendingMoveAnimation(createPendingMoveAnimation(move, 'human'))
+    }
 
-    setGame(nextGame)
-    setLastMove(madeMove)
-    clearSelection()
+    const nextGame = applyMoveToCurrentGame(move)
 
     if (!nextGame.isGameOver() && nextGame.turn() === 'b') {
       setIsBlackThinking(true)
@@ -180,7 +237,7 @@ export function BasicChessPage({
   }
 
   function handleSquareClick(square) {
-    if (isBlackThinking || game.isGameOver() || game.turn() !== 'w') {
+    if (pendingMoveAnimation || isBlackThinking || game.isGameOver() || game.turn() !== 'w') {
       return
     }
 
@@ -203,6 +260,7 @@ export function BasicChessPage({
     setLegalMoves([])
     setLastMove(null)
     setIsBlackThinking(false)
+    setPendingMoveAnimation(null)
     setCurrentScenario(null)
     setScenarioNotice('Standard starting position loaded.')
     setCopyStatus('')
@@ -231,6 +289,8 @@ export function BasicChessPage({
     }
   }
 
+  const shouldPlaceExtrasBelow = extrasPlacement === 'below'
+
   return (
     <div className={['game-page', rootClassName].filter(Boolean).join(' ')}>
       <div className="page-topbar">
@@ -239,18 +299,20 @@ export function BasicChessPage({
             Back
           </button>
         ) : null}
-        {topControls}
+        {shouldPlaceExtrasBelow ? null : topControls}
       </div>
 
-      <main className="app-shell">
+      <main className={['app-shell', shouldPlaceExtrasBelow ? 'app-shell-below' : ''].filter(Boolean).join(' ')}>
         <section className="play-area" aria-label="Chess board">
           <ChessBoard
+            enableStormBoardEffects={enableStormBoardEffects}
             game={game}
             selectedSquare={selectedSquare}
             legalMoves={legalMoves}
             lastMove={lastMove}
-            inputDisabled={isBlackThinking || game.isGameOver()}
+            inputDisabled={Boolean(pendingMoveAnimation) || isBlackThinking || game.isGameOver()}
             onSquareClick={handleSquareClick}
+            pendingMoveAnimation={pendingMoveAnimation}
             pieceRotation={pieceRotation}
             pieceSet={pieceSet}
             sidePieceFactions={sidePieceFactions}
@@ -261,6 +323,12 @@ export function BasicChessPage({
         </section>
 
         <aside className="side-panel" aria-label="Game information">
+          {shouldPlaceExtrasBelow && topControls ? (
+            <>
+              <div className="storm-debug-extra-controls">{topControls}</div>
+              <div className="panel-divider" />
+            </>
+          ) : null}
           <GameStatus
             statusText={statusText}
             lastMove={lastMove}
