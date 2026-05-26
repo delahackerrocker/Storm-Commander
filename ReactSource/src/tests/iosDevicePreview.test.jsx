@@ -4,29 +4,20 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
 
-async function openDebugPage(user, pageName) {
-  const debugButton = screen.getByRole('button', { name: /^Debug$/ })
-  for (let press = 0; press < 6; press += 1) {
-    await user.click(debugButton)
-  }
-  await user.click(screen.getByRole('button', { name: pageName }))
-}
-
 afterEach(() => {
   window.history.replaceState({}, '', '/')
 })
 
 describe('iPhone device preview', () => {
-  it('opens the iPhone preview from debug mode', async () => {
-    const user = userEvent.setup()
+  it('opens the iPhone preview from query mode without debug chrome', () => {
+    window.history.replaceState({}, '', '/?storm-view=ios-preview')
 
     render(<App />)
-
-    await openDebugPage(user, /^iPhone Preview$/)
 
     expect(screen.getByRole('heading', { name: /^iPhone Preview$/ })).toBeInTheDocument()
     expect(screen.getByLabelText(/^iPhone model$/)).toBeInTheDocument()
     expect(screen.getByTitle(/^Storm Commander iPhone preview$/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
   })
 
   it('applies the selected iPhone viewport as exact iframe dimensions', async () => {
