@@ -222,6 +222,7 @@ describe('separate variant style sources', () => {
     expect(encounterRootRule).toContain(
       'radial-gradient(circle at 100% 100%, var(--storm-player-faction-bg), transparent 44%)',
     )
+    expect(stormStyles).toContain('--storm-player-faction-stroke: rgba(232, 108, 36, 0.9);')
     expect(encounterRootRule).toContain(
       'radial-gradient(circle at 86% 8%, rgba(89, 30, 58, 0.42), transparent 32%)',
     )
@@ -240,16 +241,19 @@ describe('separate variant style sources', () => {
     expect(panelRule).toContain('align-items: center;')
     expect(panelRule).toContain('gap: 8px;')
     expect(panelRule).toContain('z-index: 30;')
-    expect(missionStatusButtonRule).toContain('width: 48px;')
-    expect(missionStatusButtonRule).toContain('height: 48px;')
-    expect(missionStatusButtonRule).toContain('border: 1px solid rgba(5, 5, 5, 0.9);')
-    expect(missionStatusButtonRule).toContain('border-radius: var(--radius);')
+    expect(missionStatusButtonRule).toContain('min-width: 112px;')
+    expect(missionStatusButtonRule).toContain('min-height: 38px;')
+    expect(missionStatusButtonRule).toContain('border: 1px solid var(--storm-player-faction-stroke);')
+    expect(missionStatusButtonRule).toContain('border-radius: 7px;')
+    expect(missionStatusButtonRule).toContain('padding: 8px 13px;')
     expect(missionStatusButtonRule).toContain('color: var(--storm-old-ivory);')
-    expect(missionStatusButtonRule).toContain('background: #2b2d1e;')
+    expect(missionStatusButtonRule).toContain('background: rgba(17, 19, 3, 0.86);')
     expect(missionStatusButtonRule).toContain(
       'box-shadow: inset 0 0 0 1px rgba(243, 240, 223, 0.08);',
     )
-    expect(missionStatusButtonFocusRule).toContain('background: #3d4321;')
+    expect(missionStatusButtonRule).toContain('font-size: 0.84rem;')
+    expect(missionStatusButtonRule).toContain('font-weight: 900;')
+    expect(missionStatusButtonFocusRule).toContain('background: rgba(17, 19, 3, 0.96);')
     expect(missionStatusButtonFocusRule).toContain('outline: 3px solid var(--storm-cannon-cyan);')
     expect(commsWindowRule).toContain('box-sizing: border-box;')
     expect(commsWindowRule).toContain('position: relative;')
@@ -284,9 +288,7 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain('gap: 8px;')
     expect(stormStyles).toContain('width: 36px;')
     expect(verticalMediaRule).not.toContain('"player-comms"')
-    expect(phoneMediaRule).toContain('.storm-commander-root .storm-mission-status-button')
-    expect(phoneMediaRule).toContain('width: 44px;')
-    expect(phoneMediaRule).toContain('height: 44px;')
+    expect(phoneMediaRule).not.toContain('.storm-commander-root .storm-mission-status-button')
     expect(iconButtonRule).toContain('width: 40px;')
     expect(iconButtonRule).toContain('height: 40px;')
     expect(iconButtonRule).toContain('min-width: 40px;')
@@ -301,6 +303,9 @@ describe('separate variant style sources', () => {
     expect(movementRule).toContain('grid-area: movement;')
     expect(movementRule).toContain('width: 100%;')
     expect(movementRule).toContain('aspect-ratio: 1;')
+    expect(movementRule).toContain(
+      'border: 1px solid var(--storm-comms-faction-color, rgba(107, 110, 58, 0.72));',
+    )
     expect(barkRule).toContain('display: none;')
     expect(stormStyles).toContain('grid-template-columns: 85px 85px minmax(130px, 1fr);')
     expect(stormStyles).toContain('grid-template-areas: "portrait movement title";')
@@ -381,7 +386,7 @@ describe('separate variant style sources', () => {
     expect(movementRule).toContain('justify-self: center;')
     expect(movementRule).toContain('align-self: center;')
     expect(movementRule).toContain('grid-template-columns: repeat(5, 11px);')
-    expect(movementRule).toContain('border: 2px solid var(--storm-comms-faction-color')
+    expect(movementRule).toContain('border: 1px solid var(--storm-comms-faction-color')
     expect(movementRule).toContain('background: rgba(7, 2, 12, 0.62);')
     expect(movementRule).not.toContain('linear-gradient')
     expect(movementRule).not.toContain('background-size')
@@ -427,7 +432,13 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain('--storm-soft-selection-color: rgba(213, 166, 14, 1);')
     expect(stormStyles).toContain('--storm-soft-selection-color: rgba(85, 170, 242, 1);')
     expect(stormStyles).toContain('--storm-soft-selection-color: rgba(154, 112, 212, 1);')
-    expect(activeSelectionRule).toContain('border: 5px solid var(--selected);')
+    expect(stormStyles).toContain('--storm-active-selection-color: rgba(232, 108, 36, 0.9);')
+    expect(stormStyles).toContain('--storm-active-selection-color: rgba(213, 166, 14, 0.92);')
+    expect(stormStyles).toContain('--storm-active-selection-color: rgba(85, 170, 242, 0.9);')
+    expect(stormStyles).toContain('--storm-active-selection-color: rgba(154, 112, 212, 0.92);')
+    expect(activeSelectionRule).toContain(
+      'border: 5px solid var(--storm-active-selection-color, var(--selected));',
+    )
     expect(activeSelectionRule).toContain('border-radius: 50%;')
     expect(encounterLightSquareRule).toContain('background: rgba(255, 255, 255, 0.01265625);')
     expect(lastMoveFromRule).toContain('opacity: 0.3;')
