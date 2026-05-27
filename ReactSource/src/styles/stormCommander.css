@@ -2204,6 +2204,10 @@
 }
 
 @media (max-width: 560px) and (orientation: portrait) {
+  .storm-commander-root.storm-encounter-root {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
   .storm-commander-root .storm-encounter-shell {
     grid-template-columns: 1fr;
     grid-template-areas:
