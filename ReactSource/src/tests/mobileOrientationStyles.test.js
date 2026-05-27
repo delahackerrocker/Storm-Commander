@@ -67,6 +67,8 @@ describe('Storm Commander mobile orientation styles', () => {
     )
 
     expect(portraitRules).toContain('.storm-commander-root .storm-encounter-shell')
+    expect(portraitRules).toContain('.storm-commander-root.storm-encounter-root')
+    expect(portraitRules).toContain('padding-top: env(safe-area-inset-top, 0px);')
     expect(portraitRules).toContain('grid-template-columns: 1fr;')
     expect(portraitRules).toContain('"opponent-comms"')
     expect(portraitRules).toContain('"board"')
