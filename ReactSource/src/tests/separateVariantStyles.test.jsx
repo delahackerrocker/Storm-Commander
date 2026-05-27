@@ -43,6 +43,26 @@ describe('separate variant style sources', () => {
     expect(globalStyles).not.toMatch(/\.move-history/)
   })
 
+  it('anchors play mode controls in a bottom-left dock', () => {
+    const globalStyles = readFileSync('src/styles.css', 'utf8')
+    const playControlsRule = globalStyles.match(
+      /\.play-controls\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const playControlChildrenRule = globalStyles.match(
+      /\.play-controls > \*\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+
+    expect(playControlsRule).toContain('position: fixed;')
+    expect(playControlsRule).toContain('left: 16px;')
+    expect(playControlsRule).toContain('bottom: 16px;')
+    expect(playControlsRule).toContain('display: flex;')
+    expect(playControlsRule).toContain('align-items: center;')
+    expect(playControlsRule).toContain('gap: 8px;')
+    expect(playControlsRule).toContain('z-index: 30;')
+    expect(playControlsRule).toContain('pointer-events: none;')
+    expect(playControlChildrenRule).toContain('pointer-events: auto;')
+  })
+
   it('keeps random encounter comms around a centered board column', () => {
     const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
     const shellRule = stormStyles.match(
@@ -216,13 +236,21 @@ describe('separate variant style sources', () => {
     expect(panelRule).toContain('position: fixed;')
     expect(panelRule).toContain('left: 16px;')
     expect(panelRule).toContain('bottom: 16px;')
+    expect(panelRule).toContain('display: flex;')
+    expect(panelRule).toContain('align-items: center;')
+    expect(panelRule).toContain('gap: 8px;')
     expect(panelRule).toContain('z-index: 30;')
     expect(missionStatusButtonRule).toContain('width: 48px;')
     expect(missionStatusButtonRule).toContain('height: 48px;')
+    expect(missionStatusButtonRule).toContain('border: 1px solid rgba(5, 5, 5, 0.9);')
     expect(missionStatusButtonRule).toContain('border-radius: var(--radius);')
-    expect(missionStatusButtonRule).toContain('background: rgba(115, 221, 126, 0.9);')
-    expect(missionStatusButtonRule).toContain('box-shadow: 0 8px 22px rgba(115, 221, 126, 0.18);')
-    expect(missionStatusButtonFocusRule).toContain('outline: 3px solid rgba(115, 221, 126, 0.5);')
+    expect(missionStatusButtonRule).toContain('color: var(--storm-old-ivory);')
+    expect(missionStatusButtonRule).toContain('background: #2b2d1e;')
+    expect(missionStatusButtonRule).toContain(
+      'box-shadow: inset 0 0 0 1px rgba(243, 240, 223, 0.08);',
+    )
+    expect(missionStatusButtonFocusRule).toContain('background: #3d4321;')
+    expect(missionStatusButtonFocusRule).toContain('outline: 3px solid var(--storm-cannon-cyan);')
     expect(commsWindowRule).toContain('box-sizing: border-box;')
     expect(commsWindowRule).toContain('position: relative;')
     expect(commsWindowRule).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
