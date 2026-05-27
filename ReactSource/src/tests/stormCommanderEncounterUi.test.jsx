@@ -121,7 +121,7 @@ describe('Storm Commander random encounter UI', () => {
       const briefingAiType = missionDialog.querySelector('.storm-mission-ai-type')
       expect(briefingAiType).toHaveTextContent(/^Sloppy Aggressive$/)
       expect(briefingAiType).toHaveAttribute('data-faction', 'imperial')
-      expect(encounterStatusButton).toHaveTextContent('?')
+      expect(encounterStatusButton).toHaveTextContent('Mission')
       expect(screen.queryByRole('complementary', { name: /^Encounter status$/ }))
         .not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /^Mission$/ })).not.toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('Storm Commander random encounter UI', () => {
         name: /Mission status\. Objective: .+\. Progress: .+\. Open mission briefing\./,
       })
 
-      expect(encounterStatusButton).toHaveTextContent('?')
+      expect(encounterStatusButton).toHaveTextContent('Mission')
       expect(screen.queryByRole('complementary', { name: /^Encounter status$/ }))
         .not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /^Mission$/ })).not.toBeInTheDocument()
@@ -191,6 +191,9 @@ describe('Storm Commander random encounter UI', () => {
       expect(opponentComms).toHaveAttribute('data-faction', 'imperial')
       expect(container.querySelector('.storm-encounter-root')).toHaveStyle(
         '--storm-player-faction-bg: rgba(232, 108, 36, 0.24)',
+      )
+      expect(container.querySelector('.storm-encounter-root')).toHaveStyle(
+        '--storm-player-faction-stroke: rgba(232, 108, 36, 0.9)',
       )
       expect(container.querySelector('.storm-encounter-root')).toHaveStyle(
         '--storm-opponent-faction-bg: rgba(213, 166, 14, 0.26)',
@@ -989,7 +992,7 @@ describe('Storm Commander random encounter UI', () => {
       .not.toBeInTheDocument()
   })
 
-  it('keeps soft rings off during the player turn and upgrades the player ship to active selection', async () => {
+  it('moves player active selection to soft selection when scanning an enemy on the player turn', async () => {
     const user = userEvent.setup()
     const encounter = {
       id: 'test_soft_selection_rings',
@@ -1046,13 +1049,14 @@ describe('Storm Commander random encounter UI', () => {
     await user.click(secondOpponentSquare)
 
     expect(playerSquare).not.toHaveClass('is-selected')
-    expect(playerSquare).not.toHaveClass('is-player-soft-selected')
+    expect(playerSquare).toHaveClass('is-player-soft-selected')
     expect(firstOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
-    expect(secondOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
+    expect(secondOpponentSquare).not.toHaveClass('is-selected')
+    expect(secondOpponentSquare).toHaveClass('is-opponent-soft-selected')
     expect(secondOpponentSquare).toHaveAttribute('data-faction', 'imperial')
   })
 
-  it('waits until the enemy turn to replace active selection with soft rings', async () => {
+  it('shows player soft selection and enemy active selection during the enemy turn', async () => {
     vi.useFakeTimers()
     const encounter = {
       id: 'test_selection_ring_enemy_turn',
@@ -1110,6 +1114,8 @@ describe('Storm Commander random encounter UI', () => {
 
       fireEvent.click(screen.getByRole('button', { name: /C4 empty legal destination/i }))
 
+      expect(playerStartSquare).not.toHaveClass('is-selected')
+
       await act(async () => {
         vi.advanceTimersByTime(1200)
       })
@@ -1119,7 +1125,9 @@ describe('Storm Commander random encounter UI', () => {
       expect(screen.getByRole('grid')).toHaveAttribute('data-current-faction', 'imperial')
       expect(playerMovedSquare).not.toHaveClass('is-selected')
       expect(playerMovedSquare).toHaveClass('is-player-soft-selected')
-      expect(opponentSquare).toHaveClass('is-opponent-soft-selected')
+      expect(opponentSquare).toHaveClass('is-selected')
+      expect(opponentSquare).not.toHaveClass('is-opponent-soft-selected')
+      expect(opponentSquare).toHaveAttribute('data-faction', 'imperial')
     } finally {
       vi.useRealTimers()
     }
@@ -1439,7 +1447,7 @@ describe('Storm Commander random encounter UI', () => {
       .toHaveLength(0)
   })
 
-  it('separates last move origin and destination markers', () => {
+  it('does not render circular last move markers on encounter squares', () => {
     const encounter = {
       id: 'test_last_move_marker_sides',
       title: 'Random Pirate Raid',
@@ -1471,7 +1479,7 @@ describe('Storm Commander random encounter UI', () => {
       ],
     }
 
-    const { container } = render(
+    const { container, rerender } = render(
       <StormCommanderEncounterPage
         encounter={encounter}
         onBack={() => {}}
@@ -1481,14 +1489,25 @@ describe('Storm Commander random encounter UI', () => {
       />,
     )
 
-    const lastMoveFrom = container.querySelector('.storm-encounter-square.is-last-move-from')
-    const lastMoveTo = container.querySelector('.storm-encounter-square.is-last-move-to')
+    expect(container.querySelector('.storm-encounter-square.is-last-move')).toBeNull()
+    expect(container.querySelector('.storm-encounter-square.is-last-move-from')).toBeNull()
+    expect(container.querySelector('.storm-encounter-square.is-last-move-to')).toBeNull()
 
-    expect(lastMoveFrom).toHaveAccessibleName(/^D4 empty square$/)
-    expect(lastMoveFrom).toHaveClass('is-last-move')
-    expect(lastMoveTo).toHaveAccessibleName(/^E3 Rebel bishop square$/)
-    expect(lastMoveTo).toHaveClass('is-last-move')
-    expect(lastMoveTo).not.toHaveClass('is-last-move-from')
+    rerender(
+      <StormCommanderEncounterPage
+        encounter={{ ...encounter, currentFaction: 'imperial' }}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        onReturnToChess={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    expect(container.querySelector('.storm-encounter-square.is-last-move')).toBeNull()
+    expect(container.querySelector('.storm-encounter-square.is-last-move-from')).toBeNull()
+    expect(container.querySelector('.storm-encounter-square.is-last-move-to')).toBeNull()
+    expect(screen.getByRole('button', { name: /^E3 Rebel bishop square$/ }))
+      .toBeInTheDocument()
   })
 
   it('renders runtime faction rocket exhaust on encounter ships', () => {

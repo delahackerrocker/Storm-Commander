@@ -92,7 +92,6 @@ function getRandomThinkingPieceId(pieces, currentPieceId) {
 
 function getBoardStyle(encounter) {
   const currentTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[encounter.currentFaction]
-  const lastMoveTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[encounter.lastMove?.faction]
 
   return {
     '--storm-encounter-columns': encounter.board.width,
@@ -104,12 +103,6 @@ function getBoardStyle(encounter) {
           '--storm-turn-hint-soft': currentTheme.hintSoft,
         }
       : {}),
-    ...(lastMoveTheme
-      ? {
-          '--storm-last-move-ring': lastMoveTheme.hint,
-          '--storm-last-move-ring-soft': lastMoveTheme.hintSoft,
-        }
-      : {}),
   }
 }
 
@@ -119,7 +112,12 @@ function getEncounterRootStyle(encounter) {
   const opponentTheme = STORM_COMMANDER_FACTION_VISUAL_THEMES[opponentFaction]
 
   return {
-    ...(playerTheme ? { '--storm-player-faction-bg': playerTheme.hintSoft } : {}),
+    ...(playerTheme
+      ? {
+          '--storm-player-faction-bg': playerTheme.hintSoft,
+          '--storm-player-faction-stroke': playerTheme.hint,
+        }
+      : {}),
     ...(opponentTheme ? { '--storm-opponent-faction-bg': opponentTheme.hintSoft } : {}),
   }
 }
@@ -504,7 +502,7 @@ function MissionStatusButton({ encounter, isMissionBriefingOpen, onOpenMission }
       title={`Objective: ${objectiveLabel}. Progress: ${progressText}.`}
       onClick={onOpenMission}
     >
-      ?
+      Mission
     </button>
   )
 }
@@ -607,7 +605,9 @@ export function StormCommanderEncounterPage({
     !isMoveAnimating
   const selectedPiece =
     isPlayerTurn && selection?.encounterId === encounter.id
-      ? encounter.pieces.find((piece) => piece.id === selection.pieceId) || null
+      ? encounter.pieces.find(
+          (piece) => piece.id === selection.pieceId && piece.faction === encounter.playerFaction,
+        ) || null
       : null
   const playerPieces = useMemo(
     () => encounter.pieces.filter((piece) => piece.faction === encounter.playerFaction),
@@ -643,6 +643,15 @@ export function StormCommanderEncounterPage({
     latestOpponentMovePiece ||
     opponentPieces[0] ||
     null
+  const playerSoftSelectionPiece =
+    playerCommsSelection?.encounterId === encounter.id
+      ? playerPieces.find((piece) => piece.id === playerCommsSelection.pieceId) || null
+      : null
+  const opponentSoftSelectionPiece =
+    !isEnemyThinking ? manuallySelectedOpponentPiece || latestOpponentMovePiece : null
+  const activeOpponentPiece = isEnemyThinking
+    ? enemyThinkingPiece || opponentPieces[0] || null
+    : null
   const legalMoves = useMemo(
     () =>
       selectedPiece && encounter.currentFaction === encounter.playerFaction
@@ -894,29 +903,23 @@ export function StormCommanderEncounterPage({
               const piece = getEncounterPieceAt(encounter, square)
               const legalMove = legalMoveForSquare.get(`${square.x},${square.y}`)
               const isActiveSelection = Boolean(
-                selectedPiece && sameSquare(selectedPiece.square, square),
+                (!isMoveAnimating && selectedPiece && sameSquare(selectedPiece.square, square)) ||
+                  (activeOpponentPiece && sameSquare(activeOpponentPiece.square, square)),
               )
               const isPlayerSoftSelection = Boolean(
-                isEnemyThinking &&
                 !isActiveSelection &&
-                piece?.id &&
-                playerCommsPiece?.id === piece.id,
+                  piece?.id &&
+                  playerSoftSelectionPiece?.id === piece.id,
               )
               const isOpponentSoftSelection = Boolean(
-                isEnemyThinking &&
-                piece?.id &&
-                opponentCommsPiece?.id === piece.id,
+                !isActiveSelection &&
+                  piece?.id &&
+                  opponentSoftSelectionPiece?.id === piece.id,
               )
               const isExtraction = sameSquare(square, encounter.objective.extractionSquare)
               const isTarget =
                 Boolean(encounter.objective.targetPieceId) &&
                 piece?.id === encounter.objective.targetPieceId
-              const isLastMoveFrom = Boolean(
-                encounter.lastMove && sameSquare(encounter.lastMove.from, square),
-              )
-              const isLastMoveTo = Boolean(
-                encounter.lastMove && sameSquare(encounter.lastMove.to, square),
-              )
               const isMoveAnimationFrom = Boolean(
                 pendingMoveAnimation && sameSquare(pendingMoveAnimation.move.from, square),
               )
@@ -936,9 +939,6 @@ export function StormCommanderEncounterPage({
                 legalMove?.capturedPieceId ? 'is-capture' : '',
                 isExtraction ? 'is-extraction' : '',
                 isTarget ? 'is-target' : '',
-                isLastMoveFrom || isLastMoveTo ? 'is-last-move' : '',
-                isLastMoveFrom ? 'is-last-move-from' : '',
-                isLastMoveTo ? 'is-last-move-to' : '',
                 isMoveAnimationFrom ? 'is-move-animation-from' : '',
                 isMoveAnimationTo ? 'is-move-animation-to' : '',
                 isMoveAnimationCaptureTo ? 'is-move-animation-capture-to' : '',
