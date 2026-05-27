@@ -846,13 +846,18 @@ export function StormCommanderEncounterPage({
 
   return (
     <div className={rootClassName} style={rootStyle}>
-      {onBack && !isMissionResultOpen ? (
-        <div className="page-topbar">
+      <div className="play-controls storm-encounter-panel" aria-label="Play controls">
+        {onBack && !isMissionResultOpen ? (
           <button type="button" className="back-button" onClick={onBack}>
             Back
           </button>
-        </div>
-      ) : null}
+        ) : null}
+        <MissionStatusButton
+          encounter={encounter}
+          isMissionBriefingOpen={isMissionBriefingOpen}
+          onOpenMission={() => setDismissedMissionEncounterId(null)}
+        />
+      </div>
 
       <main className="storm-encounter-shell">
         <ShipCommsWindow
@@ -981,13 +986,6 @@ export function StormCommanderEncounterPage({
           variant="opponent"
         />
 
-        <div className="storm-encounter-panel">
-          <MissionStatusButton
-            encounter={encounter}
-            isMissionBriefingOpen={isMissionBriefingOpen}
-            onOpenMission={() => setDismissedMissionEncounterId(null)}
-          />
-        </div>
       </main>
 
       {isMissionBriefingOpen ? (

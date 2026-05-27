@@ -118,6 +118,21 @@ button {
   font-size: 1rem;
 }
 
+.play-controls {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.play-controls > * {
+  pointer-events: auto;
+}
+
 .menu-button:hover,
 .back-button:hover {
   border-color: rgba(255, 140, 42, 0.82);

@@ -293,14 +293,19 @@ export function BasicChessPage({
 
   return (
     <div className={['game-page', rootClassName].filter(Boolean).join(' ')}>
-      <div className="page-topbar">
-        {onBack ? (
+      {!shouldPlaceExtrasBelow && topControls ? (
+        <div className="page-topbar">
+          {topControls}
+        </div>
+      ) : null}
+
+      {onBack ? (
+        <div className="play-controls" aria-label="Play controls">
           <button type="button" className="back-button" onClick={onBack}>
             Back
           </button>
-        ) : null}
-        {shouldPlaceExtrasBelow ? null : topControls}
-      </div>
+        </div>
+      ) : null}
 
       <main className={['app-shell', shouldPlaceExtrasBelow ? 'app-shell-below' : ''].filter(Boolean).join(' ')}>
         <section className="play-area" aria-label="Chess board">
