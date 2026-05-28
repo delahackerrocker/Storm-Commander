@@ -745,6 +745,12 @@
     var(--storm-space-black);
 }
 
+.storm-commander-root.storm-encounter-root.storm-debug-chess-root {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
 .storm-commander-root.is-mission-briefing-open {
   --storm-board-animation-play-state: paused;
   --storm-star-tween-ms: 0ms;

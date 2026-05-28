@@ -32,6 +32,22 @@ describe('separate variant style sources', () => {
     expect(screen.getAllByRole('img')).toHaveLength(32)
   })
 
+  it('allows Storm debug chess pages to scroll while Random Encounter stays locked', () => {
+    const stormStyles = readFileSync('src/styles/stormCommander.css', 'utf8')
+    const debugRootRule = stormStyles.match(
+      /\.storm-commander-root\.storm-encounter-root\.storm-debug-chess-root\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const encounterRootRule = stormStyles.match(
+      /\.storm-commander-root\.storm-encounter-root\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+
+    expect(encounterRootRule).toContain('height: 100dvh;')
+    expect(encounterRootRule).toContain('overflow: hidden;')
+    expect(debugRootRule).toContain('height: auto;')
+    expect(debugRootRule).toContain('min-height: 100dvh;')
+    expect(debugRootRule).toContain('overflow: visible;')
+  })
+
   it('keeps chess-specific selectors out of the global shell stylesheet', () => {
     const globalStyles = readFileSync('src/styles.css', 'utf8')
 
