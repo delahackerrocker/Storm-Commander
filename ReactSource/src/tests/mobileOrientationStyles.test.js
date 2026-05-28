@@ -63,7 +63,7 @@ describe('Storm Commander mobile orientation styles', () => {
     )
     const landscapeRules = getMediaBlock(
       stormStyles,
-      '@media (max-width: 956px) and (orientation: landscape)',
+      '@media (max-width: 1376px) and (orientation: landscape)',
     )
 
     expect(portraitRules).toContain('.storm-commander-root .storm-encounter-shell')
