@@ -9,6 +9,19 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'))
 }
 
+function readText(path) {
+  return readFileSync(path, 'utf8')
+}
+
+function readPlistArray(plist, key) {
+  const match = plist.match(
+    new RegExp(`<key>${key}</key>\\s*<array>(?<body>[\\s\\S]*?)</array>`),
+  )
+
+  return Array.from(match?.groups.body.matchAll(/<string>(?<value>[^<]+)<\/string>/g) ?? [])
+    .map((entry) => entry.groups.value)
+}
+
 describe('iOS_Source Capacitor wrapper config', () => {
   it('keeps iOS packaging in the root iOS_Source folder', () => {
     const packageJson = readJson(resolve(iosSourceRoot, 'package.json'))
@@ -39,5 +52,30 @@ describe('iOS_Source Capacitor wrapper config', () => {
         path: 'ios',
       },
     })
+  })
+
+  it('targets both iPhone and iPad for TestFlight builds', () => {
+    const xcodeProject = readText(resolve(
+      iosSourceRoot,
+      'ios/App/App.xcodeproj/project.pbxproj',
+    ))
+    const targetedFamilies = Array.from(
+      xcodeProject.matchAll(/TARGETED_DEVICE_FAMILY = "(?<value>[^"]+)";/g),
+    ).map((entry) => entry.groups.value)
+
+    expect(targetedFamilies.length).toBeGreaterThanOrEqual(2)
+    expect(targetedFamilies.every((value) => value === '1,2')).toBe(true)
+  })
+
+  it('keeps iPad portrait and landscape orientations available', () => {
+    const plist = readText(resolve(iosSourceRoot, 'ios/App/App/Info.plist'))
+    const ipadOrientations = readPlistArray(plist, 'UISupportedInterfaceOrientations~ipad')
+
+    expect(ipadOrientations).toEqual([
+      'UIInterfaceOrientationPortrait',
+      'UIInterfaceOrientationPortraitUpsideDown',
+      'UIInterfaceOrientationLandscapeLeft',
+      'UIInterfaceOrientationLandscapeRight',
+    ])
   })
 })

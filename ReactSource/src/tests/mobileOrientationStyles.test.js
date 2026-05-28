@@ -63,7 +63,7 @@ describe('Storm Commander mobile orientation styles', () => {
     )
     const landscapeRules = getMediaBlock(
       stormStyles,
-      '@media (max-width: 956px) and (orientation: landscape)',
+      '@media (max-width: 1376px) and (orientation: landscape)',
     )
 
     expect(portraitRules).toContain('.storm-commander-root .storm-encounter-shell')
@@ -77,6 +77,7 @@ describe('Storm Commander mobile orientation styles', () => {
     expect(portraitRules).toContain('grid-template-columns: 43px 43px minmax(0, 1fr);')
 
     expect(landscapeRules).toContain('.storm-commander-root .storm-encounter-shell')
+    expect(landscapeRules).not.toBe('')
     expect(landscapeRules).toContain(
       'grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);',
     )

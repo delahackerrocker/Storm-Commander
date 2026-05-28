@@ -2249,7 +2249,7 @@
   }
 }
 
-@media (max-width: 956px) and (orientation: landscape) {
+@media (max-width: 1376px) and (orientation: landscape) {
   .storm-commander-root .storm-encounter-shell {
     grid-template-columns: minmax(180px, 250px) minmax(320px, 760px) minmax(180px, 250px);
     grid-template-areas: "opponent-comms board player-comms";

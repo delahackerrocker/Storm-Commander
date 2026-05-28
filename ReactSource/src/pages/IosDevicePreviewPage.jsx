@@ -36,11 +36,11 @@ export function IosDevicePreviewPage({ onBack }) {
 
         <div className="ios-preview-title-group">
           <p className="ios-preview-eyebrow">Debug View</p>
-          <h1>iPhone Preview</h1>
+          <h1>iOS Preview</h1>
         </div>
 
         <label className="ios-preview-field" htmlFor="ios-preview-device">
-          <span>iPhone model</span>
+          <span>Device model</span>
           <select
             id="ios-preview-device"
             value={deviceId}
@@ -90,7 +90,7 @@ export function IosDevicePreviewPage({ onBack }) {
         >
           <iframe
             className="ios-preview-frame"
-            title="Storm Commander iPhone preview"
+            title="Storm Commander iOS preview"
             src={frameSrc}
             width={viewport.width}
             height={viewport.height}
