@@ -12,7 +12,6 @@ export function CharactersPage({ onBack }) {
       </div>
 
       <section className="storm-characters-header">
-        <p className="eyebrow">Hero Roster</p>
         <h1 id="characters-title">Characters</h1>
       </section>
 

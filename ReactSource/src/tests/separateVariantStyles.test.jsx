@@ -97,6 +97,12 @@ describe('separate variant style sources', () => {
     const commsWindowRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-window\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
+    const playerCommsStackRule = stormStyles.match(
+      /\.storm-commander-root \.storm-player-comms-stack\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const playerCommsStackWindowRule = stormStyles.match(
+      /\.storm-commander-root \.storm-player-comms-stack > \.storm-comms-window-player\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
     const playerCommsRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-window-player\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -162,6 +168,15 @@ describe('separate variant style sources', () => {
     )?.groups.body
     const objectivePanelRule = stormStyles.match(
       /\.storm-commander-root \.storm-objective-panel\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const playerObjectiveStatusRule = stormStyles.match(
+      /\.storm-commander-root \.storm-player-objective-status\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const playerObjectiveStatusTitleRule = stormStyles.match(
+      /\.storm-commander-root \.storm-player-objective-status h2\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const playerObjectiveProgressRule = stormStyles.match(
+      /\.storm-commander-root \.storm-player-objective-status \.storm-objective-progress\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
     const objectiveTargetIconRule = stormStyles.match(
       /\.storm-commander-root \.storm-objective-target-icon\s*\{(?<body>[^}]+)\}/,
@@ -288,6 +303,11 @@ describe('separate variant style sources', () => {
     expect(commsWindowRule).toContain('width: 100%;')
     expect(commsWindowRule).toContain('border: 2px solid var(--storm-comms-faction-color')
     expect(commsWindowRule).toContain('0 0 18px var(--storm-comms-faction-glow')
+    expect(playerCommsStackRule).toContain('grid-area: player-comms;')
+    expect(playerCommsStackRule).toContain('display: grid;')
+    expect(playerCommsStackRule).toContain('gap: 14px;')
+    expect(playerCommsStackRule).toContain('align-content: start;')
+    expect(playerCommsStackWindowRule).toContain('grid-area: auto;')
     expect(playerCommsRule).toContain('grid-area: player-comms;')
     expect(playerCommsRule).not.toContain('"movement portrait hero"')
     expect(opponentCommsRule).toContain('grid-area: opponent-comms;')
@@ -397,6 +417,15 @@ describe('separate variant style sources', () => {
     expect(objectivePanelRule).toBeDefined()
     expect(objectivePanelRule).toContain('grid-template-columns: minmax(0, 1fr) auto;')
     expect(objectivePanelRule).toContain('align-items: center;')
+    expect(playerObjectiveStatusRule).toContain('border: 1px solid var(--storm-player-faction-stroke);')
+    expect(playerObjectiveStatusRule).toContain('padding: 14px;')
+    expect(playerObjectiveStatusRule).toContain(
+      'radial-gradient(circle at 16% 0%, var(--storm-player-faction-bg), transparent 48%)',
+    )
+    expect(playerObjectiveStatusRule).toContain('rgba(17, 19, 3, 0.88)')
+    expect(playerObjectiveStatusRule).toContain('0 0 18px rgba(232, 108, 36, 0.32)')
+    expect(playerObjectiveStatusTitleRule).toContain('color: var(--storm-pirate-orange);')
+    expect(playerObjectiveProgressRule).toContain('color: var(--storm-pirate-orange);')
     expect(objectiveTargetIconRule).toBeDefined()
     expect(objectiveTargetIconRule).toContain('justify-self: end;')
     expect(objectiveTargetIconRule).toContain('width: 86px;')

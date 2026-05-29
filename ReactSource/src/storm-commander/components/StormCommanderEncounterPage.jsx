@@ -527,6 +527,20 @@ function MissionStatusButton({ encounter, isMissionBriefingOpen, onOpenMission }
   )
 }
 
+function MissionObjectiveStatusPanel({ encounter }) {
+  return (
+    <section
+      className="storm-player-objective-status"
+      role="region"
+      aria-label="Player objective status"
+    >
+      <h2>Objective: {getObjectiveTypeLabel(encounter.objective.type)}</h2>
+      <p>{encounter.objective.text}</p>
+      <p className="storm-objective-progress">{getObjectiveProgressText(encounter)}</p>
+    </section>
+  )
+}
+
 function MissionBriefingDialog({ encounter, onDismiss }) {
   const objectiveTargetIcon = <MissionObjectiveTargetIcon encounter={encounter} />
 
@@ -915,14 +929,17 @@ export function StormCommanderEncounterPage({
       </div>
 
       <main className="storm-encounter-shell">
-        <ShipCommsWindow
-          ariaLabel="Player comms"
-          emptyText="Select a Pirate ship to open player comms."
-          piece={playerCommsPiece}
-          pieceRotation={pieceRotation}
-          selectionFlash={selectionFlash}
-          variant="player"
-        />
+        <div className="storm-player-comms-stack">
+          <ShipCommsWindow
+            ariaLabel="Player comms"
+            emptyText="Select a Pirate ship to open player comms."
+            piece={playerCommsPiece}
+            pieceRotation={pieceRotation}
+            selectionFlash={selectionFlash}
+            variant="player"
+          />
+          <MissionObjectiveStatusPanel encounter={encounter} />
+        </div>
 
         <section className="storm-encounter-play-area" aria-label="Random encounter board">
           <div

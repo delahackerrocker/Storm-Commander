@@ -12,6 +12,7 @@ describe('Chess-ish prototype', () => {
     render(<App />)
 
     expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
+    expect(screen.queryByText(/^Start Menu$/)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /^Storm Commander$/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Random Encounter$/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Storm Chess Drill$/ })).toBeInTheDocument()
@@ -106,6 +107,7 @@ describe('Chess-ish prototype', () => {
     await openStartMenuPage(user, /^Characters$/)
 
     expect(screen.getByRole('main', { name: /^Characters$/ })).toBeInTheDocument()
+    expect(screen.queryByText(/^Hero Roster$/)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /^Characters$/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /^Prank Sumatra$/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /^Thalia Mott$/ })).toBeInTheDocument()

@@ -1548,6 +1548,19 @@
   grid-area: player-comms;
 }
 
+.storm-commander-root .storm-player-comms-stack {
+  grid-area: player-comms;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  justify-self: stretch;
+  min-width: 0;
+}
+
+.storm-commander-root .storm-player-comms-stack > .storm-comms-window-player {
+  grid-area: auto;
+}
+
 .storm-commander-root .storm-comms-window-opponent {
   grid-area: opponent-comms;
 }
@@ -1760,6 +1773,44 @@
 .storm-commander-root .storm-comms-empty {
   color: #d9e5df;
   font-weight: 650;
+}
+
+.storm-commander-root .storm-player-objective-status {
+  min-width: 0;
+  border: 1px solid var(--storm-player-faction-stroke);
+  border-radius: var(--radius);
+  padding: 14px;
+  background:
+    radial-gradient(circle at 16% 0%, var(--storm-player-faction-bg), transparent 48%),
+    rgba(17, 19, 3, 0.88);
+  box-shadow:
+    0 0 18px rgba(232, 108, 36, 0.32),
+    0 14px 40px rgba(4, 8, 18, 0.28);
+}
+
+.storm-commander-root .storm-player-objective-status h2,
+.storm-commander-root .storm-player-objective-status p {
+  margin: 0;
+}
+
+.storm-commander-root .storm-player-objective-status h2 {
+  color: var(--storm-pirate-orange);
+  font-size: 1.04rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.storm-commander-root .storm-player-objective-status p {
+  margin-top: 8px;
+  color: #d9e5df;
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.storm-commander-root .storm-player-objective-status .storm-objective-progress {
+  color: var(--storm-pirate-orange);
+  font-weight: 900;
+  text-shadow: 0 0 12px rgba(232, 108, 36, 0.38);
 }
 
 .storm-commander-root .storm-objective-panel p,

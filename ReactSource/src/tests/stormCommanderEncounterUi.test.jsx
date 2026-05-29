@@ -245,6 +245,59 @@ describe('Storm Commander random encounter UI', () => {
     }
   })
 
+  it('shows objective status directly under the player comms panel after the briefing closes', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_player_comms_objective_status',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'imperial'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 7,
+        turnsElapsed: 0,
+        text: 'Survive 7 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    const { container } = render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
+
+    const playerCommsStack = container.querySelector('.storm-player-comms-stack')
+    const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+    const objectiveStatus = screen.getByRole('region', { name: /^Player objective status$/ })
+
+    expect(playerCommsStack).toContainElement(playerComms)
+    expect(playerCommsStack).toContainElement(objectiveStatus)
+    expect([...playerCommsStack.children]).toEqual([playerComms, objectiveStatus])
+    expect(within(objectiveStatus).getByRole('heading', { name: /^Objective: Survive Turns$/ }))
+      .toBeInTheDocument()
+    expect(within(objectiveStatus).getByText(/^Survive 7 turns until the jump drive charges\.$/))
+      .toBeInTheDocument()
+    expect(within(objectiveStatus).getByText(/^0\/7 turns survived$/))
+      .toHaveClass('storm-objective-progress')
+  })
+
   it('shows an extraction icon on the mission briefing objective panel', () => {
     const encounter = {
       id: 'test_escape_briefing_marker',
