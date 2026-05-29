@@ -32,6 +32,13 @@ describe('Storm Commander random encounter generator', () => {
     expect(encounter.turnOrder).toEqual(encounter.factions)
   })
 
+  it('never generates a random encounter board larger than 7 by 7', () => {
+    const encounter = generateRandomEncounter(() => 0.99)
+
+    expect(encounter.board.width).toBeLessThanOrEqual(7)
+    expect(encounter.board.height).toBeLessThanOrEqual(7)
+  })
+
   it('places every generated piece inside the board without overlap', () => {
     const encounter = generateRandomEncounter(() => 0.42)
     const occupiedSquares = new Set()

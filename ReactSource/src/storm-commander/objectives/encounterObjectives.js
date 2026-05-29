@@ -10,11 +10,15 @@ function hasFactionPieces(encounter, faction) {
   return encounter.pieces.some((piece) => piece.faction === faction)
 }
 
-function complete(encounter) {
+function hasEnemyPieces(encounter) {
+  return encounter.pieces.some((piece) => piece.faction !== encounter.playerFaction)
+}
+
+function complete(encounter, outcome = 'Victory: objective complete.') {
   return {
     ...encounter,
     status: 'won',
-    outcome: 'Victory: objective complete.',
+    outcome,
   }
 }
 
@@ -40,13 +44,15 @@ export function evaluateEncounterStatus(encounter) {
       (piece) => piece.id === encounter.objective.targetPieceId,
     )
 
-    return targetAlive ? encounter : complete(encounter)
+    if (!targetAlive) {
+      return complete(encounter)
+    }
   }
 
   if (encounter.objective?.type === 'surviveTurns') {
-    return encounter.objective.turnsElapsed >= encounter.objective.turnsRequired
-      ? complete(encounter)
-      : encounter
+    if (encounter.objective.turnsElapsed >= encounter.objective.turnsRequired) {
+      return complete(encounter)
+    }
   }
 
   if (encounter.objective?.type === 'escapeToSquare') {
@@ -56,13 +62,19 @@ export function evaluateEncounterStatus(encounter) {
         sameSquare(piece.square, encounter.objective.extractionSquare),
     )
 
-    return escaped ? complete(encounter) : encounter
+    if (escaped) {
+      return complete(encounter)
+    }
   }
 
   if (encounter.objective?.type === 'captureValue') {
-    return encounter.capturedValueByPlayer >= encounter.objective.valueRequired
-      ? complete(encounter)
-      : encounter
+    if (encounter.capturedValueByPlayer >= encounter.objective.valueRequired) {
+      return complete(encounter)
+    }
+  }
+
+  if (!hasEnemyPieces(encounter)) {
+    return complete(encounter, 'Victory: enemy fleet destroyed.')
   }
 
   return encounter

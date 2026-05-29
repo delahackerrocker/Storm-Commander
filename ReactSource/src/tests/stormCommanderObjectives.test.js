@@ -81,4 +81,36 @@ describe('Storm Commander encounter objectives', () => {
 
     expect(evaluateEncounterStatus(encounter).status).toBe('won')
   })
+
+  it('wins when the player destroys every enemy piece even if the objective is incomplete', () => {
+    const encounter = {
+      board: { width: 5, height: 5 },
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'imperial'],
+      currentFaction: 'pirate',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      objective: {
+        type: 'surviveTurns',
+        turnsRequired: 5,
+        turnsElapsed: 0,
+        text: 'Survive 5 turns until the jump drive charges.',
+      },
+      pieces: [
+        { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+        { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 1, y: 3 } },
+      ],
+    }
+
+    const nextEncounter = applyEncounterMove(encounter, {
+      pieceId: 'pirate_rook',
+      from: { x: 1, y: 1 },
+      to: { x: 1, y: 3 },
+      capturedPieceId: 'imperial_pawn',
+      capturedValue: 1,
+    })
+
+    expect(nextEncounter.status).toBe('won')
+    expect(nextEncounter.outcome).toBe('Victory: enemy fleet destroyed.')
+  })
 })

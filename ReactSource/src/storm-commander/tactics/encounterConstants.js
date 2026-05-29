@@ -2,7 +2,7 @@ export const STORM_COMMANDER_PLAYER_FACTION = 'pirate'
 
 export const STORM_COMMANDER_ENEMY_FACTIONS = ['imperial', 'robocorp', 'rebel']
 
-export const STORM_COMMANDER_BOARD_SIZES = [5, 6, 7, 8]
+export const STORM_COMMANDER_BOARD_SIZES = [5, 6, 7]
 
 export const STORM_COMMANDER_PIECE_VALUES = {
   p: 1,
