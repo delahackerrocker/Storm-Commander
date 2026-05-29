@@ -236,8 +236,10 @@ describe('Storm Commander random encounter UI', () => {
         'pirate',
       )
       expect(within(playerComms).queryByText(/^Movement$/)).not.toBeInTheDocument()
-      expect(within(playerComms).getByRole('heading', { name: /Pirate .* : [A-Z][1-9]/i }))
+      expect(within(playerComms).getByRole('heading', { name: /^Pirate [A-Z][a-z]+$/i }))
         .toBeInTheDocument()
+      expect(within(playerComms).queryByRole('heading', { name: /: [A-Z][1-9]/i }))
+        .not.toBeInTheDocument()
     } finally {
       randomSpy.mockRestore()
     }
@@ -375,8 +377,10 @@ describe('Storm Commander random encounter UI', () => {
 
     const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
-    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen : C4$/ }))
+    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen$/ }))
       .toBeInTheDocument()
+    expect(within(playerComms).queryByRole('heading', { name: /^Pirate Queen : C4$/ }))
+      .not.toBeInTheDocument()
     expect(within(playerComms).getByRole('img', { name: /^Prank Sumatra hero portrait$/ }))
       .toBeInTheDocument()
   })
@@ -435,7 +439,7 @@ describe('Storm Commander random encounter UI', () => {
 
       const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
-      expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook : A4$/ }))
+      expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook$/ }))
         .toBeInTheDocument()
     } finally {
       vi.useRealTimers()
@@ -842,20 +846,20 @@ describe('Storm Commander random encounter UI', () => {
 
       fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
 
-      expect(screen.getByRole('heading', { name: /Imperial Rook : B4/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Imperial Rook$/i })).toBeInTheDocument()
 
       await act(async () => {
         vi.advanceTimersByTime(500)
       })
 
-      expect(screen.getByRole('heading', { name: /Imperial Bishop : B2/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Imperial Bishop$/i })).toBeInTheDocument()
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
 
       await act(async () => {
         vi.advanceTimersByTime(500)
       })
 
-      expect(screen.getByRole('heading', { name: /Imperial Knight : E1/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Imperial Knight$/i })).toBeInTheDocument()
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
 
       await act(async () => {
@@ -917,12 +921,12 @@ describe('Storm Commander random encounter UI', () => {
 
     const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
 
-    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn : D4$/ }))
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn$/ }))
       .toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Imperial queen square/i }))
 
-    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen : E1$/ }))
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen$/ }))
       .toBeInTheDocument()
   })
 
@@ -1439,7 +1443,7 @@ describe('Storm Commander random encounter UI', () => {
     )
 
     expect(within(screen.getByRole('complementary', { name: /^Player comms$/ }))
-      .getByRole('heading', { name: /^Pirate Pawn : C3$/ })).toBeInTheDocument()
+      .getByRole('heading', { name: /^Pirate Pawn$/ })).toBeInTheDocument()
     expect(captureHints).toHaveLength(4)
     expect(pawnMovementIcon.querySelectorAll('.storm-movement-pattern-cell.is-move'))
       .toHaveLength(8)

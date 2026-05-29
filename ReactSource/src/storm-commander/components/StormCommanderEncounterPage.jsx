@@ -398,7 +398,6 @@ function MovementPatternIcon({ faction, pieceType }) {
 
 function ShipCommsWindow({
   ariaLabel,
-  board,
   emptyText,
   piece,
   pieceRotation,
@@ -421,7 +420,6 @@ function ShipCommsWindow({
   const factionName = getFactionDisplayName(piece.faction)
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
   const pilotTitle = `${factionName} ${displayPieceName}`
-  const squareLabel = getSquareLabel(piece.square, board)
   const heroProfile = getStormCommanderHeroForPiece(piece)
   const heroPortrait = heroProfile?.assets.portraits[0]
   const activeSelectionFlash =
@@ -460,7 +458,7 @@ function ShipCommsWindow({
       >
         <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
       </div>
-      <h2>{pilotTitle} : {squareLabel}</h2>
+      <h2>{pilotTitle}</h2>
       <div className="storm-comms-transmission">
         <MovementPatternIcon faction={piece.faction} pieceType={piece.type} />
         <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
@@ -919,7 +917,6 @@ export function StormCommanderEncounterPage({
       <main className="storm-encounter-shell">
         <ShipCommsWindow
           ariaLabel="Player comms"
-          board={encounter.board}
           emptyText="Select a Pirate ship to open player comms."
           piece={playerCommsPiece}
           pieceRotation={pieceRotation}
@@ -1026,7 +1023,6 @@ export function StormCommanderEncounterPage({
 
         <ShipCommsWindow
           ariaLabel="Opponent comms"
-          board={encounter.board}
           emptyText="Touch an opponent ship to scan their comms."
           piece={opponentCommsPiece}
           pieceRotation={pieceRotation}
