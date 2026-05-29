@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CharactersPage } from './pages/CharactersPage'
 import { IosDevicePreviewPage } from './pages/IosDevicePreviewPage'
 import { StartPage } from './pages/StartPage'
 import { StormCommanderPage } from './pages/StormCommanderPage'
@@ -9,6 +10,7 @@ const PAGES = {
   randomEncounter: 'random-encounter',
   stormChessDrill: 'storm-chess-drill',
   basicChess: 'basic-chess',
+  characters: 'characters',
 }
 
 const STORM_VIEW_QUERY_PARAM = 'storm-view'
@@ -42,6 +44,7 @@ function App() {
   let page = (
     <StartPage
       onOpenBasicChess={() => openPage(PAGES.basicChess)}
+      onOpenCharacters={() => openPage(PAGES.characters)}
       onOpenRandomEncounter={() => openPage(PAGES.randomEncounter)}
       onOpenStormChessDrill={() => openPage(PAGES.stormChessDrill)}
     />
@@ -83,6 +86,15 @@ function App() {
       <StormCommanderPage
         key="storm-chess-drill"
         allowChessDrill
+        onBack={() => openPage(PAGES.start)}
+      />
+    )
+  }
+
+  if (currentPage === PAGES.characters) {
+    page = (
+      <CharactersPage
+        key="characters"
         onBack={() => openPage(PAGES.start)}
       />
     )

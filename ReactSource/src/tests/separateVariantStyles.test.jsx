@@ -46,6 +46,7 @@ describe('separate variant style sources', () => {
     expect(debugRootRule).toContain('height: auto;')
     expect(debugRootRule).toContain('min-height: 100dvh;')
     expect(debugRootRule).toContain('overflow: visible;')
+    expect(debugRootRule).toContain('padding-bottom: 96px;')
   })
 
   it('keeps chess-specific selectors out of the global shell stylesheet', () => {
@@ -226,7 +227,7 @@ describe('separate variant style sources', () => {
     const verticalBreakpointIndex = stormStyles.indexOf('@media (max-width: 900px)')
     const phoneBreakpointIndex = stormStyles.indexOf('@media (max-width: 560px)')
     const compactCommsIndex = stormStyles.indexOf(
-      'grid-template-columns: 43px 43px minmax(0, 1fr);',
+      'grid-template-columns: 43px 43px 43px minmax(0, 1fr);',
     )
 
     expect(stormStyles).not.toContain('storm-encounter-topbar')
@@ -273,15 +274,16 @@ describe('separate variant style sources', () => {
     expect(missionStatusButtonFocusRule).toContain('outline: 3px solid var(--storm-cannon-cyan);')
     expect(commsWindowRule).toContain('box-sizing: border-box;')
     expect(commsWindowRule).toContain('position: relative;')
-    expect(commsWindowRule).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
+    expect(commsWindowRule).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
     expect(commsWindowRule).toContain('grid-template-areas:')
-    expect(commsWindowRule).toContain('"portrait movement"')
-    expect(commsWindowRule).toContain('"title title";')
+    expect(commsWindowRule).toContain('"hero portrait movement"')
+    expect(commsWindowRule).toContain('"title title title";')
     expect(commsWindowRule).toContain('justify-self: stretch;')
     expect(commsWindowRule).toContain('width: 100%;')
     expect(commsWindowRule).toContain('border: 2px solid var(--storm-comms-faction-color')
     expect(commsWindowRule).toContain('0 0 18px var(--storm-comms-faction-glow')
     expect(playerCommsRule).toContain('grid-area: player-comms;')
+    expect(playerCommsRule).toContain('"movement portrait hero"')
     expect(opponentCommsRule).toContain('grid-area: opponent-comms;')
     expect(stormStyles).not.toContain('.storm-commander-root .storm-mission-summary-row')
     expect(stormStyles).not.toContain('.storm-commander-root .storm-mission-summary-button')
@@ -298,7 +300,7 @@ describe('separate variant style sources', () => {
     expect(stackedMediaRule).toContain(
       '.storm-commander-root .storm-comms-window-player',
     )
-    expect(stackedMediaRule).toContain('grid-template-areas: "title movement portrait";')
+    expect(stackedMediaRule).toContain('grid-template-areas: "title movement portrait hero";')
     expect(stackedMediaRule).toContain('text-align: right;')
     expect(stormStyles).toContain('@media (max-width: 560px)')
     expect(stormStyles).toContain('gap: 8px;')
@@ -323,8 +325,8 @@ describe('separate variant style sources', () => {
       'border: 1px solid var(--storm-comms-faction-color, rgba(107, 110, 58, 0.72));',
     )
     expect(barkRule).toContain('display: none;')
-    expect(stormStyles).toContain('grid-template-columns: 85px 85px minmax(130px, 1fr);')
-    expect(stormStyles).toContain('grid-template-areas: "portrait movement title";')
+    expect(stormStyles).toContain('grid-template-columns: 85px 85px 85px minmax(130px, 1fr);')
+    expect(stormStyles).toContain('grid-template-areas: "hero portrait movement title";')
     expect(stormStyles).toContain('grid-area: portrait;')
     expect(stormStyles).toContain(".storm-commander-root .storm-comms-window[data-faction='pirate']")
     expect(stormStyles).toContain(".storm-commander-root .storm-comms-window[data-faction='imperial']")
@@ -334,6 +336,7 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain(".storm-commander-root .storm-comms-portrait[data-faction='imperial']")
     expect(stormStyles).toContain(".storm-commander-root .storm-comms-portrait[data-faction='robocorp']")
     expect(stormStyles).toContain(".storm-commander-root .storm-comms-portrait[data-faction='rebel']")
+    expect(stormStyles).toContain(".storm-commander-root .storm-comms-hero-portrait[data-faction='pirate']")
     expect(stormStyles).toContain('border-color: rgba(232, 108, 36, 0.82);')
     expect(stormStyles).toContain('border-color: rgba(213, 166, 14, 0.86);')
     expect(stormStyles).toContain('border-color: rgba(85, 170, 242, 0.82);')
@@ -357,7 +360,7 @@ describe('separate variant style sources', () => {
     expect(commsTitleRule).toContain('color: var(--storm-comms-title-color')
     expect(stackedCommsTitleRule).toContain('font-size: 2rem;')
     expect(stormStyles).toContain('display: contents;')
-    expect(stormStyles).toContain('grid-template-columns: 43px 43px minmax(0, 1fr);')
+    expect(stormStyles).toContain('grid-template-columns: 43px 43px 43px minmax(0, 1fr);')
     expect(compactCommsIndex).toBeGreaterThan(verticalBreakpointIndex)
     expect(compactCommsIndex).toBeLessThan(phoneBreakpointIndex)
     expect(stormStyles).toContain('width: 43px;')
@@ -375,6 +378,9 @@ describe('separate variant style sources', () => {
     expect(missionDialogRule).toContain('box-sizing: border-box;')
     expect(missionDialogRule).toContain('width: min(760px, calc(100vw - 32px));')
     expect(missionDialogRule).toContain('max-height: calc(100dvh - 48px);')
+    expect(missionDialogRule).toContain('align-self: center;')
+    expect(missionDialogRule).toContain('justify-self: center;')
+    expect(missionDialogRule).toContain('margin: auto;')
     expect(missionDialogRule).toContain('align-content: center;')
     expect(missionDialogRule).toContain('border-radius: var(--radius);')
     expect(stormStyles).toContain('padding: 22px;')

@@ -2,6 +2,7 @@ import heroImageUrl from '../assets/hero.png'
 
 export function StartPage({
   onOpenBasicChess,
+  onOpenCharacters,
   onOpenRandomEncounter,
   onOpenStormChessDrill,
 }) {
@@ -23,6 +24,9 @@ export function StartPage({
           </button>
           <button type="button" className="menu-button" onClick={onOpenBasicChess}>
             Basic Chess
+          </button>
+          <button type="button" className="menu-button" onClick={onOpenCharacters}>
+            Characters
           </button>
         </div>
       </section>

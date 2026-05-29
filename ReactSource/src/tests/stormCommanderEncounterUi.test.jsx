@@ -377,6 +377,8 @@ describe('Storm Commander random encounter UI', () => {
 
     expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen : C4$/ }))
       .toBeInTheDocument()
+    expect(within(playerComms).getByRole('img', { name: /^Prank Sumatra hero portrait$/ }))
+      .toBeInTheDocument()
   })
 
   it('keeps the last selected player ship in comms after the move selection clears', async () => {
@@ -1037,8 +1039,8 @@ describe('Storm Commander random encounter UI', () => {
     const secondOpponentSquare = screen.getByRole('button', { name: /E1 Imperial queen square/i })
 
     expect(playerSquare.querySelector('.storm-selection-ring')).toBeInTheDocument()
-    expect(playerSquare).not.toHaveClass('is-player-soft-selected')
-    expect(firstOpponentSquare).not.toHaveClass('is-opponent-soft-selected')
+    expect(playerSquare).toHaveClass('is-player-soft-selected')
+    expect(firstOpponentSquare).toHaveClass('is-opponent-soft-selected')
     expect(firstOpponentSquare).toHaveAttribute('data-faction', 'imperial')
 
     await user.click(playerSquare)
@@ -1104,13 +1106,14 @@ describe('Storm Commander random encounter UI', () => {
       const playerStartSquare = screen.getByRole('button', { name: /B4 Pirate rook square/i })
       const opponentSquare = screen.getByRole('button', { name: /E1 Imperial queen square/i })
 
-      expect(playerStartSquare).not.toHaveClass('is-player-soft-selected')
-      expect(opponentSquare).not.toHaveClass('is-opponent-soft-selected')
+      expect(playerStartSquare).toHaveClass('is-player-soft-selected')
+      expect(opponentSquare).toHaveClass('is-opponent-soft-selected')
 
       fireEvent.click(playerStartSquare)
 
       expect(playerStartSquare).toHaveClass('is-selected')
       expect(playerStartSquare).not.toHaveClass('is-player-soft-selected')
+      expect(opponentSquare).toHaveClass('is-opponent-soft-selected')
 
       fireEvent.click(screen.getByRole('button', { name: /C4 empty legal destination/i }))
 

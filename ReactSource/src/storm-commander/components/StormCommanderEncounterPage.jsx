@@ -24,6 +24,7 @@ import {
   getFactionDisplayName,
   getPieceDisplayName,
 } from '../tactics/encounterConstants'
+import { getStormCommanderHeroForPiece } from '../heroes/heroProfiles'
 
 const ENEMY_MOVE_DELAY_MS = 1500
 const ENEMY_THINKING_SELECTION_INTERVAL_MS = 500
@@ -421,6 +422,8 @@ function ShipCommsWindow({
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
   const pilotTitle = `${factionName} ${displayPieceName}`
   const squareLabel = getSquareLabel(piece.square, board)
+  const heroProfile = getStormCommanderHeroForPiece(piece)
+  const heroPortrait = heroProfile?.assets.portraits[0]
   const activeSelectionFlash =
     selectionFlash?.faction === piece.faction ? selectionFlash : null
 
@@ -430,6 +433,25 @@ function ShipCommsWindow({
       aria-label={ariaLabel}
       data-faction={piece.faction}
     >
+      <div
+        className="storm-comms-hero-portrait"
+        role="img"
+        aria-label={
+          heroProfile
+            ? `${heroProfile.fullName} hero portrait`
+            : `${factionName} hero portrait`
+        }
+        data-faction={piece.faction}
+      >
+        {heroPortrait ? (
+          <img
+            className="storm-comms-hero-image"
+            src={heroPortrait}
+            alt=""
+            aria-hidden="true"
+          />
+        ) : null}
+      </div>
       <div
         className="storm-comms-portrait"
         role="img"
@@ -770,6 +792,32 @@ export function StormCommanderEncounterPage({
     onBoardAnimationsPausedChange?.(false)
   }, [onBoardAnimationsPausedChange])
 
+  const handleBattleStart = useCallback(() => {
+    const initialPlayerPiece = getInitialCommsPiece(playerPieces, encounter.id)
+    const initialOpponentPiece = opponentPieces[0] || null
+
+    if (initialPlayerPiece) {
+      setPlayerCommsSelection({ encounterId: encounter.id, pieceId: initialPlayerPiece.id })
+    }
+
+    if (initialOpponentPiece) {
+      setOpponentCommsSelection({
+        encounterId: encounter.id,
+        latestOpponentMovePieceId,
+        pieceId: initialOpponentPiece.id,
+      })
+    }
+
+    onBoardAnimationsPausedChange?.(false)
+    setDismissedMissionEncounterId(encounter.id)
+  }, [
+    encounter.id,
+    latestOpponentMovePieceId,
+    onBoardAnimationsPausedChange,
+    opponentPieces,
+    playerPieces,
+  ])
+
   useEffect(() => {
     if (!isMissionBriefingOpen) {
       return undefined
@@ -777,14 +825,14 @@ export function StormCommanderEncounterPage({
 
     function handleMissionKeyDown(event) {
       if (event.key === 'Escape') {
-        setDismissedMissionEncounterId(encounter.id)
+        handleBattleStart()
       }
     }
 
     window.addEventListener('keydown', handleMissionKeyDown)
 
     return () => window.removeEventListener('keydown', handleMissionKeyDown)
-  }, [encounter.id, isMissionBriefingOpen])
+  }, [handleBattleStart, isMissionBriefingOpen])
 
   function handleNewEncounter() {
     onNewEncounter()
@@ -991,7 +1039,7 @@ export function StormCommanderEncounterPage({
       {isMissionBriefingOpen ? (
         <MissionBriefingDialog
           encounter={encounter}
-          onDismiss={() => setDismissedMissionEncounterId(encounter.id)}
+          onDismiss={handleBattleStart}
         />
       ) : null}
 

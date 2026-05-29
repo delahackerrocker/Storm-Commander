@@ -120,6 +120,13 @@ describe.each(IOS_DEVICE_VIEWPORTS)('iOS device viewport smoke: $name', (viewpor
       expect(screen.getByText('Basic Chess')).toBeInTheDocument()
       expect(screen.getByText('White to move')).toBeInTheDocument()
       expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
+
+      await openPage(user, /^Back$/)
+      await openPage(user, /^Characters$/)
+
+      expect(screen.getByRole('main', { name: /^Characters$/ })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Prank Sumatra$/ })).toBeInTheDocument()
+      expect(screen.getAllByRole('article')).toHaveLength(8)
     } finally {
       randomSpy.mockRestore()
     }

@@ -1,6 +1,6 @@
 export const STORM_COMMANDER_FACTION_IDS = ['pirate', 'imperial', 'robocorp', 'rebel']
 
-export const STORM_COMMANDER_ASSET_VERSION = '20260520-imperial-ivory-gold'
+export const STORM_COMMANDER_ASSET_VERSION = '20260528-hero-profiles'
 
 export const STORM_COMMANDER_ASSET_BASE_URL = import.meta.env.BASE_URL || '/'
 

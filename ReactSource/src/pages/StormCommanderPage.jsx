@@ -81,11 +81,15 @@ function useLowPowerStarfieldMotion(isPaused = false) {
       applyStarfieldStyle(rootElement, nextMotion)
     }
 
-    function startStarfieldTimer() {
+    function startStarfieldTimer({ advanceImmediately = true } = {}) {
       clearStarfieldTimer()
 
       if (isPaused || document.hidden) {
         return
+      }
+
+      if (advanceImmediately) {
+        advanceStarfield()
       }
 
       timerId = window.setInterval(
@@ -102,7 +106,7 @@ function useLowPowerStarfieldMotion(isPaused = false) {
 
       lastTickTime = getCurrentTimeMs()
       advanceStarfield()
-      startStarfieldTimer()
+      startStarfieldTimer({ advanceImmediately: false })
     }
 
     applyStarfieldStyle(rootElement, starfieldMotionRef.current)

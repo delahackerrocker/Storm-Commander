@@ -10,6 +10,10 @@ import {
 } from '../chess/stormCommanderPieceAssets'
 import { createRandomSideFactions } from '../chess/stormCommanderFactions'
 import {
+  STORM_COMMANDER_HEROES_BY_FACTION,
+  STORM_COMMANDER_HERO_PROFILES,
+} from '../storm-commander/heroes/heroProfiles'
+import {
   STORM_COMMANDER_BOARD_ANIMATION_FPS,
   STORM_COMMANDER_STARFIELD_TICK_MS,
   STORM_COMMANDER_STARFIELD_STEP_COUNT,
@@ -123,6 +127,40 @@ describe('Storm Commander variant', () => {
     for (const path of factionPaths) {
       expect(path).toMatch(/^\/assets\/chess\/storm-commander\/factions\/.+\/.+\.png\?v=.+$/)
       expect(path).toContain(`?v=${STORM_COMMANDER_ASSET_VERSION}`)
+    }
+  })
+
+  it('provides runtime hero profiles with portrait and full body assets', () => {
+    expect(STORM_COMMANDER_HERO_PROFILES).toHaveLength(8)
+    expect(STORM_COMMANDER_HEROES_BY_FACTION.pirate.map((hero) => hero.fullName)).toEqual([
+      'Prank Sumatra',
+      'Captain Lilith Haraway',
+    ])
+    expect(STORM_COMMANDER_HEROES_BY_FACTION.imperial.map((hero) => hero.fullName)).toEqual([
+      'Admiral/Bishop John Trace',
+      'Sister Mary Wren',
+    ])
+    expect(STORM_COMMANDER_HEROES_BY_FACTION.robocorp.map((hero) => hero.fullName)).toEqual([
+      'Dayna Scry',
+      'Fenris Scry',
+    ])
+    expect(STORM_COMMANDER_HEROES_BY_FACTION.rebel.map((hero) => hero.fullName)).toEqual([
+      'Lance Rosenthorn',
+      'Thalia Mott',
+    ])
+
+    for (const hero of STORM_COMMANDER_HERO_PROFILES) {
+      expect(hero.color).toMatch(/^#[0-9a-f]{6}$/i)
+      expect(hero.source.document).toBe('Inspo/RebelFutureDesignDeck.pdf')
+      expect(hero.assets.portraits).toHaveLength(2)
+      expect(hero.assets.fullBodies).toHaveLength(2)
+
+      for (const path of [...hero.assets.portraits, ...hero.assets.fullBodies]) {
+        expect(path).toMatch(
+          /^\/assets\/chess\/storm-commander\/heroes\/.+\/.+\/.+\.png\?v=.+$/,
+        )
+        expect(path).toContain(`?v=${STORM_COMMANDER_ASSET_VERSION}`)
+      }
     }
   })
 

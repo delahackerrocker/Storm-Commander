@@ -16,6 +16,13 @@ describe('Chess-ish prototype', () => {
     expect(screen.getByRole('button', { name: /^Random Encounter$/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Storm Chess Drill$/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Basic Chess$/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Characters$/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual([
+      'Random Encounter',
+      'Storm Chess Drill',
+      'Basic Chess',
+      'Characters',
+    ])
     expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
   })
 
@@ -85,6 +92,24 @@ describe('Chess-ish prototype', () => {
     )
     expect(container.querySelector('.page-topbar .back-button')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /^back$/i }))
+
+    expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
+  })
+
+  it('opens the Characters roster from the Start Menu and returns to the Start Menu', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await openStartMenuPage(user, /^Characters$/)
+
+    expect(screen.getByRole('main', { name: /^Characters$/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^Characters$/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^Prank Sumatra$/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^Thalia Mott$/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('article')).toHaveLength(8)
 
     await user.click(screen.getByRole('button', { name: /^back$/i }))
 

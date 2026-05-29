@@ -52,6 +52,9 @@ describe('Storm Commander mobile orientation styles', () => {
     expect(missionOverlayRule).toContain('overflow: hidden;')
     expect(missionDialogRule).toContain('overflow-x: hidden;')
     expect(missionDialogRule).toContain('overflow-y: auto;')
+    expect(missionDialogRule).toContain('align-self: center;')
+    expect(missionDialogRule).toContain('justify-self: center;')
+    expect(missionDialogRule).toContain('margin: auto;')
     expect(missionDismissRule).toContain('justify-self: end;')
   })
 
@@ -74,7 +77,8 @@ describe('Storm Commander mobile orientation styles', () => {
     expect(portraitRules).toContain('"board"')
     expect(portraitRules).toContain('"player-comms";')
     expect(portraitRules).toContain('width: min(720px, calc(100vw - 24px));')
-    expect(portraitRules).toContain('grid-template-columns: 43px 43px minmax(0, 1fr);')
+    expect(portraitRules).toContain('grid-template-columns: 43px 43px 43px minmax(0, 1fr);')
+    expect(portraitRules).toContain('grid-template-areas: "hero portrait movement title";')
 
     expect(landscapeRules).toContain('.storm-commander-root .storm-encounter-shell')
     expect(landscapeRules).toContain(
@@ -85,8 +89,8 @@ describe('Storm Commander mobile orientation styles', () => {
     expect(landscapeRules).toContain('width: min(1320px, calc(100vw - 12px));')
     expect(landscapeRules).toContain('padding: 8px 0;')
     expect(landscapeRules).toContain('padding: 10px;')
-    expect(landscapeRules).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
-    expect(landscapeRules).toContain('"portrait movement"')
-    expect(landscapeRules).toContain('"title title";')
+    expect(landscapeRules).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
+    expect(landscapeRules).toContain('"hero portrait movement"')
+    expect(landscapeRules).toContain('"title title title";')
   })
 })

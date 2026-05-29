@@ -145,6 +145,124 @@ button {
   outline-offset: 3px;
 }
 
+.storm-characters-page {
+  min-height: 100vh;
+  padding: clamp(24px, 4vw, 56px);
+  color: #f3f0df;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(232, 108, 36, 0.2), transparent 32%),
+    radial-gradient(circle at 92% 10%, rgba(85, 170, 242, 0.18), transparent 34%),
+    linear-gradient(180deg, #120617 0%, #07020c 100%);
+}
+
+.storm-characters-toolbar {
+  position: sticky;
+  top: 16px;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 28px;
+}
+
+.storm-characters-header {
+  width: min(1180px, 100%);
+  margin: 0 auto 24px;
+}
+
+.storm-characters-header h1 {
+  margin: 0;
+  color: #f3f0df;
+  font-size: clamp(2.8rem, 9vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+.storm-character-grid {
+  width: min(1180px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin: 0 auto;
+}
+
+.storm-character-card {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 2px solid color-mix(in srgb, var(--storm-character-color) 72%, transparent);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--storm-character-color) 22%, transparent), transparent 42%),
+    rgba(17, 19, 3, 0.84);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--storm-character-color) 24%, transparent),
+    0 18px 55px rgba(4, 8, 18, 0.34);
+}
+
+.storm-character-copy {
+  min-width: 0;
+}
+
+.storm-character-faction,
+.storm-character-card h2 {
+  margin: 0;
+}
+
+.storm-character-faction {
+  color: var(--storm-character-color);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.storm-character-card h2 {
+  color: #f3f0df;
+  font-size: 1.35rem;
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+
+.storm-character-media {
+  display: grid;
+  gap: 12px;
+}
+
+.storm-character-portraits,
+.storm-character-bodies {
+  display: grid;
+  gap: 10px;
+}
+
+.storm-character-portraits {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.storm-character-bodies {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.storm-character-portrait,
+.storm-character-body {
+  width: 100%;
+  min-width: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--storm-character-color) 34%, transparent));
+}
+
+.storm-character-portrait {
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--storm-character-color) 64%, transparent);
+  border-radius: 7px;
+  background: rgba(7, 2, 12, 0.58);
+}
+
+.storm-character-body {
+  max-height: 340px;
+}
+
 @media (max-width: 640px) {
   .start-page {
     align-items: end;
