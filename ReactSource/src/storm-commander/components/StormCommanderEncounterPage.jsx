@@ -26,7 +26,7 @@ import {
 } from '../tactics/encounterConstants'
 import { getStormCommanderHeroForPiece } from '../heroes/heroProfiles'
 
-const ENEMY_MOVE_DELAY_MS = 1500
+const ENEMY_MOVE_DELAY_MS = 3000
 const ENEMY_THINKING_SELECTION_INTERVAL_MS = 500
 const SELECTION_FLASH_DURATION_MS = 300
 const MOVE_ANIMATION_DURATION_MS = 1200
@@ -123,13 +123,15 @@ function getEncounterRootStyle(encounter) {
   }
 }
 
-function getObjectiveTypeLabel(type) {
+function getObjectiveTypeLabel(objective) {
+  const type = objective?.type ?? objective
+
   if (type === 'destroyTarget') {
     return 'Destroy Target'
   }
 
   if (type === 'surviveTurns') {
-    return 'Survive Turns'
+    return objective?.turnsRequired ? `Survive ${objective.turnsRequired} Turns` : 'Survive Turns'
   }
 
   if (type === 'escapeToSquare') {
@@ -137,7 +139,7 @@ function getObjectiveTypeLabel(type) {
   }
 
   if (type === 'captureValue') {
-    return 'Capture Value'
+    return 'Capture Ships'
   }
 
   return 'Objective'
@@ -419,6 +421,7 @@ function ShipCommsWindow({
   const pieceName = getPieceDisplayName(piece.type)
   const factionName = getFactionDisplayName(piece.faction)
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
+  const shipClassName = `${displayPieceName} Class`
   const pilotTitle = `${factionName} ${displayPieceName}`
   const heroProfile = getStormCommanderHeroForPiece(piece)
   const heroPortrait = heroProfile?.assets.portraits[0]
@@ -458,7 +461,10 @@ function ShipCommsWindow({
       >
         <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
       </div>
-      <h2>{pilotTitle}</h2>
+      <h2 aria-label={`${factionName} ${shipClassName}`}>
+        <span className="storm-comms-title-faction">{factionName}</span>
+        <span className="storm-comms-title-class">{shipClassName}</span>
+      </h2>
       <div className="storm-comms-transmission">
         <MovementPatternIcon faction={piece.faction} pieceType={piece.type} />
         <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
@@ -508,7 +514,7 @@ function MissionStatList({ encounter }) {
 }
 
 function MissionStatusButton({ encounter, isMissionBriefingOpen, onOpenMission }) {
-  const objectiveLabel = getObjectiveTypeLabel(encounter.objective.type)
+  const objectiveLabel = getObjectiveTypeLabel(encounter.objective)
   const progressText = getObjectiveProgressText(encounter)
 
   return (
@@ -534,7 +540,7 @@ function MissionObjectiveStatusPanel({ encounter }) {
       role="region"
       aria-label="Player objective status"
     >
-      <h2>Objective: {getObjectiveTypeLabel(encounter.objective.type)}</h2>
+      <h2>Objective: {getObjectiveTypeLabel(encounter.objective)}</h2>
       <p>{encounter.objective.text}</p>
       <p className="storm-objective-progress">{getObjectiveProgressText(encounter)}</p>
     </section>
@@ -559,7 +565,7 @@ function MissionBriefingDialog({ encounter, onDismiss }) {
 
         <section className="storm-objective-panel">
           <div className="storm-objective-copy">
-            <h2>Objective: {getObjectiveTypeLabel(encounter.objective.type)}</h2>
+            <h2>Objective: {getObjectiveTypeLabel(encounter.objective)}</h2>
             <p>{encounter.objective.text}</p>
             <p className="storm-objective-progress">{getObjectiveProgressText(encounter)}</p>
             {encounter.outcome ? <p className="storm-outcome">{encounter.outcome}</p> : null}

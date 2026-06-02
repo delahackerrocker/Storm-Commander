@@ -152,11 +152,18 @@ describe('separate variant style sources', () => {
     const commsTitleRule = [...stormStyles.matchAll(
       /\.storm-commander-root \.storm-comms-window h2\s*\{(?<body>[^}]+)\}/g,
     )].map((match) => match.groups.body)
-      .find((body) => body.includes('font-size: 1.04rem;'))
+      .find((body) => body.includes('font-size: 1.14rem;'))
+    const commsTitleLineRule = stormStyles.match(
+      /\.storm-commander-root \.storm-comms-title-faction,\s*\n\.storm-commander-root \.storm-comms-title-class\s*\{(?<body>[^}]+)\}/,
+    )?.groups.body
+    const commsTitleClassRule = [...stormStyles.matchAll(
+      /\.storm-commander-root \.storm-comms-title-class\s*\{(?<body>[^}]+)\}/g,
+    )].map((match) => match.groups.body)
+      .find((body) => body.includes('font-size: 0.92em;'))
     const stackedCommsTitleRule = [...stormStyles.matchAll(
       /\.storm-commander-root \.storm-comms-window h2\s*\{(?<body>[^}]+)\}/g,
     )].map((match) => match.groups.body)
-      .find((body) => body.includes('font-size: 2rem;'))
+      .find((body) => body.includes('font-size: 1.75rem;'))
     const missionOverlayRule = stormStyles.match(
       /\.storm-commander-root \.storm-mission-overlay\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
@@ -239,8 +246,9 @@ describe('separate variant style sources', () => {
     const movementCaptureHintRule = stormStyles.match(
       /\.storm-commander-root \.storm-movement-pattern-cell\.is-capture-hint\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
-    const verticalBreakpointIndex = stormStyles.indexOf('@media (max-width: 900px)')
-    const phoneBreakpointIndex = stormStyles.indexOf('@media (max-width: 560px)')
+    const phonePortraitBreakpointIndex = stormStyles.indexOf(
+      '@media (max-width: 560px) and (orientation: portrait)',
+    )
     const compactCommsIndex = stormStyles.indexOf(
       'grid-template-columns: 43px 43px 43px minmax(0, 1fr);',
     )
@@ -270,9 +278,13 @@ describe('separate variant style sources', () => {
     expect(encounterBoardRule).toContain('box-sizing: border-box;')
     expect(encounterBoardRule).toContain('width: min(100%, var(--storm-encounter-board-max-size));')
     expect(encounterBoardRule).toContain('margin: 0 auto;')
+    expect(encounterLightSquareRule).toContain('background: rgba(255, 255, 255, 0.010125);')
     expect(panelRule).toContain('position: fixed;')
-    expect(panelRule).toContain('left: 16px;')
+    expect(panelRule).toContain('left: 50%;')
     expect(panelRule).toContain('bottom: 16px;')
+    expect(panelRule).toContain('box-sizing: border-box;')
+    expect(panelRule).toContain('width: min(1320px, calc(100vw - 32px));')
+    expect(panelRule).toContain('transform: translateX(-50%);')
     expect(panelRule).toContain('display: flex;')
     expect(panelRule).toContain('align-items: center;')
     expect(panelRule).toContain('gap: 8px;')
@@ -315,6 +327,8 @@ describe('separate variant style sources', () => {
     expect(stormStyles).not.toContain('.storm-commander-root .storm-mission-summary-button')
     expect(stormStyles).not.toContain('storm-mission-summary-new-encounter')
     expect(stackedMediaRule).toContain('.storm-commander-root .storm-encounter-shell')
+    expect(stackedMediaRule).toContain('.storm-commander-root .storm-encounter-panel')
+    expect(stackedMediaRule).toContain('width: min(760px, calc(100vw - 32px));')
     expect(normalizedStackedMediaRule).toContain(
       [
         'grid-template-areas:',
@@ -332,6 +346,10 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain('gap: 8px;')
     expect(stormStyles).toContain('width: 36px;')
     expect(verticalMediaRule).not.toContain('"player-comms"')
+    expect(verticalMediaRule).toContain('.storm-commander-root .storm-encounter-panel')
+    expect(verticalMediaRule).toContain('width: min(720px, calc(100vw - 24px));')
+    expect(verticalMediaRule).not.toContain('grid-template-columns: 43px 43px 43px minmax(0, 1fr);')
+    expect(verticalMediaRule).not.toContain('width: 43px;')
     expect(phoneMediaRule).not.toContain('.storm-commander-root .storm-mission-status-button')
     expect(iconButtonRule).toContain('width: 40px;')
     expect(iconButtonRule).toContain('height: 40px;')
@@ -384,11 +402,14 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain(".storm-commander-root .storm-mission-ai-type[data-faction='robocorp']")
     expect(stormStyles).toContain(".storm-commander-root .storm-mission-ai-type[data-faction='rebel']")
     expect(commsTitleRule).toContain('color: var(--storm-comms-title-color')
-    expect(stackedCommsTitleRule).toContain('font-size: 2rem;')
+    expect(commsTitleRule).toContain('display: grid;')
+    expect(commsTitleLineRule).toContain('display: block;')
+    expect(commsTitleClassRule).toContain('font-size: 0.92em;')
+    expect(stackedCommsTitleRule).toContain('font-size: 1.75rem;')
+    expect(stackedCommsTitleRule).toContain('white-space: normal;')
     expect(stormStyles).toContain('display: contents;')
     expect(stormStyles).toContain('grid-template-columns: 43px 43px 43px minmax(0, 1fr);')
-    expect(compactCommsIndex).toBeGreaterThan(verticalBreakpointIndex)
-    expect(compactCommsIndex).toBeLessThan(phoneBreakpointIndex)
+    expect(compactCommsIndex).toBeGreaterThan(phonePortraitBreakpointIndex)
     expect(stormStyles).toContain('width: 43px;')
     expect(stormStyles).toContain('height: 43px;')
     expect(stormStyles).toContain('grid-template-columns: repeat(5, minmax(0, 1fr));')
@@ -498,7 +519,7 @@ describe('separate variant style sources', () => {
       'border: 5px solid var(--storm-active-selection-color, var(--selected));',
     )
     expect(activeSelectionRule).toContain('border-radius: 50%;')
-    expect(encounterLightSquareRule).toContain('background: rgba(255, 255, 255, 0.01265625);')
+    expect(encounterLightSquareRule).toContain('background: rgba(255, 255, 255, 0.010125);')
     expect(lastMoveFromRule).toContain('opacity: 0.3;')
     expect(legalMoveRule).toContain('z-index: 2;')
     expect(legalMoveRule).toContain('width: 10%;')

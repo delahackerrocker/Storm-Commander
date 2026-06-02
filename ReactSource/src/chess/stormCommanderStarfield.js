@@ -14,6 +14,7 @@ const LAYER_PIXELS_PER_SECOND = {
   asteroidFar: 68,
 }
 
+const STARFIELD_DRIFT_SPEED_SCALE = 0.65
 const MIN_SPEED_MULTIPLIER = 1.08
 const SPEED_MULTIPLIER_RANGE = 1.32
 const MIN_MANEUVER_STEPS = 7
@@ -54,7 +55,8 @@ function moveSpeedTowardTarget(fromSpeed, toSpeed) {
 
 function getLayerStep(angle, pixelsPerSecond, speedMultiplier, elapsedMs) {
   const radians = (angle * Math.PI) / 180
-  const distance = pixelsPerSecond * speedMultiplier * (elapsedMs / 1000)
+  const distance =
+    pixelsPerSecond * STARFIELD_DRIFT_SPEED_SCALE * speedMultiplier * (elapsedMs / 1000)
 
   return {
     x: Math.cos(radians) * distance,

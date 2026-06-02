@@ -277,6 +277,26 @@ describe('Storm Commander variant', () => {
     expect(nextStyle['--storm-piece-rotation']).toMatch(/deg$/)
   })
 
+  it('moves starfield layers at 65 percent of the original drift speed', () => {
+    const initialMotion = {
+      ...createInitialStarfieldMotion(() => 0),
+      angle: 0,
+      targetAngle: 0,
+      speed: 1,
+      targetSpeed: 1,
+      retargetInSteps: 5,
+    }
+
+    const nextMotion = advanceStarfieldMotion(initialMotion, () => 0, 1000)
+
+    expect(nextMotion.nearX).toBeCloseTo(100.1)
+    expect(nextMotion.midX).toBeCloseTo(63.7)
+    expect(nextMotion.farX).toBeCloseTo(35.1)
+    expect(nextMotion.dustX).toBeCloseTo(23.4)
+    expect(nextMotion.asteroidNearX).toBeCloseTo(76.7)
+    expect(nextMotion.asteroidFarX).toBeCloseTo(44.2)
+  })
+
   it('uses the shortest turn across the 360 degree heading wrap', () => {
     const nextMotion = advanceStarfieldMotion(
       {

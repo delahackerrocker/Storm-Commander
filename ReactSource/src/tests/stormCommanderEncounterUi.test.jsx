@@ -178,11 +178,24 @@ describe('Storm Commander random encounter UI', () => {
 
       const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
       const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
+      const playerTitle = within(playerComms).getByRole('heading', {
+        name: /^Pirate [A-Z][a-z]+ Class$/i,
+      })
+      const opponentTitle = within(opponentComms).getByRole('heading', {
+        name: /^Imperial [A-Z][a-z]+ Class$/i,
+      })
 
       expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
         .toBeInTheDocument()
       expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
         .toBeInTheDocument()
+      expect(playerTitle.querySelector('.storm-comms-title-faction')).toHaveTextContent(/^Pirate$/)
+      expect(playerTitle.querySelector('.storm-comms-title-class'))
+        .toHaveTextContent(/^[A-Z][a-z]+ Class$/)
+      expect(opponentTitle.querySelector('.storm-comms-title-faction'))
+        .toHaveTextContent(/^Imperial$/)
+      expect(opponentTitle.querySelector('.storm-comms-title-class'))
+        .toHaveTextContent(/^[A-Z][a-z]+ Class$/)
       expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
         .toHaveAttribute('data-faction', 'pirate')
       expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
@@ -236,7 +249,9 @@ describe('Storm Commander random encounter UI', () => {
         'pirate',
       )
       expect(within(playerComms).queryByText(/^Movement$/)).not.toBeInTheDocument()
-      expect(within(playerComms).getByRole('heading', { name: /^Pirate [A-Z][a-z]+$/i }))
+      expect(within(playerComms).getByRole('heading', {
+        name: /^Pirate [A-Z][a-z]+ Class$/i,
+      }))
         .toBeInTheDocument()
       expect(within(playerComms).queryByRole('heading', { name: /: [A-Z][1-9]/i }))
         .not.toBeInTheDocument()
@@ -290,11 +305,62 @@ describe('Storm Commander random encounter UI', () => {
     expect(playerCommsStack).toContainElement(playerComms)
     expect(playerCommsStack).toContainElement(objectiveStatus)
     expect([...playerCommsStack.children]).toEqual([playerComms, objectiveStatus])
-    expect(within(objectiveStatus).getByRole('heading', { name: /^Objective: Survive Turns$/ }))
+    expect(within(objectiveStatus).getByRole('heading', { name: /^Objective: Survive 7 Turns$/ }))
       .toBeInTheDocument()
     expect(within(objectiveStatus).getByText(/^Survive 7 turns until the jump drive charges\.$/))
       .toBeInTheDocument()
     expect(within(objectiveStatus).getByText(/^0\/7 turns survived$/))
+      .toHaveClass('storm-objective-progress')
+  })
+
+  it('labels capture value objectives as capture ships in the player status panel', async () => {
+    const user = userEvent.setup()
+    const encounter = {
+      id: 'test_player_comms_capture_ships_status',
+      title: 'Random Pirate Raid',
+      board: { width: 5, height: 5 },
+      factions: ['pirate', 'robocorp'],
+      playerFaction: 'pirate',
+      turnOrder: ['pirate', 'robocorp'],
+      currentFaction: 'pirate',
+      round: 1,
+      intro: 'Commander, Robocorp signatures just dropped out of slipspace.',
+      capturedValueByPlayer: 0,
+      status: 'active',
+      outcome: null,
+      objective: {
+        type: 'captureValue',
+        valueRequired: 6,
+        text: 'Capture enough enemy ships to break their formation.',
+      },
+      pieces: [
+        { id: 'pirate_queen', faction: 'pirate', type: 'q', square: { x: 1, y: 1 } },
+        { id: 'robocorp_pawn', faction: 'robocorp', type: 'p', square: { x: 3, y: 1 } },
+      ],
+    }
+
+    render(
+      <StormCommanderEncounterPage
+        encounter={encounter}
+        onBack={() => {}}
+        onNewEncounter={() => {}}
+        setEncounter={() => {}}
+      />,
+    )
+
+    expect(screen.getByRole('button', {
+      name: /Mission status\. Objective: Capture Ships\. Progress: 0\/6 value captured\./,
+    })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /^Battle$/ }))
+
+    const objectiveStatus = screen.getByRole('region', { name: /^Player objective status$/ })
+
+    expect(within(objectiveStatus).getByRole('heading', { name: /^Objective: Capture Ships$/ }))
+      .toBeInTheDocument()
+    expect(within(objectiveStatus).getByText(/^Capture enough enemy ships to break their formation\.$/))
+      .toBeInTheDocument()
+    expect(within(objectiveStatus).getByText(/^0\/6 value captured$/))
       .toHaveClass('storm-objective-progress')
   })
 
@@ -430,9 +496,9 @@ describe('Storm Commander random encounter UI', () => {
 
     const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
-    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen$/ }))
+    expect(within(playerComms).getByRole('heading', { name: /^Pirate Queen Class$/ }))
       .toBeInTheDocument()
-    expect(within(playerComms).queryByRole('heading', { name: /^Pirate Queen : C4$/ }))
+    expect(within(playerComms).queryByRole('heading', { name: /^Pirate Queen Class : C4$/ }))
       .not.toBeInTheDocument()
     expect(within(playerComms).getByRole('img', { name: /^Prank Sumatra hero portrait$/ }))
       .toBeInTheDocument()
@@ -492,7 +558,7 @@ describe('Storm Commander random encounter UI', () => {
 
       const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
 
-      expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook$/ }))
+      expect(within(playerComms).getByRole('heading', { name: /^Pirate Rook Class$/ }))
         .toBeInTheDocument()
     } finally {
       vi.useRealTimers()
@@ -815,7 +881,7 @@ describe('Storm Commander random encounter UI', () => {
       fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
 
       await act(async () => {
-        vi.advanceTimersByTime(1499)
+        vi.advanceTimersByTime(2999)
       })
 
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
@@ -899,24 +965,24 @@ describe('Storm Commander random encounter UI', () => {
 
       fireEvent.click(screen.getByRole('button', { name: /^Battle$/ }))
 
-      expect(screen.getByRole('heading', { name: /^Imperial Rook$/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Imperial Rook Class$/i })).toBeInTheDocument()
 
       await act(async () => {
         vi.advanceTimersByTime(500)
       })
 
-      expect(screen.getByRole('heading', { name: /^Imperial Bishop$/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Imperial Bishop Class$/i })).toBeInTheDocument()
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
 
       await act(async () => {
         vi.advanceTimersByTime(500)
       })
 
-      expect(screen.getByRole('heading', { name: /^Imperial Knight$/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /^Imperial Knight Class$/i })).toBeInTheDocument()
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
 
       await act(async () => {
-        vi.advanceTimersByTime(499)
+        vi.advanceTimersByTime(1999)
       })
 
       expect(container.querySelector('.storm-capture-animation-layer')).not.toBeInTheDocument()
@@ -974,12 +1040,12 @@ describe('Storm Commander random encounter UI', () => {
 
     const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
 
-    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn$/ }))
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Pawn Class$/ }))
       .toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Imperial queen square/i }))
 
-    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen$/ }))
+    expect(within(opponentComms).getByRole('heading', { name: /^Imperial Queen Class$/ }))
       .toBeInTheDocument()
   })
 
@@ -1496,7 +1562,7 @@ describe('Storm Commander random encounter UI', () => {
     )
 
     expect(within(screen.getByRole('complementary', { name: /^Player comms$/ }))
-      .getByRole('heading', { name: /^Pirate Pawn$/ })).toBeInTheDocument()
+      .getByRole('heading', { name: /^Pirate Pawn Class$/ })).toBeInTheDocument()
     expect(captureHints).toHaveLength(4)
     expect(pawnMovementIcon.querySelectorAll('.storm-movement-pattern-cell.is-move'))
       .toHaveLength(8)
