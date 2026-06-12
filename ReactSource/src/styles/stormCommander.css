@@ -1529,7 +1529,8 @@
   grid-template-areas:
     "hero hero"
     "portrait movement"
-    "title title";
+    "title title"
+    "bark bark";
   gap: var(--storm-comms-tile-gap);
   align-content: start;
   justify-self: stretch;
@@ -1566,6 +1567,13 @@
 
 .storm-commander-root .storm-comms-window-opponent {
   grid-area: opponent-comms;
+}
+
+.storm-commander-root .storm-comms-window.is-speaking {
+  box-shadow:
+    0 0 28px var(--storm-comms-faction-glow, transparent),
+    0 18px 55px rgba(4, 8, 18, 0.38),
+    inset 0 0 0 1px var(--storm-comms-faction-color, rgba(243, 240, 223, 0.28));
 }
 
 .storm-commander-root .storm-comms-window[data-faction='pirate'] {
@@ -1781,10 +1789,15 @@
 }
 
 .storm-commander-root .storm-comms-bark {
+  grid-area: bark;
   display: none;
   align-items: center;
   min-height: 85px;
   overflow-wrap: anywhere;
+}
+
+.storm-commander-root .storm-comms-window.is-speaking .storm-comms-bark {
+  display: flex;
 }
 
 .storm-commander-root .storm-comms-empty {

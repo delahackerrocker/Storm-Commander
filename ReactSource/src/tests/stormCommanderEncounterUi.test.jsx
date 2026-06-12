@@ -11,6 +11,10 @@ import {
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import {
+  STORM_COMMANDER_BRIEFING_LINE_DURATION_MS,
+  buildPilotChatterSequence,
+} from '../storm-commander/comms/pilotChatter'
 import { StormCommanderEncounterPage } from '../storm-commander/components/StormCommanderEncounterPage'
 
 async function renderRandomEncounterApp(user) {
@@ -22,6 +26,70 @@ async function renderRandomEncounterApp(user) {
 }
 
 describe('Storm Commander random encounter UI', () => {
+  it('plays objective chatter through comms and soft-selects the current speaker before battle', () => {
+    vi.useFakeTimers()
+
+    try {
+      const encounter = {
+        id: 'test_comm_briefing_sequence',
+        title: 'Random Pirate Raid',
+        board: { width: 5, height: 5 },
+        factions: ['pirate', 'imperial'],
+        playerFaction: 'pirate',
+        turnOrder: ['pirate', 'imperial'],
+        currentFaction: 'pirate',
+        round: 1,
+        intro: 'Commander, Imperial signatures just dropped out of slipspace.',
+        capturedValueByPlayer: 0,
+        status: 'active',
+        outcome: null,
+        objective: {
+          type: 'destroyTarget',
+          targetPieceId: 'imperial_queen',
+          text: 'Destroy the Imperial queen.',
+        },
+        pieces: [
+          { id: 'pirate_rook', faction: 'pirate', type: 'r', square: { x: 1, y: 1 } },
+          { id: 'pirate_pawn', faction: 'pirate', type: 'p', square: { x: 0, y: 4 } },
+          { id: 'imperial_queen', faction: 'imperial', type: 'q', square: { x: 3, y: 1 } },
+          { id: 'imperial_pawn', faction: 'imperial', type: 'p', square: { x: 4, y: 4 } },
+        ],
+      }
+      const chatterSequence = buildPilotChatterSequence(encounter)
+
+      render(
+        <StormCommanderEncounterPage
+          encounter={encounter}
+          onBack={() => {}}
+          onBoardAnimationsPausedChange={() => {}}
+          onNewEncounter={() => {}}
+          setEncounter={() => {}}
+        />,
+      )
+
+      const playerComms = screen.getByRole('complementary', { name: /^Player comms$/ })
+      const opponentComms = screen.getByRole('complementary', { name: /^Opponent comms$/ })
+
+      expect(within(playerComms).getByText(`"${chatterSequence[0].text}"`))
+        .toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /B4 Pirate rook square/i }))
+        .toHaveClass('is-player-soft-selected')
+
+      act(() => {
+        vi.advanceTimersByTime(STORM_COMMANDER_BRIEFING_LINE_DURATION_MS)
+      })
+
+      expect(within(opponentComms).getByText(`"${chatterSequence[1].text}"`))
+        .toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /D4 Imperial queen square/i }))
+        .toHaveClass('is-opponent-soft-selected')
+      expect(within(playerComms).queryByText(`"${chatterSequence[0].text}"`))
+        .not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('marks board and ship animations paused while the mission briefing is open', async () => {
     const user = userEvent.setup()
     const onBoardAnimationsPausedChange = vi.fn()

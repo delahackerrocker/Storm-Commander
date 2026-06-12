@@ -25,6 +25,10 @@ import {
   getPieceDisplayName,
 } from '../tactics/encounterConstants'
 import { getStormCommanderHeroForPiece } from '../heroes/heroProfiles'
+import {
+  STORM_COMMANDER_BRIEFING_LINE_DURATION_MS,
+  buildPilotChatterSequence,
+} from '../comms/pilotChatter'
 
 const ENEMY_MOVE_DELAY_MS = 3000
 const ENEMY_THINKING_SELECTION_INTERVAL_MS = 500
@@ -401,9 +405,11 @@ function MovementPatternIcon({ faction, pieceType }) {
 function ShipCommsWindow({
   ariaLabel,
   emptyText,
+  isSpeaking = false,
   piece,
   pieceRotation,
   selectionFlash,
+  transmissionText,
   variant,
 }) {
   if (!piece) {
@@ -430,7 +436,11 @@ function ShipCommsWindow({
 
   return (
     <aside
-      className={`storm-comms-window storm-comms-window-${variant}`}
+      className={[
+        'storm-comms-window',
+        `storm-comms-window-${variant}`,
+        isSpeaking ? 'is-speaking' : '',
+      ].filter(Boolean).join(' ')}
       aria-label={ariaLabel}
       data-faction={piece.faction}
     >
@@ -467,7 +477,9 @@ function ShipCommsWindow({
       </h2>
       <div className="storm-comms-transmission">
         <MovementPatternIcon faction={piece.faction} pieceType={piece.type} />
-        <p className="storm-comms-bark">"{STORM_COMMANDER_PILOT_BARKS[piece.type]}"</p>
+        <p className="storm-comms-bark" aria-live={isSpeaking ? 'polite' : undefined}>
+          "{transmissionText || STORM_COMMANDER_PILOT_BARKS[piece.type]}"
+        </p>
       </div>
       {activeSelectionFlash ? (
         <div
@@ -635,10 +647,17 @@ export function StormCommanderEncounterPage({
   const [selectionFlash, setSelectionFlash] = useState(null)
   const [pendingMoveAnimation, setPendingMoveAnimation] = useState(null)
   const [enemyThinkingPieceSelection, setEnemyThinkingPieceSelection] = useState(null)
+  const [briefingChatterSelection, setBriefingChatterSelection] = useState({
+    encounterId: null,
+    index: 0,
+  })
   const selectionFlashIdRef = useRef(0)
   const isMoveAnimating = Boolean(pendingMoveAnimation)
   const isPlayerTurn =
     encounter.status === 'active' && encounter.currentFaction === encounter.playerFaction
+  const isMissionResultOpen = encounter.status !== 'active'
+  const isMissionBriefingOpen =
+    encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
   const isEnemyThinking =
     encounter.status === 'active' &&
     encounter.currentFaction !== encounter.playerFaction &&
@@ -653,11 +672,33 @@ export function StormCommanderEncounterPage({
     () => encounter.pieces.filter((piece) => piece.faction === encounter.playerFaction),
     [encounter.pieces, encounter.playerFaction],
   )
+  const briefingChatterSequence = useMemo(
+    () => buildPilotChatterSequence(encounter),
+    [encounter],
+  )
+  const briefingChatterIndex =
+    isMissionBriefingOpen && briefingChatterSelection.encounterId === encounter.id
+      ? briefingChatterSelection.index
+      : 0
+  const currentBriefingChatter =
+    isMissionBriefingOpen && briefingChatterSequence.length > 0
+      ? briefingChatterSequence[
+          Math.min(briefingChatterIndex, briefingChatterSequence.length - 1)
+        ]
+      : null
+  const briefingSpeakerPiece = currentBriefingChatter
+    ? encounter.pieces.find((piece) => piece.id === currentBriefingChatter.pieceId) || null
+    : null
+  const briefingPlayerPiece =
+    currentBriefingChatter?.side === 'player' ? briefingSpeakerPiece : null
+  const briefingOpponentPiece =
+    currentBriefingChatter?.side === 'opponent' ? briefingSpeakerPiece : null
   const playerCommsPiece =
-    playerCommsSelection?.encounterId === encounter.id
+    briefingPlayerPiece ||
+    (playerCommsSelection?.encounterId === encounter.id
       ? playerPieces.find((piece) => piece.id === playerCommsSelection.pieceId) ||
         getInitialCommsPiece(playerPieces, encounter.id)
-      : getInitialCommsPiece(playerPieces, encounter.id)
+      : getInitialCommsPiece(playerPieces, encounter.id))
   const opponentPieces = useMemo(
     () => encounter.pieces.filter((piece) => piece.faction !== encounter.playerFaction),
     [encounter.pieces, encounter.playerFaction],
@@ -677,6 +718,7 @@ export function StormCommanderEncounterPage({
       ? opponentPieces.find((piece) => piece.id === opponentCommsSelection.pieceId) || null
       : null
   const opponentCommsPiece =
+    briefingOpponentPiece ||
     (isEnemyThinking && opponentPieces.length === 1 ? opponentPieces[0] : null) ||
     enemyThinkingPiece ||
     manuallySelectedOpponentPiece ||
@@ -684,11 +726,13 @@ export function StormCommanderEncounterPage({
     opponentPieces[0] ||
     null
   const playerSoftSelectionPiece =
-    playerCommsSelection?.encounterId === encounter.id
+    briefingPlayerPiece ||
+    (playerCommsSelection?.encounterId === encounter.id
       ? playerPieces.find((piece) => piece.id === playerCommsSelection.pieceId) || null
-      : null
+      : null)
   const opponentSoftSelectionPiece =
-    !isEnemyThinking ? manuallySelectedOpponentPiece || latestOpponentMovePiece : null
+    briefingOpponentPiece ||
+    (!isEnemyThinking ? manuallySelectedOpponentPiece || latestOpponentMovePiece : null)
   const activeOpponentPiece = isEnemyThinking
     ? enemyThinkingPiece || opponentPieces[0] || null
     : null
@@ -699,10 +743,6 @@ export function StormCommanderEncounterPage({
         : [],
     [encounter, selectedPiece],
   )
-  const isMissionResultOpen = encounter.status !== 'active'
-  const isMissionBriefingOpen =
-    encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
-
   const startMoveAnimation = useCallback((move) => {
     const movingPiece = encounter.pieces.find((piece) => piece.id === move.pieceId)
     const capturedPiece = move.capturedPieceId
@@ -803,6 +843,34 @@ export function StormCommanderEncounterPage({
   }, [encounter, isEnemyThinking, setEncounter, startMoveAnimation])
 
   useEffect(() => {
+    if (
+      !isMissionBriefingOpen ||
+      briefingChatterIndex >= briefingChatterSequence.length - 1
+    ) {
+      return undefined
+    }
+
+    const timerId = window.setTimeout(() => {
+      setBriefingChatterSelection((currentSelection) => {
+        const currentIndex =
+          currentSelection.encounterId === encounter.id ? currentSelection.index : 0
+
+        return {
+          encounterId: encounter.id,
+          index: Math.min(currentIndex + 1, briefingChatterSequence.length - 1),
+        }
+      })
+    }, STORM_COMMANDER_BRIEFING_LINE_DURATION_MS)
+
+    return () => window.clearTimeout(timerId)
+  }, [
+    briefingChatterIndex,
+    briefingChatterSequence.length,
+    encounter.id,
+    isMissionBriefingOpen,
+  ])
+
+  useEffect(() => {
     onBoardAnimationsPausedChange?.(isMissionBriefingOpen)
   }, [isMissionBriefingOpen, onBoardAnimationsPausedChange])
 
@@ -835,6 +903,11 @@ export function StormCommanderEncounterPage({
     opponentPieces,
     playerPieces,
   ])
+
+  const handleOpenMission = useCallback(() => {
+    setBriefingChatterSelection({ encounterId: encounter.id, index: 0 })
+    setDismissedMissionEncounterId(null)
+  }, [encounter.id])
 
   useEffect(() => {
     if (!isMissionBriefingOpen) {
@@ -930,7 +1003,7 @@ export function StormCommanderEncounterPage({
         <MissionStatusButton
           encounter={encounter}
           isMissionBriefingOpen={isMissionBriefingOpen}
-          onOpenMission={() => setDismissedMissionEncounterId(null)}
+          onOpenMission={handleOpenMission}
         />
       </div>
 
@@ -939,9 +1012,15 @@ export function StormCommanderEncounterPage({
           <ShipCommsWindow
             ariaLabel="Player comms"
             emptyText="Select a Pirate ship to open player comms."
+            isSpeaking={currentBriefingChatter?.side === 'player'}
             piece={playerCommsPiece}
             pieceRotation={pieceRotation}
             selectionFlash={selectionFlash}
+            transmissionText={
+              currentBriefingChatter?.side === 'player'
+                ? currentBriefingChatter.text
+                : null
+            }
             variant="player"
           />
           <MissionObjectiveStatusPanel encounter={encounter} />
@@ -1047,9 +1126,15 @@ export function StormCommanderEncounterPage({
         <ShipCommsWindow
           ariaLabel="Opponent comms"
           emptyText="Touch an opponent ship to scan their comms."
+          isSpeaking={currentBriefingChatter?.side === 'opponent'}
           piece={opponentCommsPiece}
           pieceRotation={pieceRotation}
           selectionFlash={selectionFlash}
+          transmissionText={
+            currentBriefingChatter?.side === 'opponent'
+              ? currentBriefingChatter.text
+              : null
+          }
           variant="opponent"
         />
 
