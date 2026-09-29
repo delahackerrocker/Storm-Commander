@@ -190,7 +190,7 @@ describe('Storm Commander random encounter UI', () => {
       ])
       expect(within(missionDialog).getByText(/^AI$/)).toBeInTheDocument()
       const briefingAiType = missionDialog.querySelector('.storm-mission-ai-type')
-      expect(briefingAiType).toHaveTextContent(/^Sloppy Aggressive$/)
+      expect(briefingAiType).toHaveTextContent(/^Standard$/)
       expect(briefingAiType).toHaveAttribute('data-faction', 'imperial')
       expect(encounterStatusButton).toHaveTextContent('Mission')
       expect(screen.queryByRole('complementary', { name: /^Encounter status$/ }))

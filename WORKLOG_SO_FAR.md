@@ -165,3 +165,11 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Retained random selection among similarly scored moves, with no deeper search or positional scoring. The enemy still takes favorable exchanges but avoids obvious bait and can defend a marked ship or block extraction.
 - Validation: all 145 tests pass, including bait avoidance, profitable exchanges, extraction defense, target protection, unchanged input state, and randomized equivalent choices. Lint and production build pass.
 - Synced the iOS wrapper and advanced version 1.01 to build 12. Commander personalities and adaptive difficulty remain proposed future options, outside this release.
+
+## 2026-09-28 — Difficulty Modes And Mission-Aware Commanders
+
+- Extended the final build-12 batch with Standard, Commander Styles, and Adaptive choices in a shared difficulty panel on the title screen and battlefield. Settings persist locally; changing a setting affects the next match, and the open panel pauses board input and AI. Native dialog behavior supplies modal focus handling and Escape dismissal.
+- Authored bold/measured styles per commander. Rebels use the gentlest faction tuning, Robocorp slightly stronger, and Imperials strongest within a narrow range. Both character styles defend marked ships/fleet value during target/capture missions and pursue Pirates during survival/extraction missions. The commander identity is frozen at mission creation and shared by opening radio, tactics, and the opponent portrait.
+- Adaptive starts at the commander baseline, increases one small step after each win, decreases two after each loss, and clamps to levels 0–8. Only completed adaptive matches count, each once; unfinished/abandoned matches and other modes do not alter progress. Current-match difficulty stays fixed even if settings change.
+- The initial modest AI web update completed before the scope expanded. Held the TestFlight upload and final deployment until this complete batch was ready.
+- Validation: 159 tests across 27 files pass; lint and production build pass. Browser checks at 1440×1000, 393×852, 375×667, and 852×393 verified dialog fit, saved settings, keyboard dismissal/focus return, fixed current-match mode, consistent portraits, and footer fit. Native iPhone 17 simulator build/run and difficulty selection/persistence verified; restored Standard after the check.

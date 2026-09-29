@@ -25,7 +25,9 @@ import {
   getFactionDisplayName,
   getPieceDisplayName,
 } from '../tactics/encounterConstants'
-import { getStormCommanderHeroForPiece } from '../heroes/heroProfiles'
+import { getStormCommanderHeroForPiece, STORM_COMMANDER_HERO_PROFILES } from '../heroes/heroProfiles'
+import { DifficultyDialog } from './DifficultyDialog'
+import { DIFFICULTY_OPTIONS, getCommanderTactics } from '../difficulty/difficultySettings'
 import {
   STORM_COMMANDER_BRIEFING_LINE_DURATION_MS,
   buildPilotChatterSequence,
@@ -385,6 +387,7 @@ function MovementPatternIcon({ faction, pieceType }) {
 }
 
 function ShipCommsWindow({
+  heroOverride,
   ariaLabel,
   emptyText,
   isSpeaking = false,
@@ -411,7 +414,7 @@ function ShipCommsWindow({
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
   const shipClassName = `${displayPieceName} Class`
   const pilotTitle = `${factionName} ${displayPieceName}`
-  const heroProfile = getStormCommanderHeroForPiece(piece)
+  const heroProfile = heroOverride || getStormCommanderHeroForPiece(piece)
   const heroPortrait = heroProfile?.assets.radioPortrait || heroProfile?.assets.portraits[0]
   const activeSelectionFlash =
     selectionFlash?.faction === piece.faction ? selectionFlash : null
@@ -499,7 +502,8 @@ function MissionStatList({ encounter }) {
         <dt>AI</dt>
         <dd>
           <span className="storm-mission-ai-type" data-faction={opponentFaction}>
-            Sloppy Aggressive
+            {DIFFICULTY_OPTIONS.find(option => option.id === encounter.difficulty?.mode)?.name || 'Standard'}
+            {encounter.difficulty?.mode && encounter.difficulty.mode !== 'standard' ? ` · ${getCommanderTactics(encounter).name}` : ''}
           </span>
         </dd>
       </div>
@@ -628,6 +632,7 @@ export function StormCommanderEncounterPage({
   onToggleSound,
 }) {
   const [dismissedTurnNotice, setDismissedTurnNotice] = useState(null)
+  const [difficultyOpen, setDifficultyOpen] = useState(false)
   const [selection, setSelection] = useState(null)
   const [playerCommsSelection, setPlayerCommsSelection] = useState(null)
   const [opponentCommsSelection, setOpponentCommsSelection] = useState(null)
@@ -647,7 +652,7 @@ export function StormCommanderEncounterPage({
   const isMissionBriefingOpen =
     encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
   const turnNoticeId = `${encounter.id}:${encounter.round}:${encounter.currentFaction}`
-  const isBattlePaused = isMissionBriefingOpen || isRadioPlaying
+  const isBattlePaused = isMissionBriefingOpen || isRadioPlaying || difficultyOpen
   const isEnemyThinking =
     encounter.status === 'active' &&
     encounter.currentFaction !== encounter.playerFaction &&
@@ -1012,6 +1017,8 @@ export function StormCommanderEncounterPage({
           isMissionBriefingOpen={isMissionBriefingOpen}
           onOpenMission={handleOpenMission}
         />
+        <button type="button" className="back-button" aria-haspopup="dialog"
+          disabled={isMoveAnimating} onClick={() => setDifficultyOpen(true)}>Difficulty</button>
       </div>
 
       <main className="storm-encounter-shell">
@@ -1134,6 +1141,7 @@ export function StormCommanderEncounterPage({
 
         <ShipCommsWindow
           ariaLabel="Opponent comms"
+          heroOverride={STORM_COMMANDER_HERO_PROFILES.find(hero => hero.id === encounter.enemyCommanderId)}
           emptyText="Touch an opponent ship to scan their comms."
           isSpeaking={currentBriefingChatter?.side === 'opponent'}
           piece={opponentCommsPiece}
@@ -1159,6 +1167,7 @@ export function StormCommanderEncounterPage({
       {isMissionResultOpen ? (
         <MissionResultDialog encounter={encounter} onNextMission={handleNewEncounter} />
       ) : null}
+      {difficultyOpen ? <DifficultyDialog duringMatch onClose={() => setDifficultyOpen(false)} /> : null}
     </div>
   )
 }

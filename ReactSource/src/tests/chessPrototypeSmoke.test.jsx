@@ -10,15 +10,16 @@ async function openStartMenuPage(user, pageName) {
 }
 
 describe('Chess-ish prototype', () => {
-  it('starts with only Press to Play', () => {
+  it('starts with Press to Play and Difficulty', () => {
     render(<App />)
 
     expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
     expect(screen.queryByText(/^Start Menu$/)).not.toBeInTheDocument()
     expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual([
       'Press to Play',
+      'Difficulty',
     ])
-    expect(screen.getByRole('main').textContent).toBe('Press to Play')
+    expect(screen.getByRole('main').textContent).toBe('Press to PlayDifficulty')
     expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
   })
 
@@ -51,7 +52,7 @@ describe('Chess-ish prototype', () => {
     }
   })
 
-  it('returns to the single play button and can start again', async () => {
+  it('returns to the title controls and can start again', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.tab()
@@ -60,7 +61,7 @@ describe('Chess-ish prototype', () => {
     expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
     await dismissOpeningRadio(user)
     await user.click(screen.getByRole('button', { name: /^back$/i }))
-    expect(screen.getAllByRole('button')).toHaveLength(1)
+    expect(screen.getAllByRole('button')).toHaveLength(2)
     await openStartMenuPage(user, /^Press to Play$/)
     expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
     expect(screen.queryByTestId('chess-square')).not.toBeInTheDocument()

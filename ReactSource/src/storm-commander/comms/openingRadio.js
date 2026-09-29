@@ -1,4 +1,4 @@
-import { getStormCommanderHeroForPiece } from '../heroes/heroProfiles'
+import { getStormCommanderHeroForPiece, STORM_COMMANDER_HERO_PROFILES } from '../heroes/heroProfiles'
 import { getEncounterPieceLabel } from '../tactics/encounterConstants'
 
 export const RADIO_HOLD_MS = 5000
@@ -76,7 +76,7 @@ export function buildOpeningRadio(encounter) {
     .replace(/\{(\w+)\}/g, (_, key) => context[key])
   return [
     { side: 'player', hero: getStormCommanderHeroForPiece(player), text },
-    { side: 'opponent', hero: getStormCommanderHeroForPiece(opponent),
+    { side: 'opponent', hero: STORM_COMMANDER_HERO_PROFILES.find(hero => hero.id === encounter.enemyCommanderId) || getStormCommanderHeroForPiece(opponent),
       text: ENEMY_TAUNTS[indexFor(`${encounter.id}:enemy`, ENEMY_TAUNTS.length)] },
   ]
 }

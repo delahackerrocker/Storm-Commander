@@ -11,6 +11,8 @@ import {
 } from '../chess/stormCommanderPieceAssets'
 import { StormCommanderMission } from '../storm-commander/components/StormCommanderMission'
 import { generateRandomEncounter } from '../storm-commander/encounter/generateRandomEncounter'
+import { configureEncounterDifficulty } from '../storm-commander/difficulty/difficultySettings'
+import { getDifficultySettings, recordDifficultyResult } from '../storm-commander/difficulty/useDifficultySettings'
 import { BasicChessPage } from './BasicChessPage'
 import '../styles/stormCommander.css'
 
@@ -135,12 +137,16 @@ export function StormCommanderPage({
 }) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
   const [encounter, setEncounter] = useState(() =>
-    startInRandomEncounter ? generateRandomEncounter() : null,
+    startInRandomEncounter ? configureEncounterDifficulty(generateRandomEncounter(), getDifficultySettings()) : null,
   )
   const [areBoardAnimationsPaused, setAreBoardAnimationsPaused] = useState(false)
   const { getCurrentPieceRotation, initialStarfieldStyle, starfieldRootRef } =
     useLowPowerStarfieldMotion(areBoardAnimationsPaused)
   const sideVisualThemes = useMemo(() => createSideVisualThemes(sideFactions), [sideFactions])
+
+  useEffect(() => {
+    if (encounter) recordDifficultyResult(encounter)
+  }, [encounter])
 
   const handleBoardAnimationsPausedChange = useCallback((isPaused) => {
     setAreBoardAnimationsPaused(isPaused)
@@ -153,7 +159,9 @@ export function StormCommanderPage({
   }
 
   function startRandomEncounter() {
-    setEncounter(generateRandomEncounter())
+    // Record once here too, so a fast Next Mission tap cannot race the result effect.
+    if (encounter) recordDifficultyResult(encounter)
+    setEncounter(configureEncounterDifficulty(generateRandomEncounter(), getDifficultySettings()))
   }
 
   return (

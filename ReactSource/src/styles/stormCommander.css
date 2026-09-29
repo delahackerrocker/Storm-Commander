@@ -2529,3 +2529,66 @@
 @media (prefers-reduced-motion: reduce) {
   .storm-turn-notice { animation: none; }
 }
+
+/* A compact, shared difficulty panel for the title and battlefield. */
+.start-difficulty-button {
+  position: absolute;
+  z-index: 5;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  right: max(16px, env(safe-area-inset-right));
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 1px solid #b19881;
+  border-radius: 6px;
+  color: #f2edd9;
+  background: #11150ee6;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.storm-difficulty-dialog {
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 28px));
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: auto;
+  overflow-y: auto;
+  padding: clamp(18px, 4vw, 28px);
+  border: 1px solid #e86c24;
+  border-radius: 14px;
+  color: #f2edd9;
+  background: linear-gradient(145deg, #272921, #101410);
+  box-shadow: 0 24px 90px #000a;
+  font-family: inherit;
+}
+.storm-difficulty-dialog::backdrop { background: #040609d9; }
+.storm-difficulty-dialog h1 { margin: 0 0 12px; font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.15; }
+.storm-difficulty-eyebrow { margin: 0 0 10px; color: #f3914d; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; }
+.storm-difficulty-note, .storm-difficulty-footnote { color: #c6c5b8; font-size: 0.9rem; line-height: 1.5; }
+.storm-difficulty-dialog fieldset { display: grid; gap: 10px; border: 0; padding: 0; margin: 20px 0; }
+.storm-difficulty-option { display: flex; align-items: flex-start; gap: 12px; padding: 15px 12px; border: 1px solid #646959; border-radius: 8px; cursor: pointer; }
+.storm-difficulty-option.is-selected { border-color: #f3914d; background: #e86c2417; }
+.storm-difficulty-option input { margin: 4px 0 0; flex-shrink: 0; width: 18px; height: 18px; accent-color: #e86c24; }
+.storm-difficulty-option strong { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 1rem; }
+.storm-difficulty-option small { color: #f3914d; font-size: 0.6rem; letter-spacing: 0.06em; }
+.storm-difficulty-option span span { display: block; margin-top: 5px; color: #cfcec3; font-size: 0.85rem; line-height: 1.45; }
+.storm-difficulty-option:focus-within { outline: 2px solid #f2edd9; outline-offset: 3px; }
+.storm-difficulty-done { width: 100%; min-height: 46px; margin-top: 6px; border: 1px solid #f3914d; border-radius: 6px; background: #e86c24; color: #101410; font: inherit; font-weight: 800; cursor: pointer; }
+.start-difficulty-button:focus-visible, .storm-difficulty-done:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .storm-commander-root .storm-encounter-panel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    bottom: max(12px, env(safe-area-inset-bottom));
+    gap: 6px;
+  }
+  .storm-commander-root.storm-encounter-root .storm-encounter-panel button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 4px;
+    font-size: 0.74rem;
+    height: 44px;
+    white-space: nowrap;
+  }
+}
+.start-page.is-launching .start-difficulty-button { visibility: hidden; }

@@ -101,7 +101,7 @@ describe.each(IOS_DEVICE_VIEWPORTS)('iOS device viewport smoke: $name', (viewpor
       render(<App />)
 
       expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
-      expect(screen.getAllByRole('button')).toHaveLength(1)
+      expect(screen.getAllByRole('button')).toHaveLength(2)
 
       await openPage(user, /^Press to Play$/)
       await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
@@ -113,7 +113,7 @@ describe.each(IOS_DEVICE_VIEWPORTS)('iOS device viewport smoke: $name', (viewpor
       await dismissOpeningRadio(user)
       await openPage(user, /^Back$/)
       expect(screen.getByRole('button', { name: /^Press to Play$/ })).toBeInTheDocument()
-      expect(screen.getAllByRole('button')).toHaveLength(1)
+      expect(screen.getAllByRole('button')).toHaveLength(2)
     } finally {
       randomSpy.mockRestore()
     }

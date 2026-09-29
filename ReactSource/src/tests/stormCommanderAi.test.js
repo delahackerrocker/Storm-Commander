@@ -87,4 +87,19 @@ describe('Storm Commander Sloppy Aggressive AI', () => {
     expect(selectSloppyAggressiveMove(encounter, 'imperial', () => 0)).not.toEqual(selectSloppyAggressiveMove(encounter, 'imperial', () => 0.99))
     expect(selectSloppyAggressiveMove({ ...encounter, status: 'won' }, 'imperial')).toBeNull()
   })
+
+  it.each(['lance-rosenthorn', 'thalia-mott'])('commander %s pursues Pirates in survival missions instead of retreating', commander => {
+    const encounter = position([
+      ['hunter', 'rebel', 'p', 2, 2],
+      ['pirate', 'pirate', 'p', 4, 4],
+    ], { type: 'surviveTurns', turnsRequired: 7, turnsElapsed: 0 })
+    encounter.currentFaction = 'rebel'
+    encounter.turnOrder = ['pirate', 'rebel']
+    encounter.enemyCommanderId = commander
+    encounter.difficulty = { mode: 'commanders', level: 0 }
+    for (const random of [() => 0, () => 0.99]) {
+      const move = selectSloppyAggressiveMove(encounter, 'rebel', random)
+      expect(move.to.x + move.to.y).toBe(5)
+    }
+  })
 })
