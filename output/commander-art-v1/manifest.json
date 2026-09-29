@@ -12,7 +12,8 @@
       "detail": "female CEO, straight glossy black bob with blunt bangs and long face-framing strands, violet eyes and lips, pale cool-gray skin, sleek cyan-and-charcoal shoulder-cutout suit, black circular figure-eight chest pendant",
       "portrait": "portraits/dayna-scry.png",
       "titleScreen": "title-screens/blue-robocorp.png",
-      "reference": "references/character-34.png"
+      "reference": "references/character-34.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/blue-robocorp.png"
     },
     {
       "slug": "fenris-scry",
@@ -22,7 +23,8 @@
       "detail": "severe male android, center-parted straight jaw-length black hair, pale gray angular face, small cross-shaped forehead mark, segmented silver/black armor with blue trim, raised narrow shoulder fins",
       "portrait": "portraits/fenris-scry.png",
       "titleScreen": "title-screens/blue-robocorp.png",
-      "reference": "references/character-35.png"
+      "reference": "references/character-35.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/blue-robocorp.png"
     },
     {
       "slug": "john-trace",
@@ -32,7 +34,8 @@
       "detail": "elderly broad-faced male bishop commander with deeply creased face, heavy eyebrows, slightly sly expression, white ceremonial cap with gold sun/third-eye badge, ornate ivory and gold armor with ram-shaped pauldrons and ankh-like pendant",
       "portrait": "portraits/john-trace.png",
       "titleScreen": "title-screens/yellow-imperials.png",
-      "reference": "references/character-32.png"
+      "reference": "references/character-32.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/yellow-imperials.png"
     },
     {
       "slug": "sister-mary-wren",
@@ -42,7 +45,8 @@
       "detail": "female high priestess, pale face, black hood, white brow band with gold third-eye sun motif, black and ivory armor with golden trim and ankh-like chest insignia; use eyes-visible version shown in full-body reference",
       "portrait": "portraits/sister-mary-wren.png",
       "titleScreen": "title-screens/yellow-imperials.png",
-      "reference": "references/character-33.png"
+      "reference": "references/character-33.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/yellow-imperials.png"
     },
     {
       "slug": "prank-sumatra",
@@ -52,7 +56,8 @@
       "detail": "male pirate king, swept black pompadour with orange streak, orange-lensed round goggles resting on forehead to show his blue eyes, sharp handsome clean-shaven face, high pointed black coat collar with orange piping, asymmetrical cybernetic gear",
       "portrait": "portraits/prank-sumatra.png",
       "titleScreen": "title-screens/orange-pirates.png",
-      "reference": "references/character-30.png"
+      "reference": "references/character-30.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/orange-pirates.png"
     },
     {
       "slug": "captain-lilith-haraway",
@@ -62,7 +67,8 @@
       "detail": "female pirate captain, thick rolled black locks with orange wraps, broad orange striped headband, angular metallic gray face with distinctive orange facial markings, orange lips, asymmetrical black and silver corset armor with orange trim",
       "portrait": "portraits/captain-lilith-haraway.png",
       "titleScreen": "title-screens/orange-pirates.png",
-      "reference": "references/character-31.png"
+      "reference": "references/character-31.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/orange-pirates.png"
     },
     {
       "slug": "lance-rosenthorn",
@@ -72,7 +78,8 @@
       "detail": "male rebel leader, side-swept dark hair, intense visible eyes above rigid angular lower-face respirator mask, very tall flared collar, tan-gray layered long coat and armor with violet lining, keep mask on",
       "portrait": "portraits/lance-rosenthorn.png",
       "titleScreen": "title-screens/purple-rebels.png",
-      "reference": "references/character-36.png"
+      "reference": "references/character-36.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/purple-rebels.png"
     },
     {
       "slug": "thalia-mott",
@@ -82,7 +89,8 @@
       "detail": "female rebel shaman, platinum-white side-swept hair and long braid, pale face with distinctive purple marking around her left eye, purple lips, ivory angular armor with violet trim and brown underlayer",
       "portrait": "portraits/thalia-mott.png",
       "titleScreen": "title-screens/purple-rebels.png",
-      "reference": "references/character-37.png"
+      "reference": "references/character-37.png",
+      "portraitTitleScreen": "../../ReactSource/public/assets/storm-commander/title-screens/portrait/purple-rebels.png"
     }
   ]
 }
