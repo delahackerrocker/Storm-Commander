@@ -24,7 +24,7 @@ npm.cmd run test
 - A faction-colored turn notice reads “Your move commander!” or “Enemy is moving!”. It sits below the board on desktop; on touch layouts it blinks over the board and hides when you touch the game area, reappearing on the next turn.
 - `Mission` reopens detailed objectives. `Back` returns to the title screen. After a win or loss, `Next Mission` starts another random match and a fresh radio exchange.
 - Other chess modes and the character roster are hidden from navigation; their components and scenario importer remain available for future development.
-- Portrait screens preserve the full landscape title artwork with letterboxing. Reduced-motion preferences disable the crossfade and sliding animations while retaining the sequence.
+- Upright phones up to 600 CSS pixels wide use dedicated full-screen portrait title illustrations; rotation and wider screens use the original landscape art. Reduced-motion preferences disable the crossfade and sliding animations while retaining the sequence.
 
 Opening dialogue is in `src/storm-commander/comms/openingRadio.js`: three objective-specific variants for each of the four mission types, plus ten enemy taunts. The encounter ID fixes the choice throughout a match.
 

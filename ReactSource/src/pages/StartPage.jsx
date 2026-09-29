@@ -23,14 +23,19 @@ export function StartPage({ onPlay }) {
   return (
     <main className={`start-page${launchUnlockAt ? ' is-launching' : ''}`} aria-label="Start menu">
       {SCREENS.map((screen, index) => (
-        <img
-          key={screen}
-          className={`start-title-art${index === activeScreen ? ' is-active' : ''}`}
-          src={`${import.meta.env.BASE_URL}assets/storm-commander/title-screens/${screen}.png`}
-          alt=""
-          aria-hidden="true"
-          draggable="false"
-        />
+        <picture key={screen}>
+          <source
+            media="(max-width: 600px) and (orientation: portrait)"
+            srcSet={`${import.meta.env.BASE_URL}assets/storm-commander/title-screens/portrait/${screen}.png`}
+          />
+          <img
+            className={`start-title-art${index === activeScreen ? ' is-active' : ''}`}
+            src={`${import.meta.env.BASE_URL}assets/storm-commander/title-screens/${screen}.png`}
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+          />
+        </picture>
       ))}
       <button type="button" className="start-play-button" disabled={Boolean(launchUnlockAt)} onClick={() => { primeGameAudio(); setLaunchUnlockAt(Date.now() + 2000) }}>
         <span className="start-accessible-label">Press to Play</span>

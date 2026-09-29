@@ -431,3 +431,9 @@ button {
   transition: opacity 600ms linear;
 }
 .start-page.is-launching::after { opacity: 1; }
+
+
+/* Phone compositions keep both commanders and lettering within the crop-safe area. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .start-title-art { object-fit: cover; }
+}

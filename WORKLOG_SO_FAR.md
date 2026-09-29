@@ -125,3 +125,10 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Added a 600ms black fade after Play and blocked radio tap/keyboard dismissal until two seconds after that initial press.
 - Synced the Capacitor wrapper and incremented iOS version 1.01 to build 7.
 - All 121 tests pass, including transition timing and turn notice behavior.
+
+## 2026-09-28 — iPhone Portrait Title Art
+
+- Added four dedicated portrait compositions retaining both faction commanders and the small Press to Play prompt, with Orange/Pirates first. Corrected the purple commander’s foreground hand to an armored fist surrounded by magical aura.
+- Phones up to 600 CSS pixels wide select portrait artwork; rotating to landscape restores the original wide composition. Preserved three-second crossfades and the launch/radio input guard.
+- Saved artwork and generation notes in the repository; synced Capacitor and advanced iOS version 1.01 to build 8.
+- Validation: all 121 tests, lint, and production build pass. Browser checks passed at 375×667, 393×852, and 430×932 for all four images, rotation, and Play/radio flow. Native iPhone 17 simulator build and launch passed; title and prompt clear the system safe areas.
