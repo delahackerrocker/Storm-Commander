@@ -143,3 +143,9 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Validation: 133 tests pass; lint and production build pass. Desktop and 393px phone browser checks verified ambient particles, capture timing, shrinking after capture, mission pause, and static reduced-motion mode.
 - Synced the iOS wrapper and advanced version 1.01 to build 9 for release.
 - Release completed: demo deployed and verified in a phone browser; native simulator build/run and visible starfield verified. Version 1.01 (9) uploaded successfully to App Store Connect for TestFlight and entered Apple processing.
+
+## 2026-09-28 — iOS Build 10
+
+- Rebuilt and synced the current game into the Capacitor wrapper, advanced version 1.01 to build 10, and verified the simulator build/run and release archive.
+- Uploaded build 10 successfully to the existing App Store Connect app for TestFlight; Apple reported package processing.
+- In the companion practitioner.digital repository, changed all six phone screenshot captions to Mobile, committed/pushed, deployed, and verified the live labels.
