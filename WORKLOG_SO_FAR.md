@@ -1,5 +1,13 @@
 # Worklog So Far
 
+## 2026-09-29 — Clearer Unit Identification
+
+- Follow-up: reshaped all four Knight variants with a wide short stern, medium-width fuselage, asymmetric east-facing L nose, and contrasting eye sensor. Kept angular mechanical armor and three engines. Regenerated faction/legacy Knight assets, refreshed the art cache version, inspected the fleet preview, and passed alpha validation and production build.
+- Reshaped Pawn ships into narrow scouts with wide rear blocks, and Rooks into rectangular, battlement-front ships with an abrupt wider stern. Regenerated all four faction variants and legacy side assets; bumped the art cache version.
+- Replaced duplicate ship art beside movement patterns with upright ivory chess-piece silhouettes for all six roles, in both player and opponent details panels.
+- Validation: all 159 tests, lint, and production build pass. Inspected the regenerated fleet sheet and Chrome desktop/393px phone panels. Preview screenshots are in `output/unit-readability/`.
+- Release: deployed to `https://practitioner.digital/storm_commander/` and verified the live index, JavaScript/CSS, and all 18 updated ship images against the tested build. Live desktop and phone smoke checks passed. Synced iOS version 1.01 build 14, passed the native iPhone 17 simulator build/launch and signed archive, and verified all 92 bundled web files against the mobile build. Uploaded build 14 successfully to App Store Connect for TestFlight; Apple reported package processing.
+
 ## 2026-09-29 — Pirate Fleet Introduction
 
 - Added a briefing between the rotating title screen and mission opening radio, using the requested copy and the existing Prank Sumatra / Captain Lilith Haraway portraits. Press to Begin launches the mission and starts a fresh two-second radio input guard.

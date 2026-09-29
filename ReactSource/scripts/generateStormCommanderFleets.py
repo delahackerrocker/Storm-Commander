@@ -355,7 +355,77 @@ ROLE_SHAPES = {
 }
 
 
+def draw_recognizable_pawn_or_rook(draw, role, colors):
+    """Role silhouettes stay readable at board size, independent of faction trim."""
+    if role == "pawn":
+        # A slender scout above a broad stern; no mid-body wings.
+        draw_poly(draw, [(256, 86), (278, 123), (278, 337), (346, 337),
+                         (346, 413), (166, 413), (166, 337), (234, 337),
+                         (234, 123)], colors["hull"], width=8)
+        draw_rect(draw, (244, 139, 268, 327), colors["hull_light"], width=4)
+        draw_rect(draw, (177, 348, 335, 398), colors["accent"], width=5)
+        draw_rect(draw, (241, 183, 271, 246), colors["trim"], width=4)
+        for x in (190, 211, 301, 322):
+            draw_line(draw, [(x, 362), (x, 387)], colors["accent_dark"], width=5)
+        draw_rect(draw, (237, 398, 275, 441), colors["metal"], width=5)
+        draw_rect(draw, (244, 427, 268, 440), colors["accent_light"], width=3)
+    else:
+        # Flat battlements, straight tower walls and an abrupt, wider rear block.
+        draw_poly(draw, [(162, 74), (210, 74), (210, 110), (234, 110),
+                         (234, 74), (278, 74), (278, 110), (302, 110),
+                         (302, 74), (350, 74), (350, 166), (324, 166),
+                         (324, 321), (396, 321), (396, 428), (116, 428),
+                         (116, 321), (188, 321), (188, 166), (162, 166)],
+                  colors["hull"], width=8)
+        draw_rect(draw, (172, 126, 340, 156), colors["accent"], width=5)
+        draw_rect(draw, (200, 176, 312, 310), colors["hull_light"], width=5)
+        draw_rect(draw, (228, 191, 284, 248), colors["trim"], width=5)
+        draw_line(draw, [(206, 278), (306, 278)], colors["accent_dark"], width=6)
+        draw_rect(draw, (128, 333, 384, 415), colors["accent"], width=5)
+        for x in (157, 355):
+            draw_rect(draw, (x - 16, 347, x + 16, 399), colors["metal"], width=4)
+        draw_rect(draw, (223, 347, 289, 399), colors["hull_light"], width=5)
+        for x in (153, 256, 359):
+            draw_rect(draw, (x - 19, 418, x + 19, 453), colors["metal"], width=5)
+            draw_rect(draw, (x - 12, 440, x + 12, 452), colors["accent_light"], width=3)
+
+
+def draw_recognizable_knight(draw, colors):
+    """Angular interceptor: broad stern, medium spine and an east-facing elbow."""
+    draw_poly(draw, [(206, 84), (305, 84), (305, 107), (390, 107),
+                     (405, 166), (296, 166), (296, 350), (366, 350),
+                     (366, 413), (140, 413), (140, 350), (206, 350)],
+              colors["hull"], width=8)
+    # Flat armor planes emphasize the bend without an animal muzzle or ears.
+    draw_poly(draw, [(218, 96), (293, 96), (293, 119), (379, 119),
+                     (387, 151), (281, 151), (281, 335), (218, 335)],
+              colors["hull_light"], width=4)
+    draw_rect(draw, (224, 199, 278, 318), colors["metal"], width=5)
+    for y in (219, 246, 273):
+        draw_line(draw, [(234, y), (268, y)], colors["accent_dark"], width=5)
+    # One large, high-contrast sensor reads as the Knight's eye at tile scale.
+    draw_ellipse(draw, (231, 108, 277, 154), INK, outline=None)
+    draw_ellipse(draw, (242, 116, 272, 146), colors["accent_light"], width=3)
+    draw_ellipse(draw, (258, 123, 266, 136), INK, outline=None)
+    draw_line(draw, [(329, 133), (374, 133)], colors["trim"], width=6)
+    draw_rect(draw, (151, 361, 355, 402), colors["accent"], width=5)
+    for x in (173, 333):
+        draw_line(draw, [(x, 370), (x, 392)], colors["accent_dark"], width=6)
+    draw_rect(draw, (229, 360, 277, 400), colors["hull_light"], width=4)
+    for x in (167, 253, 339):
+        draw_rect(draw, (x - 16, 407, x + 16, 444), colors["metal"], width=5)
+        draw_rect(draw, (x - 10, 432, x + 10, 443), colors["accent_light"], width=3)
+
+
 def draw_role(draw, role, faction, colors):
+    if role == "knight":
+        draw_recognizable_knight(draw, colors)
+        return
+
+    if role in {"pawn", "rook"}:
+        draw_recognizable_pawn_or_rook(draw, role, colors)
+        return
+
     for part, values in ROLE_SHAPES[role]:
         if part in {"crown", "bridge", "nose", "spire"}:
             fill = colors["accent"]

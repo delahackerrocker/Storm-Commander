@@ -129,8 +129,8 @@ describe('separate variant style sources', () => {
     const portraitRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-portrait\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
-    const portraitShipRule = stormStyles.match(
-      /\.storm-commander-root \.storm-comms-portrait \.storm-ship-piece\s*\{(?<body>[^}]+)\}/,
+    const portraitSilhouetteRule = stormStyles.match(
+      /\.storm-commander-root \.storm-chess-silhouette\s*\{(?<body>[^}]+)\}/,
     )?.groups.body
     const transmissionRule = stormStyles.match(
       /\.storm-commander-root \.storm-comms-transmission\s*\{(?<body>[^}]+)\}/,
@@ -461,12 +461,9 @@ describe('separate variant style sources', () => {
     expect(movementRule).not.toContain('background-size')
     expect(stormStyles).not.toContain('background-size: 7px 7px;')
     expect(portraitRule).toContain('position: relative;')
-    expect(portraitShipRule).toContain('width: 112.32%;')
-    expect(portraitShipRule).toContain('height: 112.32%;')
-    expect(portraitShipRule).toContain('position: absolute;')
-    expect(portraitShipRule).toContain('top: 50%;')
-    expect(portraitShipRule).toContain('left: 50%;')
-    expect(portraitShipRule).toContain('translate: -50% -50%;')
+    expect(portraitSilhouetteRule).toContain('width: 80%;')
+    expect(portraitSilhouetteRule).toContain('height: 80%;')
+    expect(portraitSilhouetteRule).toContain('color: var(--storm-old-ivory);')
     expect(barkRule).toContain('min-height: 85px;')
     expect(selectionRingRule).not.toContain('border-radius: 50%;')
     expect(selectionRingRule).toContain('z-index: 2;')

@@ -257,9 +257,9 @@ describe('Storm Commander random encounter UI', () => {
         name: /^Imperial [A-Z][a-z]+ Class$/i,
       })
 
-      expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
+      expect(within(playerComms).getByRole('img', { name: /Pirate .* chess silhouette/i }))
         .toBeInTheDocument()
-      expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
+      expect(within(opponentComms).getByRole('img', { name: /Imperial .* chess silhouette/i }))
         .toBeInTheDocument()
       expect(playerTitle.querySelector('.storm-comms-title-faction')).toHaveTextContent(/^Pirate$/)
       expect(playerTitle.querySelector('.storm-comms-title-class'))
@@ -268,9 +268,9 @@ describe('Storm Commander random encounter UI', () => {
         .toHaveTextContent(/^Imperial$/)
       expect(opponentTitle.querySelector('.storm-comms-title-class'))
         .toHaveTextContent(/^[A-Z][a-z]+ Class$/)
-      expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
+      expect(within(playerComms).getByRole('img', { name: /Pirate .* chess silhouette/i }))
         .toHaveAttribute('data-faction', 'pirate')
-      expect(within(opponentComms).getByRole('img', { name: /Imperial .* comms portrait/i }))
+      expect(within(opponentComms).getByRole('img', { name: /Imperial .* chess silhouette/i }))
         .toHaveAttribute('data-faction', 'imperial')
       expect(playerComms).toHaveAttribute('data-faction', 'pirate')
       expect(opponentComms).toHaveAttribute('data-faction', 'imperial')
@@ -311,7 +311,7 @@ describe('Storm Commander random encounter UI', () => {
 
       await user.click(screen.getAllByRole('button', { name: /Pirate .* square/i })[0])
 
-      expect(within(playerComms).getByRole('img', { name: /Pirate .* comms portrait/i }))
+      expect(within(playerComms).getByRole('img', { name: /Pirate .* chess silhouette/i }))
         .toBeInTheDocument()
       expect(within(playerComms).getByRole('img', { name: /Moves/i })).toHaveClass(
         'storm-movement-pattern',

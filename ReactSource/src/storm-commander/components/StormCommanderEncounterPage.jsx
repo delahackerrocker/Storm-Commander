@@ -4,6 +4,7 @@ import {
   STORM_COMMANDER_FACTION_PIECE_ASSETS,
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
 } from '../../chess/stormCommanderPieceAssets'
+import { ChessPieceSilhouette } from '../../components/ChessPieceSilhouette'
 import { StormCommanderShipPiece } from '../../components/StormCommanderShipPiece'
 import {
   advanceSloppyAggressiveTurn,
@@ -392,7 +393,6 @@ function ShipCommsWindow({
   emptyText,
   isSpeaking = false,
   piece,
-  pieceRotation,
   selectionFlash,
   transmissionText,
   variant,
@@ -413,7 +413,6 @@ function ShipCommsWindow({
   const factionName = getFactionDisplayName(piece.faction)
   const displayPieceName = `${pieceName[0].toUpperCase()}${pieceName.slice(1)}`
   const shipClassName = `${displayPieceName} Class`
-  const pilotTitle = `${factionName} ${displayPieceName}`
   const heroProfile = heroOverride || getStormCommanderHeroForPiece(piece)
   const heroPortrait = heroProfile?.assets.radioPortrait || heroProfile?.assets.portraits[0]
   const activeSelectionFlash =
@@ -451,10 +450,10 @@ function ShipCommsWindow({
       <div
         className="storm-comms-portrait"
         role="img"
-        aria-label={`${pilotTitle} comms portrait`}
+        aria-label={`${factionName} ${displayPieceName} chess silhouette`}
         data-faction={piece.faction}
       >
-        <StormCommanderEncounterPiece piece={piece} pieceRotation={pieceRotation} />
+        <ChessPieceSilhouette pieceType={piece.type} />
       </div>
       <h2 aria-label={`${factionName} ${shipClassName}`}>
         <span className="storm-comms-title-faction">{factionName}</span>
@@ -1028,7 +1027,6 @@ export function StormCommanderEncounterPage({
             emptyText="Select a Pirate ship to open player comms."
             isSpeaking={currentBriefingChatter?.side === 'player'}
             piece={playerCommsPiece}
-            pieceRotation={pieceRotation}
             selectionFlash={selectionFlash}
             transmissionText={
               currentBriefingChatter?.side === 'player'
@@ -1145,7 +1143,6 @@ export function StormCommanderEncounterPage({
           emptyText="Touch an opponent ship to scan their comms."
           isSpeaking={currentBriefingChatter?.side === 'opponent'}
           piece={opponentCommsPiece}
-          pieceRotation={pieceRotation}
           selectionFlash={selectionFlash}
           transmissionText={
             currentBriefingChatter?.side === 'opponent'
