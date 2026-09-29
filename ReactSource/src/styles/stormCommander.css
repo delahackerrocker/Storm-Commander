@@ -2420,3 +2420,166 @@
     border-radius: 2px;
   }
 }
+
+/* Opening transmissions sit above the battlefield and block input until both end. */
+.storm-radio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(2, 5, 12, 0.68);
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+
+.storm-radio-advance {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  border: 0;
+  color: #f6f4ee;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  touch-action: manipulation;
+}
+
+.storm-radio-advance:focus-visible { outline: 2px solid #f6cc71; outline-offset: -6px; }
+
+.storm-radio-card {
+  --radio-direction: 1;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(180px, 0.85fr) minmax(0, 1.5fr);
+  width: min(870px, 94%);
+  margin-left: auto;
+  margin-right: 0;
+  overflow: hidden;
+  border: 1px solid var(--radio-color);
+  border-right: 5px solid var(--radio-color);
+  border-radius: 5px;
+  background: #0a101a;
+  box-shadow: 0 24px 100px #000b, 0 0 40px color-mix(in srgb, var(--radio-color) 20%, transparent);
+  animation: storm-radio-enter 320ms ease-out both;
+}
+
+.storm-radio-card.is-opponent {
+  --radio-direction: -1;
+  margin-left: 0;
+  margin-right: auto;
+  border-right-width: 1px;
+  border-left: 5px solid var(--radio-color);
+}
+
+.storm-radio-card.is-leaving { animation: storm-radio-exit 320ms ease-in both; }
+.storm-radio-portrait { position: relative; min-height: 100%; background: #030710; }
+.storm-radio-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.storm-radio-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, #0004 3px 4px);
+  box-shadow: inset -15px 0 35px #0a101a80;
+}
+.storm-radio-copy { align-self: center; padding: clamp(20px, 3vw, 40px); }
+.storm-radio-channel {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--radio-color);
+  font: 700 clamp(10px, 1vw, 12px)/1.5 ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.storm-radio-signal { letter-spacing: 2px; }
+.storm-radio-copy h1 { margin: 16px 0 2px; font-size: clamp(22px, 2.6vw, 32px); line-height: 1.12; }
+.storm-radio-faction { color: #a9b4c5; font-size: 12px; text-transform: uppercase; letter-spacing: 0.16em; }
+.storm-radio-dialogue { margin: 22px 0 26px; font-size: clamp(17px, 1.7vw, 22px); line-height: 1.55; }
+.storm-radio-hint { color: #a9b4c5; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.storm-radio-timer {
+  position: absolute;
+  height: 3px;
+  bottom: 0;
+  inset-inline: 0;
+  background: var(--radio-color);
+  transform-origin: left;
+  animation: storm-radio-countdown 5s linear forwards;
+}
+@keyframes storm-radio-enter {
+  from { transform: translateX(calc(var(--radio-direction) * 110vw)); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes storm-radio-exit {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(calc(var(--radio-direction) * 110vw)); opacity: 0; }
+}
+@keyframes storm-radio-countdown { to { transform: scaleX(0); } }
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .storm-radio-advance { padding: 18px; }
+  .storm-radio-card { width: 100%; grid-template-columns: 1fr; max-height: 94dvh; overflow-y: auto; }
+  .storm-radio-portrait { height: clamp(150px, 29dvh, 270px); min-height: 0; }
+  .storm-radio-portrait img { object-position: center 28%; }
+  .storm-radio-copy { padding: 20px; }
+  .storm-radio-copy h1 { margin-top: 10px; }
+  .storm-radio-dialogue { margin: 14px 0 20px; font-size: 17px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .storm-radio-card { width: min(800px, 100%); grid-template-columns: minmax(130px, 0.65fr) 1.7fr; max-height: 90dvh; }
+  .storm-radio-copy { padding: 18px 24px; }
+  .storm-radio-copy h1 { font-size: 22px; margin-top: 8px; }
+  .storm-radio-dialogue { font-size: 16px; margin: 12px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storm-radio-card, .storm-radio-card.is-leaving, .storm-radio-timer { animation: none; }
+}
+.storm-radio-mute {
+  position: absolute;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  right: max(16px, env(safe-area-inset-right));
+  border: 1px solid #667083;
+  border-radius: 4px;
+  padding: 6px 12px;
+  background: #0a101a;
+  color: #c1c9d5;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.storm-commander-root .storm-encounter-play-area { position: relative; }
+.storm-turn-notice {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 800;
+  line-height: 1.3;
+  pointer-events: none;
+}
+@media (pointer: fine) and (min-width: 601px) {
+  .storm-commander-root .storm-encounter-shell {
+    --storm-encounter-board-max-size: calc(100dvh - 84px);
+  }
+}
+@media (pointer: coarse), (max-width: 600px) {
+  .storm-turn-notice {
+    position: absolute;
+    z-index: 9;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: max-content;
+    max-width: calc(100% - 24px);
+    margin: 0;
+    padding: 12px 18px;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    background: #060810ed;
+    text-shadow: 0 1px 3px #000;
+    animation: storm-turn-blink 1.4s ease-in-out infinite;
+  }
+  .storm-turn-notice.is-dismissed { display: none; }
+}
+@keyframes storm-turn-blink { 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) {
+  .storm-turn-notice { animation: none; }
+}

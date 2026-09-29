@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import { dismissOpeningRadio } from './radioTestHelpers'
 
 const DEFAULT_VIEWPORT = {
   height: window.innerHeight,
@@ -91,7 +92,7 @@ afterEach(() => {
 })
 
 describe.each(IOS_DEVICE_VIEWPORTS)('iOS device viewport smoke: $name', (viewport) => {
-  it('loads every playable React route from the Start Menu', async () => {
+  it('opens Storm Commander and returns to Press to Play', async () => {
     const user = userEvent.setup()
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
 
@@ -100,33 +101,19 @@ describe.each(IOS_DEVICE_VIEWPORTS)('iOS device viewport smoke: $name', (viewpor
       render(<App />)
 
       expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
-      expect(screen.getByRole('heading', { name: /^Storm Commander$/ })).toBeInTheDocument()
+      expect(screen.getAllByRole('button')).toHaveLength(1)
 
-      await openPage(user, /^Random Encounter$/)
+      await openPage(user, /^Press to Play$/)
+      await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
 
       expect(screen.getByRole('grid', { name: /Storm Commander encounter board/i }))
         .toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
 
+      await dismissOpeningRadio(user)
       await openPage(user, /^Back$/)
-      await openPage(user, /^Storm Chess Drill$/)
-
-      expect(screen.getByText('Storm Commander')).toBeInTheDocument()
-      expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
-
-      await openPage(user, /^Back$/)
-      await openPage(user, /^Basic Chess$/)
-
-      expect(screen.getByText('Basic Chess')).toBeInTheDocument()
-      expect(screen.getByText('White to move')).toBeInTheDocument()
-      expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
-
-      await openPage(user, /^Back$/)
-      await openPage(user, /^Characters$/)
-
-      expect(screen.getByRole('main', { name: /^Characters$/ })).toBeInTheDocument()
-      expect(screen.getByRole('heading', { name: /^Prank Sumatra$/ })).toBeInTheDocument()
-      expect(screen.getAllByRole('article')).toHaveLength(8)
+      expect(screen.getByRole('button', { name: /^Press to Play$/ })).toBeInTheDocument()
+      expect(screen.getAllByRole('button')).toHaveLength(1)
     } finally {
       randomSpy.mockRestore()
     }

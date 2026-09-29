@@ -29,6 +29,7 @@ function createHeroProfile({ id, fullName, faction, page }) {
       page,
     },
     assets: {
+      radioPortrait: `${STORM_COMMANDER_ASSET_BASE_URL}assets/storm-commander/commanders/${id === 'admiral-bishop-john-trace' ? 'john-trace' : id}.png`,
       portraits: [
         heroAsset(faction, id, 'portrait-a.png'),
         heroAsset(faction, id, 'portrait-b.png'),

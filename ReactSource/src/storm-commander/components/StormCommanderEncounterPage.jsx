@@ -30,6 +30,9 @@ import {
   buildPilotChatterSequence,
 } from '../comms/pilotChatter'
 
+import { playCaptureAudio, primeGameAudio } from '../audio/gameAudio'
+import { getInitialCommsPiece } from '../comms/openingRadio'
+
 const ENEMY_MOVE_DELAY_MS = 3000
 const ENEMY_THINKING_SELECTION_INTERVAL_MS = 500
 const SELECTION_FLASH_DURATION_MS = 300
@@ -66,18 +69,6 @@ function createSquares(board) {
 
 function getSquareLabel(square, board) {
   return `${String.fromCharCode(65 + square.x)}${board.height - square.y}`
-}
-
-function getInitialCommsPiece(pieces, encounterId) {
-  if (pieces.length === 0) {
-    return null
-  }
-
-  const seed = String(encounterId)
-    .split('')
-    .reduce((total, character) => total + character.charCodeAt(0), 0)
-
-  return pieces[seed % pieces.length]
 }
 
 function getRandomThinkingPieceId(pieces, currentPieceId) {
@@ -430,7 +421,7 @@ function ShipCommsWindow({
   const shipClassName = `${displayPieceName} Class`
   const pilotTitle = `${factionName} ${displayPieceName}`
   const heroProfile = getStormCommanderHeroForPiece(piece)
-  const heroPortrait = heroProfile?.assets.portraits[0]
+  const heroPortrait = heroProfile?.assets.radioPortrait || heroProfile?.assets.portraits[0]
   const activeSelectionFlash =
     selectionFlash?.faction === piece.faction ? selectionFlash : null
 
@@ -639,11 +630,17 @@ export function StormCommanderEncounterPage({
   setEncounter,
   showStarfieldLayers = false,
   starfieldLayerStyles,
+  showInitialBriefing = true,
+  isRadioPlaying = false,
+  boardFocusRef,
+  soundMuted = false,
+  onToggleSound,
 }) {
+  const [dismissedTurnNotice, setDismissedTurnNotice] = useState(null)
   const [selection, setSelection] = useState(null)
   const [playerCommsSelection, setPlayerCommsSelection] = useState(null)
   const [opponentCommsSelection, setOpponentCommsSelection] = useState(null)
-  const [dismissedMissionEncounterId, setDismissedMissionEncounterId] = useState(null)
+  const [dismissedMissionEncounterId, setDismissedMissionEncounterId] = useState(showInitialBriefing ? null : encounter.id)
   const [selectionFlash, setSelectionFlash] = useState(null)
   const [pendingMoveAnimation, setPendingMoveAnimation] = useState(null)
   const [enemyThinkingPieceSelection, setEnemyThinkingPieceSelection] = useState(null)
@@ -658,10 +655,12 @@ export function StormCommanderEncounterPage({
   const isMissionResultOpen = encounter.status !== 'active'
   const isMissionBriefingOpen =
     encounter.status === 'active' && dismissedMissionEncounterId !== encounter.id
+  const turnNoticeId = `${encounter.id}:${encounter.round}:${encounter.currentFaction}`
+  const isBattlePaused = isMissionBriefingOpen || isRadioPlaying
   const isEnemyThinking =
     encounter.status === 'active' &&
     encounter.currentFaction !== encounter.playerFaction &&
-    !isMoveAnimating
+    !isMoveAnimating && !isBattlePaused
   const selectedPiece =
     isPlayerTurn && selection?.encounterId === encounter.id
       ? encounter.pieces.find(
@@ -750,6 +749,7 @@ export function StormCommanderEncounterPage({
       : null
 
     if (movingPiece) {
+      primeGameAudio()
       setPendingMoveAnimation({
         capturedPiece: capturedPiece ? { ...capturedPiece } : null,
         move,
@@ -773,6 +773,16 @@ export function StormCommanderEncounterPage({
 
     return () => window.clearTimeout(timerId)
   }, [selectionFlash])
+
+  useEffect(() => {
+    if (!pendingMoveAnimation?.capturedPiece) return undefined
+    let stopSound
+    const timer = window.setTimeout(() => { stopSound = playCaptureAudio() }, 0)
+    return () => {
+      window.clearTimeout(timer)
+      stopSound?.()
+    }
+  }, [pendingMoveAnimation])
 
   useEffect(() => {
     if (!pendingMoveAnimation) {
@@ -871,8 +881,8 @@ export function StormCommanderEncounterPage({
   ])
 
   useEffect(() => {
-    onBoardAnimationsPausedChange?.(isMissionBriefingOpen)
-  }, [isMissionBriefingOpen, onBoardAnimationsPausedChange])
+    onBoardAnimationsPausedChange?.(isBattlePaused)
+  }, [isBattlePaused, onBoardAnimationsPausedChange])
 
   useEffect(() => () => {
     onBoardAnimationsPausedChange?.(false)
@@ -947,7 +957,7 @@ export function StormCommanderEncounterPage({
 
   function handleSquareClick(square) {
     if (
-      isMoveAnimating ||
+      isMoveAnimating || isBattlePaused ||
       encounter.status !== 'active' ||
       encounter.currentFaction !== encounter.playerFaction
     ) {
@@ -989,15 +999,21 @@ export function StormCommanderEncounterPage({
     'game-page',
     'storm-commander-root',
     'storm-encounter-root',
-    isMissionBriefingOpen ? 'is-mission-briefing-open' : '',
+    isBattlePaused ? 'is-mission-briefing-open' : '',
   ].filter(Boolean).join(' ')
 
   return (
-    <div className={rootClassName} style={rootStyle}>
+    <div className={rootClassName} style={rootStyle} inert={isRadioPlaying || undefined}>
       <div className="play-controls storm-encounter-panel" aria-label="Play controls">
         {onBack && !isMissionResultOpen ? (
           <button type="button" className="back-button" onClick={onBack}>
             Back
+          </button>
+        ) : null}
+        {onToggleSound ? (
+          <button type="button" className="back-button storm-sound-toggle"
+            aria-label="Mute game sounds" aria-pressed={soundMuted} onClick={onToggleSound}>
+            {soundMuted ? 'Sound off' : 'Sound on'}
           </button>
         ) : null}
         <MissionStatusButton
@@ -1026,7 +1042,9 @@ export function StormCommanderEncounterPage({
           <MissionObjectiveStatusPanel encounter={encounter} />
         </div>
 
-        <section className="storm-encounter-play-area" aria-label="Random encounter board">
+        <section ref={boardFocusRef} tabIndex={-1}
+          onPointerDownCapture={() => setDismissedTurnNotice(turnNoticeId)}
+          className="storm-encounter-play-area" aria-label="Random encounter board">
           <div
             className="storm-encounter-board"
             style={boardStyle}
@@ -1107,7 +1125,7 @@ export function StormCommanderEncounterPage({
                   data-testid="storm-encounter-square"
                   data-faction={piece?.faction}
                   style={legalMoveHintStyle}
-                  disabled={isMoveAnimating}
+                  disabled={isMoveAnimating || isBattlePaused}
                   aria-label={`${getSquareLabel(square, encounter.board)} ${getEncounterPieceLabel(piece)} ${actionLabel}`}
                   onClick={() => handleSquareClick(square)}
                 >
@@ -1121,6 +1139,13 @@ export function StormCommanderEncounterPage({
               encounter={encounter}
             />
           </div>
+          {encounter.status === 'active' && !isBattlePaused ? (
+            <p className={`storm-turn-notice${dismissedTurnNotice === turnNoticeId ? ' is-dismissed' : ''}`}
+              role="status" aria-live="polite"
+              style={{ color: STORM_COMMANDER_FACTION_VISUAL_THEMES[encounter.currentFaction]?.hint }}>
+              {isPlayerTurn ? 'Your move commander!' : 'Enemy is moving!'}
+            </p>
+          ) : null}
         </section>
 
         <ShipCommsWindow

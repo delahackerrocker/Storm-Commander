@@ -23,25 +23,14 @@ import {
   toStarfieldLayerStyles,
   toStarfieldStyle,
 } from '../chess/stormCommanderStarfield'
-import App from '../App'
+import { StormCommanderPage } from '../pages/StormCommanderPage'
 
 const FACTION_ASSET_PREFIX = '/assets/chess/storm-commander/factions/'
 
-async function openStartMenuPage(user, pageName) {
-  await user.click(screen.getByRole('button', { name: pageName }))
-}
-
-function openStartMenuPageWithFireEvent(pageName) {
-  fireEvent.click(screen.getByRole('button', { name: pageName }))
-}
-
 describe('Storm Commander variant', () => {
   it('opens the Storm Commander chess drill from debug mode and renders piece images', async () => {
-    const user = userEvent.setup()
 
-    render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
+    render(<StormCommanderPage allowChessDrill />)
 
     const images = screen.getAllByRole('img')
     const board = document.querySelector('.storm-commander-root .chess-board')
@@ -62,11 +51,8 @@ describe('Storm Commander variant', () => {
   })
 
   it('renders runtime rocket exhaust for Storm Commander ships', async () => {
-    const user = userEvent.setup()
 
-    render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
+    render(<StormCommanderPage allowChessDrill />)
 
     const board = document.querySelector('.storm-commander-root .chess-board')
 
@@ -90,10 +76,7 @@ describe('Storm Commander variant', () => {
   })
 
   it('opens Basic Chess as a Storm Commander-styled debug chess view', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<App />)
-
-    await openStartMenuPage(user, /^Basic Chess$/)
+    const { container } = render(<StormCommanderPage allowChessDrill={false} chessTitle="Basic Chess" />)
 
     expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
     expect(container.querySelector('.storm-commander-effects')).toBeInTheDocument()
@@ -184,13 +167,11 @@ describe('Storm Commander variant', () => {
     const randomSpy = vi.spyOn(Math, 'random')
 
     try {
-      render(<App />)
-
       randomSpy
         .mockReturnValue(0.5)
         .mockReturnValueOnce(0.01)
 
-      await openStartMenuPage(user, /^Storm Chess Drill$/)
+      render(<StormCommanderPage allowChessDrill />)
 
       const board = document.querySelector('.storm-commander-root .chess-board')
 
@@ -210,11 +191,8 @@ describe('Storm Commander variant', () => {
   })
 
   it('assigns starfield drift and piece-facing variables to Storm Commander', async () => {
-    const user = userEvent.setup()
 
-    render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
+    render(<StormCommanderPage allowChessDrill />)
 
     const effectsRoot = document.querySelector('.storm-commander-effects')
     const root = screen.getByText('Storm Commander').closest('.storm-commander-root')
@@ -339,9 +317,7 @@ describe('Storm Commander variant', () => {
   it('marks the current turn for Storm Commander visual styling without changing moves', async () => {
     const user = userEvent.setup()
 
-    render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
+    render(<StormCommanderPage allowChessDrill />)
 
     const board = document.querySelector('.storm-commander-root .chess-board')
     const whiteFaction = board.dataset.whiteFaction
@@ -382,9 +358,7 @@ describe('Storm Commander variant', () => {
   it('still supports move selection after the piece renderer refactor', async () => {
     const user = userEvent.setup()
 
-    render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
+    render(<StormCommanderPage allowChessDrill />)
     await user.click(screen.getByRole('button', { name: /b1 white knight square/i }))
 
     expect(screen.getByRole('button', { name: /a3 empty legal destination/i })).toBeInTheDocument()
@@ -394,9 +368,7 @@ describe('Storm Commander variant', () => {
   it('keeps debug chess pawns on traditional chess movement', async () => {
     const user = userEvent.setup()
 
-    render(<App />)
-
-    await openStartMenuPage(user, /^Basic Chess$/)
+    render(<StormCommanderPage allowChessDrill={false} chessTitle="Basic Chess" />)
     await user.click(screen.getByRole('button', { name: /e2 white pawn square/i }))
 
     expect(screen.getByRole('button', { name: /e3 empty legal destination/i })).toBeInTheDocument()
@@ -411,9 +383,7 @@ describe('Storm Commander variant', () => {
     vi.useFakeTimers()
 
     try {
-      render(<App />)
-
-      openStartMenuPageWithFireEvent(/^Storm Chess Drill$/)
+      render(<StormCommanderPage allowChessDrill />)
 
       fireEvent.click(screen.getByRole('button', { name: /b1 white knight square/i }))
       const destination = screen.getByRole('button', { name: /a3 empty legal destination/i })
@@ -440,9 +410,7 @@ describe('Storm Commander variant', () => {
     vi.useFakeTimers()
 
     try {
-      render(<App />)
-
-      openStartMenuPageWithFireEvent(/^Storm Chess Drill$/)
+      render(<StormCommanderPage allowChessDrill />)
       fireEvent.change(screen.getByLabelText(/Theme Filter/i), { target: { value: 'fork' } })
       fireEvent.click(screen.getByRole('button', { name: /^New Random Puzzle$/ }))
       fireEvent.click(screen.getByRole('button', { name: /d4 white knight square/i }))

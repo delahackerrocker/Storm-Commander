@@ -1,19 +1,11 @@
 import { readFileSync } from 'node:fs'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import App from '../App'
-
-async function openStartMenuPage(user, pageName) {
-  await user.click(screen.getByRole('button', { name: pageName }))
-}
+import { StormCommanderPage } from '../pages/StormCommanderPage'
 
 describe('separate variant style sources', () => {
   it('renders Basic Chess inside the Storm debug chess style root', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<App />)
-
-    await openStartMenuPage(user, /^Basic Chess$/)
+    const { container } = render(<StormCommanderPage allowChessDrill={false} chessTitle="Basic Chess" />)
 
     expect(container.querySelector('.storm-commander-root')).toBeInTheDocument()
     expect(container.querySelector('.storm-debug-chess-root')).toBeInTheDocument()
@@ -22,10 +14,7 @@ describe('separate variant style sources', () => {
   })
 
   it('renders Storm Commander inside the storm style root only', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
+    const { container } = render(<StormCommanderPage allowChessDrill />)
 
     expect(container.querySelector('.storm-commander-root')).toBeInTheDocument()
     expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()
@@ -417,7 +406,7 @@ describe('separate variant style sources', () => {
     expect(stormStyles).toContain('grid-template-rows: repeat(5, minmax(0, 1fr));')
     expect(stormStyles).toContain('width: 100%;')
     expect(stormStyles).toContain('height: 100%;')
-    expect(stormStyles).not.toContain('width: max-content;')
+    expect(encounterBoardRule).not.toContain('width: max-content;')
     expect(stormStyles).toContain('font-size: 1.28rem;')
     expect(stormStyles).toContain('display: none;')
     expect(missionOverlayRule).toContain('place-items: center;')

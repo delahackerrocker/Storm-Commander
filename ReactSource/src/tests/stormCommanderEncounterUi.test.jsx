@@ -11,6 +11,7 @@ import {
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import { dismissOpeningRadio } from './radioTestHelpers'
 import {
   STORM_COMMANDER_BRIEFING_LINE_DURATION_MS,
   buildPilotChatterSequence,
@@ -20,7 +21,9 @@ import { StormCommanderEncounterPage } from '../storm-commander/components/Storm
 async function renderRandomEncounterApp(user) {
   const renderResult = render(<App />)
 
-  await user.click(screen.getByRole('button', { name: /^Random Encounter$/ }))
+  await user.click(screen.getByRole('button', { name: /^Press to Play$/ }))
+  await dismissOpeningRadio(user)
+  await user.click(screen.getByRole('button', { name: /Mission status/ }))
 
   return renderResult
 }

@@ -58,9 +58,9 @@ describe('random encounter loop', () => {
 
     render(<App />)
 
-    await user.click(screen.getByRole('button', { name: /^Random Encounter$/ }))
+    await user.click(screen.getByRole('button', { name: /^Press to Play$/ }))
 
-    const resultDialog = screen.getByRole('dialog', { name: /^Objective Succeeded$/ })
+    const resultDialog = await screen.findByRole('dialog', { name: /^Objective Succeeded$/ })
     expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Back$/ })).not.toBeInTheDocument()
 
@@ -68,7 +68,7 @@ describe('random encounter loop', () => {
 
     expect(generateRandomEncounter).toHaveBeenCalledTimes(2)
     expect(screen.queryByRole('main', { name: /^Start menu$/ })).not.toBeInTheDocument()
-    expect(screen.getByRole('dialog', { name: /^Fresh Pirate Raid$/ })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Pirate radio transmission' })).toBeInTheDocument()
     expect(screen.getAllByTestId('storm-encounter-square')).toHaveLength(25)
     expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
   })

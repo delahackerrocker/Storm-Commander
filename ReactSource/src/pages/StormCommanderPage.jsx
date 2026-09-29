@@ -9,7 +9,7 @@ import {
 import {
   STORM_COMMANDER_FACTION_VISUAL_THEMES,
 } from '../chess/stormCommanderPieceAssets'
-import { StormCommanderEncounterPage } from '../storm-commander/components/StormCommanderEncounterPage'
+import { StormCommanderMission } from '../storm-commander/components/StormCommanderMission'
 import { generateRandomEncounter } from '../storm-commander/encounter/generateRandomEncounter'
 import { BasicChessPage } from './BasicChessPage'
 import '../styles/stormCommander.css'
@@ -131,6 +131,7 @@ export function StormCommanderPage({
   chessTitle = 'Storm Commander',
   onBack,
   startInRandomEncounter = false,
+  radioInputUnlockAt = 0,
 }) {
   const [sideFactions, setSideFactions] = useState(() => createRandomSideFactions())
   const [encounter, setEncounter] = useState(() =>
@@ -162,7 +163,9 @@ export function StormCommanderPage({
       style={initialStarfieldStyle}
     >
       {encounter ? (
-        <StormCommanderEncounterPage
+        <StormCommanderMission
+          key={encounter.id}
+          radioInputUnlockAt={radioInputUnlockAt}
           encounter={encounter}
           getCurrentPieceRotation={getCurrentPieceRotation}
           onBack={onBack}

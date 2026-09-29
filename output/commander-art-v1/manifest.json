@@ -1,0 +1,88 @@
+{
+  "source": "https://drive.google.com/file/d/166Znw1O6y-qGAB45BlMC4I2QVGrybjR7/view",
+  "sourceLocal": "../../Inspo/RebelFutureDesignDeck.pdf",
+  "generator": "built-in image_gen",
+  "status": "User-approved title screens and portrait masters; runtime copies wired into ReactSource/public/assets/storm-commander",
+  "heroes": [
+    {
+      "slug": "dayna-scry",
+      "name": "Dayna Scry",
+      "page": 34,
+      "faction": "blue-robocorp",
+      "detail": "female CEO, straight glossy black bob with blunt bangs and long face-framing strands, violet eyes and lips, pale cool-gray skin, sleek cyan-and-charcoal shoulder-cutout suit, black circular figure-eight chest pendant",
+      "portrait": "portraits/dayna-scry.png",
+      "titleScreen": "title-screens/blue-robocorp.png",
+      "reference": "references/character-34.png"
+    },
+    {
+      "slug": "fenris-scry",
+      "name": "Fenris Scry",
+      "page": 35,
+      "faction": "blue-robocorp",
+      "detail": "severe male android, center-parted straight jaw-length black hair, pale gray angular face, small cross-shaped forehead mark, segmented silver/black armor with blue trim, raised narrow shoulder fins",
+      "portrait": "portraits/fenris-scry.png",
+      "titleScreen": "title-screens/blue-robocorp.png",
+      "reference": "references/character-35.png"
+    },
+    {
+      "slug": "john-trace",
+      "name": "Admiral/Bishop John Trace",
+      "page": 32,
+      "faction": "yellow-imperials",
+      "detail": "elderly broad-faced male bishop commander with deeply creased face, heavy eyebrows, slightly sly expression, white ceremonial cap with gold sun/third-eye badge, ornate ivory and gold armor with ram-shaped pauldrons and ankh-like pendant",
+      "portrait": "portraits/john-trace.png",
+      "titleScreen": "title-screens/yellow-imperials.png",
+      "reference": "references/character-32.png"
+    },
+    {
+      "slug": "sister-mary-wren",
+      "name": "Sister Mary Wren",
+      "page": 33,
+      "faction": "yellow-imperials",
+      "detail": "female high priestess, pale face, black hood, white brow band with gold third-eye sun motif, black and ivory armor with golden trim and ankh-like chest insignia; use eyes-visible version shown in full-body reference",
+      "portrait": "portraits/sister-mary-wren.png",
+      "titleScreen": "title-screens/yellow-imperials.png",
+      "reference": "references/character-33.png"
+    },
+    {
+      "slug": "prank-sumatra",
+      "name": "Prank Sumatra",
+      "page": 30,
+      "faction": "orange-pirates",
+      "detail": "male pirate king, swept black pompadour with orange streak, orange-lensed round goggles resting on forehead to show his blue eyes, sharp handsome clean-shaven face, high pointed black coat collar with orange piping, asymmetrical cybernetic gear",
+      "portrait": "portraits/prank-sumatra.png",
+      "titleScreen": "title-screens/orange-pirates.png",
+      "reference": "references/character-30.png"
+    },
+    {
+      "slug": "captain-lilith-haraway",
+      "name": "Captain Lilith Haraway",
+      "page": 31,
+      "faction": "orange-pirates",
+      "detail": "female pirate captain, thick rolled black locks with orange wraps, broad orange striped headband, angular metallic gray face with distinctive orange facial markings, orange lips, asymmetrical black and silver corset armor with orange trim",
+      "portrait": "portraits/captain-lilith-haraway.png",
+      "titleScreen": "title-screens/orange-pirates.png",
+      "reference": "references/character-31.png"
+    },
+    {
+      "slug": "lance-rosenthorn",
+      "name": "Lance Rosenthorn",
+      "page": 36,
+      "faction": "purple-rebels",
+      "detail": "male rebel leader, side-swept dark hair, intense visible eyes above rigid angular lower-face respirator mask, very tall flared collar, tan-gray layered long coat and armor with violet lining, keep mask on",
+      "portrait": "portraits/lance-rosenthorn.png",
+      "titleScreen": "title-screens/purple-rebels.png",
+      "reference": "references/character-36.png"
+    },
+    {
+      "slug": "thalia-mott",
+      "name": "Thalia Mott",
+      "page": 37,
+      "faction": "purple-rebels",
+      "detail": "female rebel shaman, platinum-white side-swept hair and long braid, pale face with distinctive purple marking around her left eye, purple lips, ivory angular armor with violet trim and brown underlayer",
+      "portrait": "portraits/thalia-mott.png",
+      "titleScreen": "title-screens/purple-rebels.png",
+      "reference": "references/character-37.png"
+    }
+  ]
+}

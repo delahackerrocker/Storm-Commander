@@ -100,3 +100,28 @@ npm.cmd run test
 ```
 
 Use `npm.cmd run dev` for manual browser playtesting.
+
+## 2026-09-28 — Approved Title Art And Opening Radio
+
+- Saved all four approved faction title screens and all eight commander portraits to `ReactSource/public/assets/storm-commander/`, retaining original masters and source notes in `output/commander-art-v1/`.
+- Replaced the start menu with a whole-screen play target and a three-second title-art rotation with crossfades. It launches only Storm Commander random matches.
+- Added a keyed mission session so every new encounter starts its own two-call radio exchange without replaying on board updates. Pirate command enters/exits left; hostile command enters/exits right. Each call lasts five seconds or dismisses on tap/keyboard, followed by a short exit animation.
+- Added three contextual mission lines per objective type and ten enemy taunts, new commander portraits in radio/ship panels, brief synthesized radio cues, and a mute toggle. Written dialogue only, as requested.
+- Gated ship selection, movement, AI scheduling, and background motion during the opening exchange. Retained the manually opened Mission details panel.
+- Added sequence/timing, early-dismissal, faction/objective, match-reset, AI-pause, and title-cycle coverage. Tested the flow in desktop, phone portrait, and phone landscape Chrome via Playwright; native iOS/Safari have not been exercised for this change.
+
+## 2026-09-28 — Arcade Combat Sound Effects
+
+- Added local Web Audio effects with a simple NES/SNES-inspired character: five falling square-wave laser shots aligned with the volley, followed by a low triangle-wave thump and stepped noise burst at the explosion.
+- Pirate and enemy captures share the same effects; ordinary moves remain quiet. Sound playback is canceled when the combat animation is removed, and the noise generator does not consume gameplay randomness.
+- Unified radio/combat audio under `src/storm-commander/audio/gameAudio.js`. The shared Sound toggle is available during opening transmissions and on the battlefield, stops active effects when muted, and keeps its setting between matches.
+- Verified both factions' capture triggers, quiet movement, cancellation, sound timing, mute behavior, and missing-audio-API fallback. All 119 tests pass; lint and production build pass.
+
+
+## 2026-09-28 — Turn Notices And Release Preparation
+
+- Added faction-colored turn messages beneath the desktop board. On touch/mobile layouts they blink over the board until the next game-area touch, and reset each turn.
+- Corrected transmission directions: Pirate/player enters and exits right; enemy enters and exits left.
+- Added a 600ms black fade after Play and blocked radio tap/keyboard dismissal until two seconds after that initial press.
+- Synced the Capacitor wrapper and incremented iOS version 1.01 to build 7.
+- All 121 tests pass, including transition timing and turn notice behavior.

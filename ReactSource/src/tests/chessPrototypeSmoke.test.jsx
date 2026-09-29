@@ -2,28 +2,23 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import { dismissOpeningRadio } from './radioTestHelpers'
 
 async function openStartMenuPage(user, pageName) {
   await user.click(screen.getByRole('button', { name: pageName }))
+  await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
 }
 
 describe('Chess-ish prototype', () => {
-  it('starts at a Start Menu with all playable modes', () => {
+  it('starts with only Press to Play', () => {
     render(<App />)
 
     expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
     expect(screen.queryByText(/^Start Menu$/)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /^Storm Commander$/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^Random Encounter$/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^Storm Chess Drill$/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^Basic Chess$/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^Characters$/ })).toBeInTheDocument()
     expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual([
-      'Random Encounter',
-      'Storm Chess Drill',
-      'Basic Chess',
-      'Characters',
+      'Press to Play',
     ])
+    expect(screen.getByRole('main').textContent).toBe('Press to Play')
     expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
   })
 
@@ -34,7 +29,7 @@ describe('Chess-ish prototype', () => {
     try {
       const { container } = render(<App />)
 
-      await openStartMenuPage(user, /^Random Encounter$/)
+      await openStartMenuPage(user, /^Press to Play$/)
 
       const playControls = container.querySelector('.play-controls')
       const backButton = screen.getByRole('button', { name: /^back$/i })
@@ -42,8 +37,7 @@ describe('Chess-ish prototype', () => {
         name: /Mission status\. Objective: .+\. Progress: .+\. Open mission briefing\./,
       })
 
-      expect(screen.getByRole('heading', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
-      expect(screen.getByText('Storm Commander Alpha')).toBeInTheDocument()
+      expect(screen.getByRole('dialog', { name: 'Pirate radio transmission' })).toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
       expect(playControls).toContainElement(backButton)
       expect(playControls).toContainElement(missionButton)
@@ -57,64 +51,18 @@ describe('Chess-ish prototype', () => {
     }
   })
 
-  it('opens basic chess from the Start Menu and returns to the Start Menu', async () => {
+  it('returns to the single play button and can start again', async () => {
     const user = userEvent.setup()
-    const { container } = render(<App />)
-
-    await openStartMenuPage(user, /^Basic Chess$/)
-
-    expect(screen.getByText('White to move')).toBeInTheDocument()
-    expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
-    expect(screen.getByRole('button', { name: /new game/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^back$/i })).toBeInTheDocument()
-    expect(container.querySelector('.play-controls')).toContainElement(
-      screen.getByRole('button', { name: /^back$/i }),
-    )
-    expect(container.querySelector('.page-topbar .back-button')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
-    expect(container.querySelector('.storm-debug-chess-root')).toBeInTheDocument()
-    expect(container.querySelector('.standard-chess-root')).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /^back$/i }))
-
-    expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
-  })
-
-  it('opens the Storm Commander chess drill from the Start Menu and hides Debug', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<App />)
-
-    await openStartMenuPage(user, /^Storm Chess Drill$/)
-
-    expect(screen.getByText('Storm Commander')).toBeInTheDocument()
-    expect(screen.getAllByTestId('chess-square')).toHaveLength(64)
-    expect(container.querySelector('.play-controls')).toContainElement(
-      screen.getByRole('button', { name: /^back$/i }),
-    )
-    expect(container.querySelector('.page-topbar .back-button')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /^back$/i }))
-
-    expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
-  })
-
-  it('opens the Characters roster from the Start Menu and returns to the Start Menu', async () => {
-    const user = userEvent.setup()
-
     render(<App />)
-
-    await openStartMenuPage(user, /^Characters$/)
-
-    expect(screen.getByRole('main', { name: /^Characters$/ })).toBeInTheDocument()
-    expect(screen.queryByText(/^Hero Roster$/)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /^Characters$/ })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /^Prank Sumatra$/ })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /^Thalia Mott$/ })).toBeInTheDocument()
-    expect(screen.getAllByRole('article')).toHaveLength(8)
-
+    await user.tab()
+    await user.keyboard('{Enter}')
+    await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
+    expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
+    await dismissOpeningRadio(user)
     await user.click(screen.getByRole('button', { name: /^back$/i }))
-
-    expect(screen.getByRole('main', { name: /^Start menu$/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('button')).toHaveLength(1)
+    await openStartMenuPage(user, /^Press to Play$/)
+    expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
+    expect(screen.queryByTestId('chess-square')).not.toBeInTheDocument()
   })
 })

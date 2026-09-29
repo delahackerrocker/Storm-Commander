@@ -61,7 +61,7 @@ describe('iPhone device preview', () => {
 
       render(<App />)
 
-      expect(screen.getByRole('heading', { name: /^Random Pirate Raid$/ })).toBeInTheDocument()
+      expect(screen.getByRole('dialog', { name: 'Pirate radio transmission' })).toBeInTheDocument()
       expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
       expect(screen.queryByRole('button', { name: /^Debug$/ })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: /^iPhone Preview$/ })).not.toBeInTheDocument()

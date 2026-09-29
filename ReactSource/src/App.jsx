@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { CharactersPage } from './pages/CharactersPage'
 import { IosDevicePreviewPage } from './pages/IosDevicePreviewPage'
 import { StartPage } from './pages/StartPage'
 import { StormCommanderPage } from './pages/StormCommanderPage'
@@ -8,9 +7,6 @@ const PAGES = {
   start: 'start',
   iosPreview: 'ios-preview',
   randomEncounter: 'random-encounter',
-  stormChessDrill: 'storm-chess-drill',
-  basicChess: 'basic-chess',
-  characters: 'characters',
 }
 
 const STORM_VIEW_QUERY_PARAM = 'storm-view'
@@ -22,6 +18,7 @@ function getStormViewMode() {
 }
 
 function App() {
+  const [radioInputUnlockAt, setRadioInputUnlockAt] = useState(0)
   const stormViewMode = getStormViewMode()
   const [currentPage, setCurrentPage] = useState(() =>
     stormViewMode === STORM_VIEW_IOS_PREVIEW ? PAGES.iosPreview : PAGES.start,
@@ -41,19 +38,16 @@ function App() {
     )
   }
 
-  let page = (
-    <StartPage
-      onOpenBasicChess={() => openPage(PAGES.basicChess)}
-      onOpenCharacters={() => openPage(PAGES.characters)}
-      onOpenRandomEncounter={() => openPage(PAGES.randomEncounter)}
-      onOpenStormChessDrill={() => openPage(PAGES.stormChessDrill)}
-    />
-  )
+  let page = <StartPage onPlay={(unlockAt) => {
+    setRadioInputUnlockAt(unlockAt)
+    openPage(PAGES.randomEncounter)
+  }} />
 
   if (currentPage === PAGES.randomEncounter) {
     page = (
       <StormCommanderPage
         key="storm-random-encounter"
+        radioInputUnlockAt={radioInputUnlockAt}
         allowChessDrill={false}
         onBack={() => openPage(PAGES.start)}
         startInRandomEncounter
@@ -65,36 +59,6 @@ function App() {
     page = (
       <IosDevicePreviewPage
         key="ios-device-preview"
-        onBack={() => openPage(PAGES.start)}
-      />
-    )
-  }
-
-  if (currentPage === PAGES.basicChess) {
-    page = (
-      <StormCommanderPage
-        key="basic-chess"
-        allowChessDrill={false}
-        chessTitle="Basic Chess"
-        onBack={() => openPage(PAGES.start)}
-      />
-    )
-  }
-
-  if (currentPage === PAGES.stormChessDrill) {
-    page = (
-      <StormCommanderPage
-        key="storm-chess-drill"
-        allowChessDrill
-        onBack={() => openPage(PAGES.start)}
-      />
-    )
-  }
-
-  if (currentPage === PAGES.characters) {
-    page = (
-      <CharactersPage
-        key="characters"
         onBack={() => openPage(PAGES.start)}
       />
     )
