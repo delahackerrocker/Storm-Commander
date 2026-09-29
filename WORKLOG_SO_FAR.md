@@ -158,3 +158,10 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Validation: all 140 tests pass, including 2,000 seeded encounters covering all board sizes and objective types, target relocation, occupied/reachable extraction, safe-layout preservation, and a fully occupied edge fallback. Lint and production build pass.
 - Synced the iOS wrapper and advanced version 1.01 to build 11 for release.
 - Release completed: committed/pushed the balance update, deployed the web demo, verified its JavaScript matches the tested build, and passed the live mobile opening-radio/gameplay smoke check. Native simulator build/run and signed archive passed; version 1.01 (11) uploaded successfully to App Store Connect and entered Apple processing for TestFlight.
+
+## 2026-09-28 — Modest Enemy AI Increase
+
+- Added a shallow tactical check to capture-focused enemy move selection. Each candidate checks the Pirate player's next legal replies, discounts exposed fleet value by 65%, and penalizes allowing an immediate mission victory. Enemy fleet-destruction wins take priority.
+- Retained random selection among similarly scored moves, with no deeper search or positional scoring. The enemy still takes favorable exchanges but avoids obvious bait and can defend a marked ship or block extraction.
+- Validation: all 145 tests pass, including bait avoidance, profitable exchanges, extraction defense, target protection, unchanged input state, and randomized equivalent choices. Lint and production build pass.
+- Synced the iOS wrapper and advanced version 1.01 to build 12. Commander personalities and adaptive difficulty remain proposed future options, outside this release.
