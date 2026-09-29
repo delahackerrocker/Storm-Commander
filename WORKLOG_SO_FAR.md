@@ -6,7 +6,7 @@
 - Wide layouts place the crew on the left and text on the right; phone layouts center the text and button above the crew.
 - Validation: all 159 tests, lint, and production build pass. Browser verification covered the title → intro → mission flow and phone widths of 393 and 375 pixels.
 - Approved after desktop and mobile preview. Deployed the web update and verified the live intro plus exact JavaScript/CSS asset hashes; the hosting provider adds its usual monitoring script to HTML.
-- Synced the iOS wrapper and advanced version 1.01 to build 13. Native iPhone 17 simulator build/run, intro layout, mission launch, and signed release archive passed. Archive assets match the synced web build. TestFlight upload is awaiting explicit distribution approval after automatic approval review blocked the upload.
+- Synced the iOS wrapper and advanced version 1.01 to build 13. Native iPhone 17 simulator build/run, intro layout, mission launch, and signed release archive passed. Archive assets match the synced web build. After explicit TestFlight approval, uploaded version 1.01 (13) successfully to the existing App Store Connect app. Xcode reported upload/export success and Apple package processing.
 
 This is a compact narrative of what has been built in the Storm Commander / Chess-ish workspace so far.
 
