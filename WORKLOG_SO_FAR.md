@@ -132,3 +132,4 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Phones up to 600 CSS pixels wide select portrait artwork; rotating to landscape restores the original wide composition. Preserved three-second crossfades and the launch/radio input guard.
 - Saved artwork and generation notes in the repository; synced Capacitor and advanced iOS version 1.01 to build 8.
 - Validation: all 121 tests, lint, and production build pass. Browser checks passed at 375×667, 393×852, and 430×932 for all four images, rotation, and Play/radio flow. Native iPhone 17 simulator build and launch passed; title and prompt clear the system safe areas.
+- Release: published the portrait update to `https://practitioner.digital/storm_commander/`. Archived and uploaded version 1.01 (8) to the existing App Store Connect app; Xcode reported upload/export success and Apple package processing.
