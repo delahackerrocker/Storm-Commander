@@ -1,3 +1,4 @@
+import { balanceOpeningObjective } from './balanceOpeningObjective'
 import {
   STORM_COMMANDER_BOARD_SIZES,
   STORM_COMMANDER_ENEMY_FACTIONS,
@@ -167,9 +168,14 @@ function createObjective(encounter, random) {
     }
   }
 
+  const enemyValues = enemyPieces.map(piece => STORM_COMMANDER_PIECE_VALUES[piece.type])
+  const totalValue = enemyValues.reduce((total, value) => total + value, 0)
+  const largestShipValue = Math.max(...enemyValues)
+  const fleetShare = 0.75 + random() * 0.15
+
   return {
     type: 'captureValue',
-    valueRequired: 3 + randomIndex(4, random),
+    valueRequired: Math.min(totalValue, Math.max(5, largestShipValue + 1, Math.ceil(totalValue * fleetShare))),
     text: 'Capture enough enemy ships to break their formation.',
   }
 }
@@ -220,8 +226,8 @@ export function generateRandomEncounter(random = Math.random) {
     outcome: null,
   }
 
-  return {
+  return balanceOpeningObjective({
     ...encounterBase,
     objective: createObjective(encounterBase, random),
-  }
+  }, random)
 }

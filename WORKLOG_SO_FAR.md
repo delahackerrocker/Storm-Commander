@@ -149,3 +149,11 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Rebuilt and synced the current game into the Capacitor wrapper, advanced version 1.01 to build 10, and verified the simulator build/run and release archive.
 - Uploaded build 10 successfully to the existing App Store Connect app for TestFlight; Apple reported package processing.
 - In the companion practitioner.digital repository, changed all six phone screenshot captions to Mobile, committed/pushed, deployed, and verified the live labels.
+
+## 2026-09-28 — Random Mission Opening Balance
+
+- Target and extraction missions now evaluate every legal Pirate opening move with the actual victory rules. Immediately winnable objectives are relocated through a shuffled, finite candidate list; extraction squares must also start empty and remain on the board edge.
+- If no safe candidate exists in the original layout, the same ships are redeployed to opposing edges and checked again. Ship identities, faction assignments, values, and objective type are preserved; no unbounded reroll loop.
+- Capture-value goals now require 75–90% of enemy fleet value, rounded up, with a minimum of five points and more than the largest individual ship. The goal never exceeds the available fleet value. Small fleets may therefore require complete destruction.
+- Validation: all 140 tests pass, including 2,000 seeded encounters covering all board sizes and objective types, target relocation, occupied/reachable extraction, safe-layout preservation, and a fully occupied edge fallback. Lint and production build pass.
+- Synced the iOS wrapper and advanced version 1.01 to build 11 for release.
