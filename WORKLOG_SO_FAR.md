@@ -142,3 +142,4 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Rendering is capped at 30fps and 2× pixel density, with a bounded particle count. Radio/mission pauses, hidden tabs, reduced-motion preferences, and teardown stop animation work.
 - Validation: 133 tests pass; lint and production build pass. Desktop and 393px phone browser checks verified ambient particles, capture timing, shrinking after capture, mission pause, and static reduced-motion mode.
 - Synced the iOS wrapper and advanced version 1.01 to build 9 for release.
+- Release completed: demo deployed and verified in a phone browser; native simulator build/run and visible starfield verified. Version 1.01 (9) uploaded successfully to App Store Connect for TestFlight and entered Apple processing.
