@@ -1,3 +1,4 @@
+import { StormSpaceField } from '../../components/StormSpaceField'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   STORM_COMMANDER_FACTION_PIECE_ASSETS,
@@ -38,16 +39,6 @@ const ENEMY_THINKING_SELECTION_INTERVAL_MS = 500
 const SELECTION_FLASH_DURATION_MS = 300
 const MOVE_ANIMATION_DURATION_MS = 1200
 
-const STORM_STARFIELD_LAYERS = [
-  ['nebula', null],
-  ['far', 'far'],
-  ['dust', 'dust'],
-  ['mid', 'mid'],
-  ['near', 'near'],
-  ['asteroid-far', 'asteroidFar'],
-  ['asteroid-wide', 'asteroidWide'],
-  ['asteroid-near', 'asteroidNear'],
-]
 
 const STORM_COMMANDER_PAWN_CAPTURE_HINT_SQUARES = new Set(['1,1', '3,1', '1,3', '3,3'])
 
@@ -1053,15 +1044,8 @@ export function StormCommanderEncounterPage({
             aria-label={`${encounter.board.width} by ${encounter.board.height} Storm Commander encounter board`}
           >
             {showStarfieldLayers || starfieldLayerStyles ? (
-              <div className="storm-starfield-layers" aria-hidden="true">
-                {STORM_STARFIELD_LAYERS.map(([layerId, styleId]) => (
-                  <span
-                    key={layerId}
-                    className={`storm-starfield-layer storm-starfield-layer-${layerId}`}
-                    style={styleId && starfieldLayerStyles ? starfieldLayerStyles[styleId] : undefined}
-                  />
-                ))}
-              </div>
+              <StormSpaceField paused={isBattlePaused} animation={pendingMoveAnimation}
+                columns={encounter.board.width} rows={encounter.board.height} />
             ) : null}
 
             {squares.map((square) => {

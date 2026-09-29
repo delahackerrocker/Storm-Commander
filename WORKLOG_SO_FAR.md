@@ -133,3 +133,12 @@ Use `npm.cmd run dev` for manual browser playtesting.
 - Saved artwork and generation notes in the repository; synced Capacitor and advanced iOS version 1.01 to build 8.
 - Validation: all 121 tests, lint, and production build pass. Browser checks passed at 375×667, 393×852, and 430×932 for all four images, rotation, and Play/radio flow. Native iPhone 17 simulator build and launch passed; title and prompt clear the system safe areas.
 - Release: published the portrait update to `https://practitioner.digital/storm_commander/`. Archived and uploaded version 1.01 (8) to the existing App Store Connect app; Xcode reported upload/export success and Apple package processing.
+
+## 2026-09-28 — Organic Starfield And Receding Debris
+
+- Replaced repeating star/asteroid tiles with an irregular canvas starfield, with independent positions, brightness, sizes, and parallax depth. Cosmetic randomness is isolated from encounter generation and AI.
+- Occasional irregular asteroids and fragments enter from the upstream board edge at 25–50% of ship size. They follow the stars’ changing heading, tumble, and shrink/fade away in 1.7–3 seconds.
+- Captures emit seven fragments at the destroyed ship position at the 900ms explosion impact. Fragments survive the end of the move animation and obey the same drift and recession rules.
+- Rendering is capped at 30fps and 2× pixel density, with a bounded particle count. Radio/mission pauses, hidden tabs, reduced-motion preferences, and teardown stop animation work.
+- Validation: 133 tests pass; lint and production build pass. Desktop and 393px phone browser checks verified ambient particles, capture timing, shrinking after capture, mission pause, and static reduced-motion mode.
+- Synced the iOS wrapper and advanced version 1.01 to build 9 for release.

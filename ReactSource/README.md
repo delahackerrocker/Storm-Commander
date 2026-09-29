@@ -19,6 +19,7 @@ npm.cmd run test
 - You always command the orange Pirate fleet against one opposing faction.
 - Every new match opens with two radio transmissions: your Pirate commander slides in from the right with the objective, then an opposing commander slides in from the left with a taunt. Each stays for five seconds; tap anywhere or press Enter/Space/Escape to dismiss earlier.
 - Transmissions use written dialogue, saved commander portraits, and synthesized radio chirps. `Sound on/off` mutes all game effects, during the radio exchange or from the battle controls. There is no spoken voice track.
+- The battlefield uses irregularly scattered stars with varied depth and brightness. Occasional asteroids and space junk drift in with the stars at roughly one-quarter to one-half ship size, shrinking away within about two to three seconds. Destroyed ships shed fragments that follow the same drift and recession. Motion pauses for radio/mission overlays and hidden tabs; reduced-motion mode keeps the starfield still.
 - Captures play a short arcade laser volley followed by a crunchy ship-destruction burst, synchronized with the attack and explosion animations for both fleets. Ordinary movement stays quiet.
 - The board and enemy AI wait until both transmissions have left. Select a Pirate ship, then a highlighted destination to move or capture.
 - A faction-colored turn notice reads “Your move commander!” or “Enemy is moving!”. It sits below the board on desktop; on touch layouts it blinks over the board and hides when you touch the game area, reappearing on the next turn.

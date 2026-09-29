@@ -1,3 +1,4 @@
+import { StormSpaceField } from './StormSpaceField'
 import { BOARD_SQUARES } from '../chess/squareUtils'
 import {
   getStormChessMoveAnimationStyle,
@@ -6,16 +7,6 @@ import {
 import { ChessPiece } from './ChessPiece'
 import { ChessSquare } from './ChessSquare'
 
-const STORM_STARFIELD_LAYERS = [
-  ['nebula', null],
-  ['far', 'far'],
-  ['dust', 'dust'],
-  ['mid', 'mid'],
-  ['near', 'near'],
-  ['asteroid-far', 'asteroidFar'],
-  ['asteroid-wide', 'asteroidWide'],
-  ['asteroid-near', 'asteroidNear'],
-]
 
 function ChessMoveAnimationLayer({ animation, pieceSet, sidePieceFactions }) {
   if (!animation?.movingPiece) {
@@ -150,15 +141,7 @@ export function ChessBoard({
         >
           {pieceSet === 'storm-commander-png' &&
           (showStarfieldLayers || starfieldLayerStyles) ? (
-            <div className="storm-starfield-layers" aria-hidden="true">
-              {STORM_STARFIELD_LAYERS.map(([layerId, styleId]) => (
-                <span
-                  key={layerId}
-                  className={`storm-starfield-layer storm-starfield-layer-${layerId}`}
-                  style={styleId && starfieldLayerStyles ? starfieldLayerStyles[styleId] : undefined}
-                />
-              ))}
-            </div>
+            <StormSpaceField animation={pendingMoveAnimation} />
           ) : null}
           {BOARD_SQUARES.map((square) => {
             const piece = game.get(square)

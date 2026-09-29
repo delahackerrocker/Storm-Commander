@@ -207,9 +207,9 @@ describe('Storm Commander variant', () => {
     expect(effectsRoot.style.getPropertyValue('--storm-star-mid-x')).toMatch(/px$/)
     expect(effectsRoot.style.getPropertyValue('--storm-star-far-x')).toMatch(/px$/)
     expect(effectsRoot.style.getPropertyValue('--storm-asteroid-near-x')).toMatch(/px$/)
-    expect(document.querySelectorAll('.storm-starfield-layer')).toHaveLength(8)
+    expect(document.querySelector('.storm-space-particles')).toBeInTheDocument()
     expect(document.querySelector('.storm-starfield-layer-streak')).not.toBeInTheDocument()
-    expect(document.querySelector('.storm-starfield-layer-asteroid-near')).toBeInTheDocument()
+    expect(document.querySelector('.storm-starfield-layer-asteroid-near')).not.toBeInTheDocument()
   })
 
   it('keeps starfield transitions aligned to the update cadence', () => {

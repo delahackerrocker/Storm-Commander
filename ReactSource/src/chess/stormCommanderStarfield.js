@@ -173,6 +173,7 @@ export function toStarfieldStyle(starfieldMotion) {
     '--storm-asteroid-far-x': px(starfieldMotion.asteroidFarX),
     '--storm-asteroid-far-y': px(starfieldMotion.asteroidFarY),
     '--storm-piece-rotation': starfieldMotion.pieceRotation,
+    '--storm-drift-speed': `${starfieldMotion.speed}`,
   }
 }
 
