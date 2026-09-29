@@ -104,6 +104,7 @@ describe.each(IOS_DEVICE_VIEWPORTS)('iOS device viewport smoke: $name', (viewpor
       expect(screen.getAllByRole('button')).toHaveLength(2)
 
       await openPage(user, /^Press to Play$/)
+      await user.click(await screen.findByRole('button', { name: 'Press to Begin' }))
       await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
 
       expect(screen.getByRole('grid', { name: /Storm Commander encounter board/i }))

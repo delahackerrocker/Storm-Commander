@@ -48,15 +48,20 @@ describe('title screen and opening radio', () => {
     expect(vi.getTimerCount()).toBe(0)
   })
 
-  it('blocks accidental taps for two seconds from Start, including the 600ms fade', () => {
+  it('shows the intro after the title fade and guards radio input for two seconds after Begin', () => {
     vi.useFakeTimers()
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: 'Press to Play' }))
     tick(600)
+    expect(screen.getByRole('main', { name: 'Pirate fleet introduction' })).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    tick(10000)
+    expect(screen.getByRole('button', { name: 'Press to Begin' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Press to Begin' }))
     const button = screen.getByRole('button', { name: 'Continue transmission' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
-    tick(1399)
+    tick(1999)
     expect(button).toBeDisabled()
     expect(screen.getByRole('dialog', { name: 'Pirate radio transmission' })).toBeInTheDocument()
     tick(1)

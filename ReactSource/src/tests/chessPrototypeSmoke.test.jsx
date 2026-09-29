@@ -6,6 +6,7 @@ import { dismissOpeningRadio } from './radioTestHelpers'
 
 async function openStartMenuPage(user, pageName) {
   await user.click(screen.getByRole('button', { name: pageName }))
+  await user.click(await screen.findByRole('button', { name: 'Press to Begin' }))
   await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
 }
 
@@ -57,6 +58,7 @@ describe('Chess-ish prototype', () => {
     render(<App />)
     await user.tab()
     await user.keyboard('{Enter}')
+    await user.click(await screen.findByRole('button', { name: 'Press to Begin' }))
     await screen.findByRole('dialog', { name: 'Pirate radio transmission' })
     expect(screen.getAllByTestId('storm-encounter-square').length).toBeGreaterThan(0)
     await dismissOpeningRadio(user)

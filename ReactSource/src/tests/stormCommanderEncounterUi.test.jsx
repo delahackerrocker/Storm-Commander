@@ -22,6 +22,7 @@ async function renderRandomEncounterApp(user) {
   const renderResult = render(<App />)
 
   await user.click(screen.getByRole('button', { name: /^Press to Play$/ }))
+  await user.click(await screen.findByRole('button', { name: 'Press to Begin' }))
   await dismissOpeningRadio(user)
   await user.click(screen.getByRole('button', { name: /Mission status/ }))
 

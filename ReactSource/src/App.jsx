@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { IosDevicePreviewPage } from './pages/IosDevicePreviewPage'
 import { StartPage } from './pages/StartPage'
+import { PirateIntroPage } from './pages/PirateIntroPage'
 import { StormCommanderPage } from './pages/StormCommanderPage'
 
 const PAGES = {
+  intro: 'intro',
   start: 'start',
   iosPreview: 'ios-preview',
   randomEncounter: 'random-encounter',
@@ -38,10 +40,14 @@ function App() {
     )
   }
 
-  let page = <StartPage onPlay={(unlockAt) => {
-    setRadioInputUnlockAt(unlockAt)
-    openPage(PAGES.randomEncounter)
-  }} />
+  let page = <StartPage onPlay={() => openPage(PAGES.intro)} />
+
+  if (currentPage === PAGES.intro) {
+    page = <PirateIntroPage onBegin={() => {
+      setRadioInputUnlockAt(Date.now() + 2000)
+      openPage(PAGES.randomEncounter)
+    }} />
+  }
 
   if (currentPage === PAGES.randomEncounter) {
     page = (

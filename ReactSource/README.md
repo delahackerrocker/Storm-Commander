@@ -14,8 +14,8 @@ npm.cmd run test
 
 ## Play
 
-- The title screen crossfades between the four approved faction illustrations every three seconds. Tap anywhere, or focus `Press to Play` and press Enter, to start a random match.
-- Pressing Play fades to black over 0.6 seconds, then opens the radio exchange. Inputs remain locked until two seconds after the original press to prevent accidental skips.
+- The title screen crossfades between the four approved faction illustrations every three seconds. Tap anywhere, or focus `Press to Play` and press Enter, to open the Pirate fleet introduction. Read the briefing, then select `Press to Begin` to start a random match. The introduction places the Pirate commanders beside the text on wide screens and below the centered text on phones.
+- Pressing Play fades to black over 0.6 seconds, then opens the Pirate introduction. Pressing Begin opens the radio exchange, with transmission dismissal locked for two seconds to prevent accidental skips.
 - You always command the orange Pirate fleet against one opposing faction.
 - Random target and extraction missions check every legal Pirate opening move and relocate the objective if it could be completed immediately. Extraction starts on an empty edge square. Capture-value goals scale with the enemy fleet (75–90% of its value, rounded up, with a minimum greater than any single ship).
 - Enemy commanders favor captures but also check your immediate reply, avoiding obvious losing trades and protecting against an immediate mission win. Similar choices remain randomized for variety.

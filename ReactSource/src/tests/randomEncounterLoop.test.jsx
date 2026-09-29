@@ -59,6 +59,7 @@ describe('random encounter loop', () => {
     render(<App />)
 
     await user.click(screen.getByRole('button', { name: /^Press to Play$/ }))
+    await user.click(await screen.findByRole('button', { name: 'Press to Begin' }))
 
     const resultDialog = await screen.findByRole('dialog', { name: /^Objective Succeeded$/ })
     expect(within(resultDialog).getByText('Victory: objective complete.')).toBeInTheDocument()

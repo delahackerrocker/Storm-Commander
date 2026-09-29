@@ -1,0 +1,98 @@
+.pirate-intro {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  color: #f3ead9;
+  background: radial-gradient(ellipse at 24% 65%, #512711 0%, #1d1512 35%, #090c10 72%);
+  border-top: 4px solid #ed792e;
+}
+
+.pirate-intro-layout {
+  width: min(1440px, 100%);
+  margin: auto;
+  padding: max(40px, env(safe-area-inset-top)) max(48px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: clamp(24px, 4vw, 72px);
+}
+
+.pirate-intro-copy {
+  grid-column: 2;
+  grid-row: 1;
+  max-width: 560px;
+}
+
+.pirate-intro-copy h1 {
+  margin: 0 0 28px;
+  font-size: clamp(30px, 3.2vw, 48px);
+  font-weight: 850;
+  line-height: 1.13;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.pirate-intro-copy p {
+  margin: 0 0 20px;
+  color: #cfc6b9;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.65;
+}
+
+.pirate-intro-copy .pirate-intro-question {
+  color: #f3ead9;
+  font-weight: 750;
+}
+
+.pirate-intro-begin {
+  min-height: 56px;
+  margin-top: 8px;
+  padding: 14px 30px;
+  border: 1px solid #ffad67;
+  border-radius: 4px;
+  color: #170e08;
+  background: #f08a40;
+  font-weight: 800;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.pirate-intro-begin:hover { background: #ffad67; }
+.pirate-intro-begin:focus-visible { outline: 3px solid #fff4df; outline-offset: 5px; }
+
+.pirate-intro-crew {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+}
+
+.pirate-intro-crew img {
+  position: absolute;
+  width: 76%;
+  height: auto;
+}
+
+.pirate-intro-prank { left: -8%; bottom: 0; }
+.pirate-intro-lilith { right: -5%; bottom: 0; }
+
+@media (max-width: 700px) {
+  .pirate-intro { align-items: start; }
+  .pirate-intro-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: max(28px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(24px, env(safe-area-inset-left));
+  }
+  .pirate-intro-copy { grid-column: 1; text-align: center; margin: auto; }
+  .pirate-intro-copy h1 { font-size: clamp(27px, 7.2vw, 38px); margin-bottom: 18px; }
+  .pirate-intro-copy p { font-size: 16px; line-height: 1.55; margin-bottom: 14px; }
+  .pirate-intro-begin { min-height: 50px; margin-top: 4px; font-size: 17px; }
+  .pirate-intro-crew { grid-row: 2; width: min(100%, 420px); margin: auto; aspect-ratio: 1.35; }
+  .pirate-intro-crew img { width: 66%; }
+  .pirate-intro-prank { left: -2%; }
+  .pirate-intro-lilith { right: -2%; }
+}
