@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { DIFFICULTY_OPTIONS } from '../difficulty/difficultySettings'
+import { DEFAULT_DIFFICULTY, DIFFICULTY_OPTIONS } from '../difficulty/difficultySettings'
 import { chooseDifficulty, useDifficultySettings } from '../difficulty/useDifficultySettings'
 
 export function DifficultyDialog({ onClose, duringMatch = false }) {
@@ -29,7 +29,7 @@ export function DifficultyDialog({ onClose, duringMatch = false }) {
           <label key={option.id} className={`storm-difficulty-option${settings.mode === option.id ? ' is-selected' : ''}`}>
             <input type="radio" name="difficulty" value={option.id} checked={settings.mode === option.id}
               onChange={() => chooseDifficulty(option.id)} aria-describedby={`difficulty-${option.id}-description`} />
-            <span><strong>{option.name}{option.id === 'standard' ? <small>DEFAULT</small> : null}</strong>
+            <span><strong>{option.name}{option.id === DEFAULT_DIFFICULTY.mode ? <small>DEFAULT</small> : null}</strong>
               <span id={`difficulty-${option.id}-description`}>{option.description}</span></span>
           </label>
         ))}

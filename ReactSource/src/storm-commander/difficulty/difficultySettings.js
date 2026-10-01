@@ -2,13 +2,13 @@ import { getInitialCommsPiece } from '../comms/openingRadio'
 import { getStormCommanderHeroForPiece } from '../heroes/heroProfiles'
 
 export const DIFFICULTY_OPTIONS = [
-  { id: 'standard', name: 'Standard', description: 'A steady challenge. Our default enemy skill.' },
+  { id: 'standard', name: 'Standard', description: 'A steady challenge with consistent enemy skill.' },
   { id: 'commanders', name: 'Commander Styles', description: 'Distinct commanders. Rebels are gentler; Imperials are tougher. Tactics fit the mission.' },
   { id: 'adaptive', name: 'Adaptive', description: 'Commander styles that gently get harder as you win and ease off when you lose.' },
 ]
 export const MAX_ADAPTIVE_LEVEL = 8
 export const DIFFICULTY_STORAGE_KEY = 'storm-commander-difficulty-v1'
-export const DEFAULT_DIFFICULTY = { mode: 'standard', level: 0, completedIds: [] }
+export const DEFAULT_DIFFICULTY = { mode: 'adaptive', level: 0, completedIds: [] }
 
 // Authored once per character; never rerolled when a ship moves or is destroyed.
 export const COMMANDER_STYLES = {
@@ -24,7 +24,7 @@ export const COMMANDER_STYLES = {
 
 export function normalizeDifficulty(value) {
   return {
-    mode: DIFFICULTY_OPTIONS.some(option => option.id === value?.mode) ? value.mode : 'standard',
+    mode: DIFFICULTY_OPTIONS.some(option => option.id === value?.mode) ? value.mode : DEFAULT_DIFFICULTY.mode,
     level: Number.isFinite(value?.level) ? Math.max(0, Math.min(MAX_ADAPTIVE_LEVEL, Math.floor(value.level))) : 0,
     completedIds: Array.isArray(value?.completedIds) ? value.completedIds.filter(id => typeof id === 'string').slice(-32) : [],
   }

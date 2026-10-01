@@ -1,5 +1,11 @@
 # Worklog So Far
 
+## 2026-10-01 — Adaptive Difficulty Default
+
+- Made Adaptive, the third difficulty option, the default for new players and invalid/missing settings. Moved the default badge and preserved valid saved choices.
+- Validation: all 159 tests, lint, and production build pass. Updated the mission briefing assertion for Adaptive.
+- Release: deployed the web update and verified the live Adaptive default, saved Standard preference, and JavaScript/CSS hashes. Synced iOS version 1.01 build 15; signed archive passed and all 92 bundled files matched the mobile build. App Store Connect confirmed upload success and package processing for TestFlight.
+
 ## 2026-09-29 — Clearer Unit Identification
 
 - Follow-up: reshaped all four Knight variants with a wide short stern, medium-width fuselage, asymmetric east-facing L nose, and contrasting eye sensor. Kept angular mechanical armor and three engines. Regenerated faction/legacy Knight assets, refreshed the art cache version, inspected the fleet preview, and passed alpha validation and production build.

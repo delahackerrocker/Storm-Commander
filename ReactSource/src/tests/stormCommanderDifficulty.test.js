@@ -11,8 +11,8 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('saved difficulty and gentle adaptation', () => {
-  it('defaults to Standard and safely repairs invalid saved settings', () => {
-    expect(getDifficultySettings()).toEqual(DEFAULT_DIFFICULTY)
+  it('defaults to Adaptive and safely repairs invalid saved settings', () => {
+    expect(getDifficultySettings()).toEqual({ mode: 'adaptive', level: 0, completedIds: [] })
     expect(normalizeDifficulty({ mode: 'nightmare', level: Infinity, completedIds: null })).toEqual(DEFAULT_DIFFICULTY)
     expect(normalizeDifficulty({ level: 99 }).level).toBe(8)
     expect(normalizeDifficulty({ level: -3 }).level).toBe(0)
